@@ -1,0 +1,38 @@
+<script src="js/top_navbar_all.js"></script>
+
+<nav class="navbar navbar-dark fixed-top navbar-expand-xl flex-md-nowrap p-0" style="background-color:#1E284A">
+
+	<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://github.com/liulab-dfci/TRUST4">Immune Repertoire</a>
+	<div class="container-fluid">
+
+		<ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+
+			<li class="nav-item active">
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary"> <span id="chosen_sample">Choose sample</span> </button>
+					<button type="button" id="dropdown_samples" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<div class="dropdown-menu active" id="dropdown-populate">
+						<a class="dropdown-item" href="index.html">All</a>
+						<div class="dropdown-divider"></div>
+ 						<input class="form-control dropdown-item" id="searchSamples" type="text" placeholder="Sample Search">
+					</div>
+			</li>
+
+			<li class="nav-item active">
+					<a id="sample_info" class="nav-link nav-a" href="index.html" style="font-size: 1rem">Information</a>
+				</li>
+			<li class="nav-item active">
+				<a id="segment_usage" class="nav-link nav-a" href="segment_usage.html?Sample=All" style="font-size: 1rem">Segment Usage</a>
+			</li>
+			<li class="nav-item active">
+				<a id="cdr3_length" class="nav-link nav-a" href="cdr3_length.html?Sample=All" style="font-size: 1rem">CDR3</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link nav-a" href="cohort_analysis.html" style="font-size: 1rem">Cohort Analysis</a>
+			</li>
+		</ul>
+	</div>
+</nav>

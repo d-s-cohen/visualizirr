@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script src="js/load_sections.js"></script>
+  <script src="js/populate.js"></script>
+  <script src="js/functions.js"></script>
+
+  <title>Trust</title>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+
+</head>
+
+<body>
+
+  <div id="fix-for-navbar-fixed-top-spacing" style="height: 40px;">&nbsp;</div>
+  <div id="top_navbar"></div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar collapse bd-links">
+        <div class="sidebar-sticky" style="padding-top: 1rem">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="show_all()" style="font-size: 1rem">Show All</a>
+              <ul>
+                <li class="nav-item">
+                  <a class="nav-link" href="#TCR" onclick="hide_others('#TCR')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TCR</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#BCR" onclick="hide_others('#BCR')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">BCR</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#PCA" onclick="hide_others('#PCA')"
+                      style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">PCA</a>
+                  </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4" style="margin-bottom: 6rem;margin-top: 1rem;">
+        <!-- Mutation bar  -->
+        <div
+          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Cohort Analysis</h1>
+        </div>
+        <!-- Mutation sub bar1  -->
+        <div class="content_row" id="content_tcr">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TCR Richness and Eveness</h2>
+          <div class="row">
+            <div class="col text-center">
+              <h3 class="h5" style="text-align:center">TCR Richness</h3>
+              <a href="cohort/TCR_richness.png"><img src="cohort/TCR_richness.png" width="653" height="383"
+                  ></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-center">
+              <h3 class="h5" style="text-align:center">TCR Evenness</h3>
+              <a href="cohort/TCR_evenness.png"><img src="cohort/TCR_evenness.png" width="653" height="383"
+                  ></a>
+            </div>
+          </div>
+        </div>
+        <!-- Mutation sub bar2  -->
+        <div class="content_row" id="content_bcr">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">BCR Richness and Eveness</h2>
+          <div class="row">
+            <div class="col text-center">
+              <h3 class="h5" style="text-align:center">BCR richness</h3>
+              <a href="cohort/BCR_richness.png"><img src="cohort/BCR_richness.png" width="653" height="383"
+                  ></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-center">
+              <h3 class="h5" style="text-align:center">BCR evenness</h3>
+              <a href="cohort/BCR_evenness.png"><img src="cohort/BCR_evenness.png" width="653" height="383"
+                  ></a>
+            </div>
+          </div>
+        </div>
+        <div class="content_row" id="content_pca">
+            <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Principal Component Analysis</h2>
+            <div class="row">
+              <div class="col text-center">
+                <a href="cohort/naive0_PCA.png"><img src="cohort/naive0_PCA.png" width="469" height="425"
+                    ></a>
+                    <a href="cohort/naive1_PCA.png"><img src="cohort/naive1_PCA.png" width="469" height="425"
+                      ></a>
+                      <a href="cohort/BCR_evenness.png"><img src="cohort/all_sample_PCA.png" width="469" height="425"
+                        ></a>
+              </div>
+            </div>
+          </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+  <title>Trust</title>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script src="js/load_sections.js"></script>
+  <script src="js/populate.js"></script>
+  <script src="js/functions.js"></script>
+
+</head>
+
+<body>
+  <div id="fix-for-navbar-fixed-top-spacing" style="height: 40px;">&nbsp;</div>
+  <div id="top_navbar"></div>
+
+  <div class="container-fluid">
+    <div class="row">
+
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar collapse bd-links">
+        <div class="sidebar-sticky" style="padding-top: 1rem">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="show_all()" style="font-size: 1rem">Show All</a>
+              <ul>
+                <li class="nav-item">
+                  <a class="nav-link" href="#TRA" onclick="hide_others('#TRA')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRA</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#TRB" onclick="hide_others('#TRB')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRB</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#TRG" onclick="hide_others('#TRG')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRG</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#TRD" onclick="hide_others('#TRD')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRD</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#IGH" onclick="hide_others('#IGH')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGH</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#IGL" onclick="hide_others('#IGL')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGL</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#IGK" onclick="hide_others('#IGK')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGK</a>
+                </li>
+              </ul>
+            </li>
+
+          </ul>
+        </div>
+      </nav>
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4" style="margin-bottom: 6rem;margin-top: 1rem;">
+
+        <div
+          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">CDR3 length</h1>
+        </div>
+
+        <!-- TRA  -->
+        <div class="content_row" id="content_tra" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TRA</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="TRA/cdr3aaLength.png" class="imageLink"><img src="TRA/cdr3aaLength.png"
+                  class="imageEmbed" width="510" height="270"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="TRA/fancyspectra.png" class="imageLink"><img src="TRA/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRB  -->
+        <div class="content_row" id="content_trb" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TRB</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="TRB/cdr3aaLength.png" class="imageLink"><img src="TRB/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="TRB/fancyspectra.png" class="imageLink"><img src="TRB/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRG -->
+        <div class="content_row" id="content_trg" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TRG</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="TRG/cdr3aaLength.png" class="imageLink"><img src="TRG/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="TRG/fancyspectra.png" class="imageLink"><img src="TRG/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRD -->
+        <div class="content_row" id="content_trd" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TRD</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="TRD/cdr3aaLength.png" class="imageLink"><img src="TRD/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="TRD/fancyspectra.png" class="imageLink"><img src="TRD/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- IGH -->
+        <div class="content_row" id="content_igh" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">IGH</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="IGH/cdr3aaLength.png" class="imageLink"><img src="IGH/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="IGH/fancyspectra.png" class="imageLink"><img src="IGH/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- IGL -->
+        <div class="content_row" id="content_igl" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">IGL</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="IGL/cdr3aaLength.png" class="imageLink"><img src="IGL/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="IGL/fancyspectra.png" class="imageLink"><img src="IGL/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- IGK -->
+        <div class="content_row" id="content_igk" style="display:none;">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">IGK</h2>
+          <div class="row">
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 amino acids length</h3>
+              <a href="IGK/cdr3aaLength.png" class="imageLink"><img src="IGK/cdr3aaLength.png" width="510" height="270"
+                  class="imageEmbed"></a>
+            </div>
+            <div class="col-6 text-center">
+              <h3 class="h5">CDR3 nucleotides length</h3>
+              <a href="IGK/fancyspectra.png" class="imageLink"><img src="IGK/fancyspectra.png" width="510" height="270" class="imageEmbed"></a>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+</body>
+
+</html>
