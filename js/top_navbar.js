@@ -1,51 +1,50 @@
 function getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+	name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+	var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+	var results = regex.exec(location.search);
+	return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
 var current_pathname = $(location).attr('pathname');
 
-jQuery.get("cohort/sample_list.csv", function(data) {
+$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + "?sample=All" + location.hash + '">All</a>');
+
+jQuery.get("data/sample_list.csv", function (data) {
 	var lines = data.split("\n");
-	for(var i = 0; i < lines.length; i++) {
-		$('#dropdown-populate').append('<a class="sampleSelect dropdown-item" id="'+lines[i]+ '" href="' + current_pathname + "?sample=" + lines[i] + location.hash +'">'+lines[i]+'</a>');
-	 }
- });
-
-//var current_pathname = $(location).attr('pathname');
-//$('.sampleSelect').attr("href", function() {return current_pathname + "?sample=" + $(this).attr("id") + location.hash});
-
-$(document).ready( function() {	
-
-	document.getElementById("sample_info").setAttribute("href","sample_info.html?sample="+current_sample);
-	document.getElementById("segment_usage").setAttribute("href","segment_usage.html?sample="+current_sample+location.hash);
-	document.getElementById("cdr3_length").setAttribute("href","cdr3_length.html?sample="+current_sample+location.hash);
-
-}) ;		
-
-	var name = getUrlParameter( 'sample' ) ;
-	if ( name == '' )
-	{
-		jQuery.get("cohort/sample_list.csv", function(data) {
-			var lines = data.split("\n");
-		$('#chosen_sample').text( lines[0] ) ;
-	});
+	for (var i = 0; i < lines.length; i++) {
+		$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + location.hash + '">' + lines[i] + '</a>');
 	}
-	else
-	{
-		$('#chosen_sample').text( name ) ;
+});
+
+$(document).ready(function () {
+	document.getElementById("info").setAttribute("href", "index.html?sample=" + current_sample);
+	document.getElementById("segment_usage").setAttribute("href", "segment_usage.html?sample=" + current_sample + location.hash);
+	document.getElementById("cdr3_length").setAttribute("href", "cdr3_length.html?sample=" + current_sample + location.hash);
+	
+	if (current_sample == "All") {
+		document.getElementById("cohort_analysis").setAttribute("class", "nav-link nav-a");
+		document.getElementById("cohort_analysis").parentElement.setAttribute("class", "nav-item active");
 	}
 
-$('#myDropdown').on('show.bs.dropdown', function () {
-	// do something…
-  })
+});
+
+var name = getUrlParameter('sample');
+
+if (name == '') {
+	$('#chosen_sample').text('All');
+}
+else {
+	$('#chosen_sample').text(name);
+}
+
+//$('#myDropdown').on('show.bs.dropdown', function () {
+//	// do something…
+//  })
 
 $(document).ready(function () {
 	$("#searchSamples").on("keyup", function () {
 		var value = $(this).val().toLowerCase();
-		$(".sampleSelect").filter(function () {
+		$(".sampleSearch").filter(function () {
 			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
 		});
 	});

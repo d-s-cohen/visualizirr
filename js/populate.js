@@ -1,79 +1,35 @@
-
-if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'sample_info.html', 'cdr3_length.html']) >= 0) {
-	var current_sample = $(location).attr('search').split('=').pop();
-	if (current_sample == "") {
-		jQuery.get("cohort/sample_list.csv", function(data) {
-			var lines = data.split("\n");
-			current_sample = lines[0];
-	});
-	}
+var current_sample = $(location).attr('search').split('=').pop();
+if (current_sample == "") {
+	current_sample = "All";
 }
 
 if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
-	$(document).ready( function() {	
-		if (current_sample == "") {
-			jQuery.get("cohort/sample_list.csv", function(data) {
-				var lines = data.split("\n");
-				current_sample = lines[0];
-				$('.imageLink').attr("href", function() {return "samples/" + current_sample + "/" + $(this).attr("href")});
-				$('.imageEmbed').attr("src", function() {return "samples/" + current_sample + "/" + $(this).attr("src")});
-				$('.pdfEmbed').attr("data", function() {return "samples/" + current_sample + "/" + $(this).attr("data")});
-		});
-	} else {
-		$('.imageLink').attr("href", function() {return "samples/" + current_sample + "/" + $(this).attr("href")});
-		$('.imageEmbed').attr("src", function() {return "samples/" + current_sample + "/" + $(this).attr("src")});
-		$('.pdfEmbed').attr("data", function() {return "samples/" + current_sample + "/" + $(this).attr("data")});
-	}
-	}) ;	
-}
-
-if ($.inArray(window.location.pathname.split('/').pop(), ['sample_info.html']) >= 0) {
-	if (current_sample == "") {
-		jQuery.get("cohort/sample_list.csv", function(data2) {
-			var lines = data2.split("\n");
-			current_sample = lines[0];
-	d3.text("samples/" + current_sample+"/info.csv", function(data) {
-		var parsedCSV = d3.csv.parseRows(data);
-		var container = d3.select("#tableSpace")
-			.selectAll("tr")
-				.data(parsedCSV).enter()
-				.append("tr")
-
-			.selectAll("td")
-				.data(function(d) { return d; }).enter()
-				.append("td")
-				.text(function(d) { return d; });
-			});
+	$(document).ready(function () {
+		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("href") });
+		$('.imageEmbed').attr("src", function () { return "data/" + current_sample + "/" + $(this).attr("src") });
+		$('.pdfEmbed').attr("data", function () { return "data/" + current_sample + "/" + $(this).attr("data") });
 	});
-} else {
-	d3.text("samples/" + current_sample+"/info.csv", function(data) {
-		var parsedCSV = d3.csv.parseRows(data);
-		var container = d3.select("#tableSpace")
-			.selectAll("tr")
-				.data(parsedCSV).enter()
-				.append("tr")
-
-			.selectAll("td")
-				.data(function(d) { return d; }).enter()
-				.append("td")
-				.text(function(d) { return d; });
-	});
-}
 }
 
 if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
-	d3.text("cohort/info.csv", function(data) {
+	$(document).ready(function () {
+		if (current_sample == "All") {
+			$("#info_title").text("Cohort Info");
+		} else {
+			$("#info_title").text("Sample Info");
+		}
+	});
+	d3.text("data/" + current_sample + "/info.csv", function (data) {
 		var parsedCSV = d3.csv.parseRows(data);
 		var container = d3.select("#tableSpace")
 			.selectAll("tr")
-				.data(parsedCSV).enter()
-				.append("tr")
+			.data(parsedCSV).enter()
+			.append("tr")
 
 			.selectAll("td")
-				.data(function(d) { return d; }).enter()
-				.append("td")
-				.text(function(d) { return d; });
-				
+			.data(function (d) { return d; }).enter()
+			.append("td")
+			.text(function (d) { return d; });
 	});
 }
 
@@ -90,12 +46,12 @@ types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
 
 if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
-	$(document).ready( function() {	
-if (location.hash == ""){	
-	$('.content_row').show();
-} else {	
-	$('.content_row').hide();
-	$(types[location.hash]).show();
-	}
-}) ;
+	$(document).ready(function () {
+		if (location.hash == "") {
+			$('.content_row').show();
+		} else {
+			$('.content_row').hide();
+			$(types[location.hash]).show();
+		}
+	});
 }
