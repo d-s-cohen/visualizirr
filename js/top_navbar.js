@@ -7,20 +7,40 @@ function getUrlParameter(name) {
 
 var current_pathname = $(location).attr('pathname');
 
-$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + "?sample=All" + location.hash + '">All</a>');
+if (current_pathname.split('/').pop() == "cohort_analysis.html") {
+	current_pathname = current_pathname.replace(/cohort_analysis.html$/, "index.html");
+}
+
+if ($(location).attr('pathname').split('/').pop() != "cohort_analysis.html") {
+	$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + "?sample=All" + location.hash + '">All</a>');
+} else {
+	$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + '?sample=All">All</a>');
+
+}
 
 jQuery.get("data/sample_list.csv", function (data) {
 	var lines = data.split("\n");
-	for (var i = 0; i < lines.length; i++) {
-		$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + location.hash + '">' + lines[i] + '</a>');
+	if ($(location).attr('pathname').split('/').pop() != "cohort_analysis.html") {
+		for (var i = 0; i < lines.length; i++) {
+			$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + location.hash + '">' + lines[i] + '</a>');
+		}
+	} else {
+		for (var i = 0; i < lines.length; i++) {
+			$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + '">' + lines[i] + '</a>');
+		}
 	}
 });
 
 $(document).ready(function () {
 	document.getElementById("info").setAttribute("href", "index.html?sample=" + current_sample);
-	document.getElementById("segment_usage").setAttribute("href", "segment_usage.html?sample=" + current_sample + location.hash);
-	document.getElementById("cdr3_length").setAttribute("href", "cdr3_length.html?sample=" + current_sample + location.hash);
-	
+	if (window.location.pathname.split('/').pop() != "cohort_analysis.html") {
+		document.getElementById("segment_usage").setAttribute("href", "segment_usage.html?sample=" + current_sample + location.hash);
+		document.getElementById("cdr3_length").setAttribute("href", "cdr3_length.html?sample=" + current_sample + location.hash);
+	} else {
+		document.getElementById("segment_usage").setAttribute("href", "segment_usage.html?sample=" + current_sample);
+		document.getElementById("cdr3_length").setAttribute("href", "cdr3_length.html?sample=" + current_sample);
+	}
+
 	if (current_sample == "All") {
 		document.getElementById("cohort_analysis").setAttribute("class", "nav-link nav-a");
 		document.getElementById("cohort_analysis").parentElement.setAttribute("class", "nav-item active");
