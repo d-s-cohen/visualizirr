@@ -1,9 +1,8 @@
 $(function () {
-	// Wait until navbar is loaded
 	var i = setInterval(function () {
 		if ($('#navBar').length) {
 			clearInterval(i);
-
+			// Wait until navbar is loaded
 			var current_pathname = $(location).attr('pathname');
 			// For cohort_analysis, don't assign URLs in page based off of current pathname
 			if (current_pathname.split('/').pop() == "cohort_analysis.html") {
@@ -14,7 +13,6 @@ $(function () {
 				$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + "?sample=All" + location.hash + '">All</a>');
 			} else {
 				$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + '?sample=All">All</a>');
-
 			}
 			// Populate sample selection based off of sample_list.csv
 			jQuery.get("data/sample_list.csv", function (data) {
