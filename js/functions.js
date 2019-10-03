@@ -1,3 +1,9 @@
+var current_pathname = $(location).attr('pathname');
+// For cohort_analysis, don't assign URLs in page based off of current pathname
+if (current_pathname.split('/').pop() == "cohort_analysis.html") {
+	current_pathname = current_pathname.replace(/cohort_analysis.html$/, "index.html");
+}
+// Show only one section
 function hide_others(fragment) {
 	$('.content_row').hide();
 	$(types[fragment]).show();
@@ -7,7 +13,7 @@ function hide_others(fragment) {
 		$('#segment_usage').attr("href", function () { return "segment_usage.html?sample=" + current_sample + fragment });
 	}
 }
-
+// Show all sections
 function show_all() {
 	$('.content_row').show();
 	if (window.location.pathname.split('/').pop() != "cohort_analysis.html") {

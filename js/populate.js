@@ -1,8 +1,9 @@
+// Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
 if (current_sample == "") {
 	current_sample = "All";
 }
-
+// Populate figures based off of sample ID
 if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
 	$(document).ready(function () {
 		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("href") });
@@ -10,7 +11,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 		$('.pdfEmbed').attr("data", function () { return "data/" + current_sample + "/" + $(this).attr("data") });
 	});
 }
-
+// Populate information table from info.csv
 if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
 	$(document).ready(function () {
 		if (current_sample == "All") {
@@ -32,7 +33,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			.text(function (d) { return d; });
 	});
 }
-
+// Associate location hash with content IDs
 var types = {};
 types['#TRA'] = '#content_tra';
 types['#TRB'] = '#content_trb';
@@ -44,7 +45,7 @@ types['#IGK'] = '#content_igk';
 types['#TCR'] = '#content_tcr';
 types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
-
+// Display section(s) on page based off of location hash in URL
 if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
 	$(document).ready(function () {
 		if (location.hash == "") {
