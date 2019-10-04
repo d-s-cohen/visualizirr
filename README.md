@@ -1,5 +1,6 @@
 Structure of data folder (include in this directory):
 
+```
 data
 ├── All
 │   ├── cohortAnalysis
@@ -36,6 +37,7 @@ data
 │   ├── TRD
 │   └── TRG
 └── sample_list.csv
+```
 
 All IGH, IGK, IGL, TRA, TRB, TRD, and TRG directories (sample level and cohort level) 
 should contain all the files shown under the data>All>IGH directory shown above.
