@@ -8,7 +8,6 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 	$(document).ready(function () {
 		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
 		$('.imageEmbed').attr("src", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
-		$('.pdfEmbed').attr("data", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
 		$("img").on("error", function () {
 			$(this).parent().replaceWith("<p class='p-3'>No Data Shown</p>");
 		});
