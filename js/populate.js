@@ -47,6 +47,8 @@ types['#IGK'] = '#content_igk';
 types['#TCR'] = '#content_tcr';
 types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
+types['#DYN1'] = '#content_dynplot1';
+types['#DYN2'] = '#content_dynplot2';
 // Display section(s) on page based off of location hash in URL
 if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
 	$(document).ready(function () {

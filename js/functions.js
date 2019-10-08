@@ -22,3 +22,8 @@ function show_all() {
 		$('#segment_usage').attr("href", function () { return "segment_usage.html?sample=" + current_sample });
 	}
 }
+// Show class
+function show_class(showclass) {
+	$('.content_row').hide();
+	$(showclass).show();
+}

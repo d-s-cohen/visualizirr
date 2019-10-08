@@ -11,11 +11,13 @@
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
   <script src="lib/js/d3.v3.min.js"></script>
+  <script src="lib/js/plotly-latest.min.js"></script>
 
   <script src="js/load_sections.js"></script>
   <script src="js/populate.js"></script>
   <script src="js/functions.js"></script>
   <script src="js/top_navbar.js"></script>
+  <script src="js/plot.js"></script>
 
   <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
 
@@ -35,6 +37,7 @@
           <ul class="nav flex-column">
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="show_all()" style="font-size: 1rem">Show All</a>
+              <a class="nav-link" href="#STAT" onclick="show_class('.static')" style="font-size: 1rem">Static Plots</a>
               <ul>
                 <li class="nav-item">
                   <a class="nav-link" href="#TCR" onclick="hide_others('#TCR')"
@@ -47,6 +50,17 @@
                 <li class="nav-item">
                   <a class="nav-link" href="#PCA" onclick="hide_others('#PCA')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">PCA</a>
+                </li>
+                </ul>
+                <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
+                <ul>
+                <li class="nav-item">
+                  <a class="nav-link" href="#DYN1" onclick="hide_others('#DYN1')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic Plot 1</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#DYN2" onclick="hide_others('#DYN2')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic Plot 2</a>
                 </li>
               </ul>
             </li>
@@ -62,7 +76,7 @@
         </div>
 
         <!-- TCR  -->
-        <div class="content_row" id="content_tcr">
+        <div class="content_row static" id="content_tcr">
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TCR Richness and Eveness</h2>
           <div class="row">
             <div class="col text-center">
@@ -81,7 +95,7 @@
         </div>
 
         <!-- BCR  -->
-        <div class="content_row" id="content_bcr">
+        <div class="content_row static" id="content_bcr">
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">BCR Richness and Eveness</h2>
           <div class="row">
             <div class="col text-center">
@@ -99,8 +113,8 @@
           </div>
         </div>
 
-        <!-- PCA  -->        
-        <div class="content_row" id="content_pca">
+        <!-- PCA  -->
+        <div class="content_row static" id="content_pca">
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Principal Component Analysis</h2>
           <div class="row">
             <div class="col text-center">
@@ -113,9 +127,28 @@
             </div>
           </div>
         </div>
-        
+
+        <div class="content_row dynamic" id="content_dynplot1">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 1</h2>
+            <div class="col text-center">
+              <div id="plotDiv"></div>
+          </div>
+        </div>
+
+        <div class="content_row dynamic" id="content_dynplot2">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 2</h2>
+            <div class="col text-center">
+              <div id="plotDiv2"></div>
+          </div>
+        </div>
+
       </main>
     </div>
+  </div>
+
+
+  </main>
+  </div>
   </div>
 
   <div id="footer"></div>
