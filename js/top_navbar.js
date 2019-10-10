@@ -26,7 +26,7 @@ $(function () {
 						$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + '">' + lines[i] + '</a>');
 					}
 				}
-			});
+			},dataType='text');
 			// Modify navbar links based off current URL
 			$(document).ready(function () {
 				$("#info").attr("href", "index.html?sample=" + current_sample);
