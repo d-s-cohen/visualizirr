@@ -36,31 +36,31 @@
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="show_all()" style="font-size: 1rem">Show All</a>
               <ul>
-                <li class="nav-item">
+                <li class="nav-item" id="content_tra_nav">
                   <a class="nav-link" href="#TRA" onclick="hide_others('#TRA')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRA</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_trb_nav">
                   <a class="nav-link" href="#TRB" onclick="hide_others('#TRB')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRB</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_trg_nav">
                   <a class="nav-link" href="#TRG" onclick="hide_others('#TRG')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRG</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_trd_nav">
                   <a class="nav-link" href="#TRD" onclick="hide_others('#TRD')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TRD</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_igh_nav">
                   <a class="nav-link" href="#IGH" onclick="hide_others('#IGH')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGH</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_igl_nav">
                   <a class="nav-link" href="#IGL" onclick="hide_others('#IGL')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGL</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_igk_nav">
                   <a class="nav-link" href="#IGK" onclick="hide_others('#IGK')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">IGK</a>
                 </li>
@@ -83,18 +83,18 @@
           <div class="row">
             <div class="col-6 text-center">
               <h3 class="h5">Vgene usage</h3>
-              <a id="TRA/vsumBarplot.png" class="imageLink"><img id="TRA/vsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="TRA/vsumBarplot.png" class="imageLink"><img id="TRA/vsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Jgene usage</h3>
-              <a id="TRA/jsumBarplot.png" class="imageLink"><img id="TRA/jsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="TRA/jsumBarplot.png" class="imageLink"><img id="TRA/jsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJgene usage</h3>
-              <a id="TRA/vjStackBar.png" class="imageLink"><img id="TRA/vjStackBar.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="TRA/vjStackBar.png" class="imageLink"><img id="TRA/vjStackBar.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
@@ -125,8 +125,8 @@
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRB/vjpairHeatmap.png" class="imageLink"><img id="TRB/vjpairHeatmap.png" width="510"
-                  height="510" class="imageEmbed"></a>
+              <a id="TRB/vjpairHeatmap.png" class="imageLink"><img id="TRB/vjpairHeatmap.png" width="510" height="510"
+                  class="imageEmbed"></a>
             </div>
           </div>
         </div>
@@ -152,8 +152,8 @@
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRG/vjpairHeatmap.png" class="imageLink"><img id="TRG/vjpairHeatmap.png" width="510"
-                  height="510" class="imageEmbed"></a>
+              <a id="TRG/vjpairHeatmap.png" class="imageLink"><img id="TRG/vjpairHeatmap.png" width="510" height="510"
+                  class="imageEmbed"></a>
             </div>
           </div>
         </div>
@@ -179,8 +179,8 @@
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRD/vjpairHeatmap.png" class="imageLink"><img id="TRD/vjpairHeatmap.png" width="510"
-                  height="510" class="imageEmbed"></a>
+              <a id="TRD/vjpairHeatmap.png" class="imageLink"><img id="TRD/vjpairHeatmap.png" width="510" height="510"
+                  class="imageEmbed"></a>
             </div>
           </div>
         </div>
@@ -191,18 +191,18 @@
           <div class="row">
             <div class="col-6 text-center">
               <h3 class="h5">Vgene usage</h3>
-              <a id="IGH/vsumBarplot.png" class="imageLink"><img id="IGH/vsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGH/vsumBarplot.png" class="imageLink"><img id="IGH/vsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Jgene usage</h3>
-              <a id="IGH/jsumBarplot.png" class="imageLink"><img id="IGH/jsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGH/jsumBarplot.png" class="imageLink"><img id="IGH/jsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJgene usage</h3>
-              <a id="IGH/vjStackBar.png" class="imageLink"><img id="IGH/vjStackBar.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGH/vjStackBar.png" class="imageLink"><img id="IGH/vjStackBar.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
@@ -218,18 +218,18 @@
           <div class="row">
             <div class="col-6 text-center">
               <h3 class="h5">Vgene usage</h3>
-              <a id="IGL/vsumBarplot.png" class="imageLink"><img id="IGL/vsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGL/vsumBarplot.png" class="imageLink"><img id="IGL/vsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Jgene usage</h3>
-              <a id="IGL/jsumBarplot.png" class="imageLink"><img id="IGL/jsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGL/jsumBarplot.png" class="imageLink"><img id="IGL/jsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJgene usage</h3>
-              <a id="IGL/vjStackBar.png" class="imageLink"><img id="IGL/vjStackBar.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGL/vjStackBar.png" class="imageLink"><img id="IGL/vjStackBar.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
@@ -245,18 +245,18 @@
           <div class="row">
             <div class="col-6 text-center">
               <h3 class="h5">Vgene usage</h3>
-              <a id="IGK/vsumBarplot.png" class="imageLink"><img id="IGK/vsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGK/vsumBarplot.png" class="imageLink"><img id="IGK/vsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Jgene usage</h3>
-              <a id="IGK/jsumBarplot.png" class="imageLink"><img id="IGK/jsumBarplot.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGK/jsumBarplot.png" class="imageLink"><img id="IGK/jsumBarplot.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJgene usage</h3>
-              <a id="IGK/vjStackBar.png" class="imageLink"><img id="IGK/vjStackBar.png" class="imageEmbed"
-                  width="510" height="270"></a>
+              <a id="IGK/vjStackBar.png" class="imageLink"><img id="IGK/vjStackBar.png" class="imageEmbed" width="510"
+                  height="270"></a>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">VJ pairing usage</h3>
