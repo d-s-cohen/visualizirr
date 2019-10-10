@@ -12,6 +12,7 @@ types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
 types['#DYN1'] = '#content_dynplot1';
 types['#DYN2'] = '#content_dynplot2';
+types[''] = 'blank';
 // Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
 if (current_sample == "") {
@@ -22,14 +23,23 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 	$(document).ready(function () {
 		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
 		$('.imageEmbed').attr("src", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
-		$("img").on("error", function () {
-			var remove_id = $(this).parent().parent().parent().parent().attr("id");
-			$(this).parent().parent().remove();
+		$(".imageEmbed").on("error", function () {
+			var remove_id = $(this).closest('.content_row').attr("id");
+			$(this).closest('.col-6').remove();
 			if ($('#' + remove_id).find('img').length == 0) {
 				$('#' + remove_id).remove();
 				$('#' + remove_id + '_nav').remove();
 				if (types[location.hash] == '#' + remove_id) {
 					window.location.replace(window.location.pathname.split('/').pop() + "?sample=" + current_sample);
+				}
+			}
+		});
+		$(".imageEmbed").on("load", function () {
+			var remove_id = $(this).closest('.content_row').attr("id");
+			if ($('#' + remove_id).find('img').length > 0) {
+				$('#' + remove_id + '_nav').show();
+				if ($.inArray(types[location.hash], ['blank', '#' + remove_id]) >= 0) {
+					$('#' + remove_id).show();
 				}
 			}
 		});
@@ -55,16 +65,5 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			.data(function (d) { return d; }).enter()
 			.append("td")
 			.text(function (d) { return d; });
-	});
-}
-// Display section(s) on page based off of location hash in URL
-if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
-	$(document).ready(function () {
-		if (location.hash == "") {
-			$('.content_row').show();
-		} else {
-			$('.content_row').hide();
-			$(types[location.hash]).show();
-		}
 	});
 }
