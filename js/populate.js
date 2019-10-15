@@ -24,22 +24,22 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
 		$('.imageEmbed').attr("src", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
 		$(".imageEmbed").on("error", function () {
-			var remove_id = $(this).closest('.content_row').attr("id");
+			var content_id = $(this).closest('.content_row').attr("id");
 			$(this).closest('.col-6').remove();
-			if ($('#' + remove_id).find('img').length == 0) {
-				$('#' + remove_id).remove();
-				$('#' + remove_id + '_nav').remove();
-				if (types[location.hash] == '#' + remove_id) {
+			if ($('#' + content_id).find('img').length == 0) {
+				$('#' + content_id).remove();
+				$('#' + content_id + '_nav').remove();
+				if (types[location.hash] == '#' + content_id) {
 					window.location.replace(window.location.pathname.split('/').pop() + "?sample=" + current_sample);
 				}
 			}
 		});
 		$(".imageEmbed").on("load", function () {
-			var remove_id = $(this).closest('.content_row').attr("id");
-			if ($('#' + remove_id).find('img').length > 0) {
-				$('#' + remove_id + '_nav').show();
-				if ($.inArray(types[location.hash], ['blank', '#' + remove_id]) >= 0) {
-					$('#' + remove_id).show();
+			var content_id = $(this).closest('.content_row').attr("id");
+			if ($('#' + content_id).find('img').length > 0) {
+				$('#' + content_id + '_nav').show();
+				if ($.inArray(types[location.hash], ['blank', '#' + content_id]) >= 0) {
+					$('#' + content_id).show();
 				}
 			}
 		});
