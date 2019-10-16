@@ -1,3 +1,34 @@
+var tra_pre = [];
+var tra_on = [];
+var trb_pre = [];
+var trb_on = [];
+var trg_pre = [];
+var trg_on = [];
+var trd_pre = [];
+var trd_on = [];
+var igh_pre = [];
+var igh_on = [];
+var igl_pre = [];
+var igl_on = [];
+var igk_pre = [];
+var igk_on = [];
+for (var i = 1; i < 150; i++) {
+  tra_pre.push(Math.random() * 50);
+  tra_on.push(Math.random() * 60);
+  trb_pre.push(Math.random() * 30);
+  trb_on.push(Math.random() * 40);
+  trg_pre.push(Math.random() * 25);
+  trg_on.push(Math.random() * 35);
+  trd_pre.push(Math.random() * 40);
+  trd_on.push(Math.random() * 45);
+  igh_pre.push(Math.random() * 50);
+  igh_on.push(Math.random() * 75);
+  igl_pre.push(Math.random() * 35);
+  igl_on.push(Math.random() * 45);
+  igk_pre.push(Math.random() * 35);
+  igk_on.push(Math.random() * 40);
+}
+
 $(document).ready(function () {
 
   var x = ['Subset 1', 'Subset 1', 'Subset 1', 'Subset 1', 'Subset 1', 'Subset 1',
@@ -240,19 +271,71 @@ $(document).ready(function () {
       }]
     }]
   });
+
+  var trace1 = {
+    x: tra_pre,
+    name: 'Pre-treatment',
+    type: "histogram",
+    opacity: 0.5,
+    marker: {
+      color: 'green',
+    },
+  };
+  var trace2 = {
+    x: tra_on,
+    name: 'Post-treatment',
+    type: "histogram",
+    opacity: 0.6,
+    marker: {
+      color: 'red',
+    },
+  };
+
+  var data = [trace1, trace2];
+  var layout = {
+    barmode: "overlay",
+    title: 'CDR3 Length',
+    yaxis: {
+      title: 'Samples',
+      zeroline: false
+    },
+    xaxis: {
+      title: 'Average CDR3 length'
+    }
+  };
+  Plotly.newPlot("plotDiv3", data, layout);
+
+
   // URL location hash show/hide support
   if (window.location.pathname.split('/').pop() == 'cohort_analysis.html') {
-      if (location.hash == "") {
-        $('.content_row').show();
-      } else if ($.inArray(location.hash, ["#DYN","#STAT"]) >= 0){
-        var classes = {};
-        classes['#DYN'] = '.dynamic';
-        classes['#STAT'] = '.static';
-        $('.content_row').hide();
-        $(classes[location.hash]).show();
-      } else {
-        $('.content_row').hide();
-        $(types[location.hash]).show();
-      }
+    if (location.hash == "") {
+      $('.content_row').show();
+    } else if ($.inArray(location.hash, ["#DYN", "#STAT"]) >= 0) {
+      var classes = {};
+      classes['#DYN'] = '.dynamic';
+      classes['#STAT'] = '.static';
+      $('.content_row').hide();
+      $(classes[location.hash]).show();
+    } else {
+      $('.content_row').hide();
+      $(types[location.hash]).show();
+    }
   }
 });
+
+
+
+function chainChange(a, b, c) {
+  var update = {
+    x: [a]
+  }
+  Plotly.restyle('plotDiv3', update, 0);
+  var update = {
+    x: [b]
+  }
+  Plotly.restyle('plotDiv3', update, 1);
+
+  $("#dropdownChain").text(c);
+
+}
+

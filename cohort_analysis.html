@@ -8,6 +8,7 @@
   <!-- CSS and JS libraries-->
   <link rel="stylesheet" href="lib/css/bootstrap.min.css">
   <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
+  <script src="lib/js/popper.min.js"></script>
   <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
@@ -61,6 +62,10 @@
                   <a class="nav-link" href="#DYN2" onclick="hide_others('#DYN2')"
                     style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic Plot 2</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#DYN3" onclick="hide_others('#DYN3')"
+                      style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic Plot 3</a>
+                  </li>
               </ul>
             </li>
           </ul>
@@ -141,6 +146,31 @@
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content_row dynamic" id="content_dynplot3">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 3</h2>
+          <div class="row">
+            <div class="col text-center">
+              <div id="plotDiv3"></div>
+              <div class="dropdown">
+                  <button type="button" class="btn btn-secondary" disabled>Chain Selection</button>
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  TRA
+                </button>
+                <div class="dropdown-menu" >
+                  <a class="dropdown-item" onclick="chainChange(tra_pre,tra_on,'TRA')">TRA</a>
+                  <a class="dropdown-item" onclick="chainChange(trb_pre,trb_on,'TRB')">TRB</a>
+                  <a class="dropdown-item" onclick="chainChange(trg_pre,trg_on,'TRG')">TRG</a>
+                  <a class="dropdown-item" onclick="chainChange(trd_pre,trd_on,'TRD')">TRD</a>
+                  <a class="dropdown-item" onclick="chainChange(igh_pre,igh_on,'IGH')">IGH</a>
+                  <a class="dropdown-item" onclick="chainChange(igl_pre,igl_on,'IGL')">IGL</a>
+                  <a class="dropdown-item" onclick="chainChange(igk_pre,igk_on,'IGK')">IGK</a>
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>

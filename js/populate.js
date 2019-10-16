@@ -12,6 +12,7 @@ types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
 types['#DYN1'] = '#content_dynplot1';
 types['#DYN2'] = '#content_dynplot2';
+types['#DYN3'] = '#content_dynplot3';
 types[''] = 'blank';
 // Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
