@@ -1,36 +1,48 @@
-<nav class="navbar navbar-dark fixed-top navbar-expand-xl flex-md-nowrap p-0" style="background-color:#1E284A" id="navBar">
+<div id="fix-for-navbar-fixed-top-spacing" style="height: 40px;">&nbsp;</div>
+<nav class="navbar navbar-dark fixed-top navbar-expand-sm lex-md-nowrap p-0" style="background-color:#1E284A"
+	id="navBar">
 
 	<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="index.html">Immune Repertoire</a>
 	<div class="container-fluid">
 
-		<ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+		<div class="collapse navbar-collapse" id="navbar-collapse-1">
 
-			<li class="nav-item active">
-				<div class="btn-group">
-					<button type="button" class="btn btn-primary"> <span id="chosen_sample"></span> </button>
-					<button type="button" id="dropdown_samples" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-						data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<div class="dropdown-menu active" id="dropdown-populate">
-						<div class="dropdown-divider" ></div>
-						<input class="form-control dropdown-item" id="searchSamples" type="text" placeholder="Sample Search"></input>
-					</div>
-					</div>
-			</li>
+			<ul class="navbar-nav flex-sm-row ml-md-auto d-sm-flex">
 
-			<li class="nav-item active">
-				<a id="info" class="nav-link nav-a" style="font-size: 1rem">Information</a>
-			</li>
-			<li class="nav-item active">
-				<a id="segment_usage" class="nav-link nav-a" style="font-size: 1rem">Segment Usage</a>
-			</li>
-			<li class="nav-item active">
-				<a id="cdr3_length" class="nav-link nav-a" style="font-size: 1rem">CDR3</a>
-			</li>
-			<li class="nav-item disabled" id="cohort_analysis_status">
-				<a id="cohort_analysis" class="nav-link nav-a disabled" href="cohort_analysis.html" style="font-size: 1rem">Cohort Analysis</a>
-			</li>
-		</ul>
+				<li class="nav-item active">
+					<div class="btn-group">
+						<button type="button" class="btn btn-primary"> <span id="chosen_sample"></span> </button>
+						<button type="button" id="dropdown_samples"
+							class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">
+							<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu active" id="dropdown-populate">
+							<div class="dropdown-divider"></div>
+							<input class="form-control dropdown-item" id="searchSamples" type="text"
+								placeholder="Sample Search"></input>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item active">
+					<a id="info" class="nav-link nav-a" style="font-size: 1rem">Information</a>
+				</li>
+				<li class="nav-item active">
+					<a id="segment_usage" class="nav-link nav-a" style="font-size: 1rem">Segment Usage</a>
+				</li>
+				<li class="nav-item active">
+					<a id="cdr3_length" class="nav-link nav-a" style="font-size: 1rem">CDR3</a>
+				</li>
+				<li class="nav-item disabled" id="cohort_analysis_status">
+					<a id="cohort_analysis" class="nav-link nav-a disabled" href="cohort_analysis.html"
+						style="font-size: 1rem">Cohort Analysis</a>
+				</li>
+			</ul>
+		</div>
+		<button type="button" class="btn btn-primary btn-sm d-block d-sm-none w-100" data-toggle="collapse"
+			data-target="#navbar-collapse-1">
+			. . .
+		</button>
 	</div>
 </nav>
