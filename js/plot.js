@@ -1,33 +1,163 @@
-var tra_pre = [];
-var tra_on = [];
-var trb_pre = [];
-var trb_on = [];
-var trg_pre = [];
-var trg_on = [];
-var trd_pre = [];
-var trd_on = [];
-var igh_pre = [];
-var igh_on = [];
-var igl_pre = [];
-var igl_on = [];
-var igk_pre = [];
-var igk_on = [];
-for (var i = 1; i < 150; i++) {
-  tra_pre.push(Math.random() * 50);
-  tra_on.push(Math.random() * 60);
-  trb_pre.push(Math.random() * 30);
-  trb_on.push(Math.random() * 40);
-  trg_pre.push(Math.random() * 25);
-  trg_on.push(Math.random() * 35);
-  trd_pre.push(Math.random() * 40);
-  trd_on.push(Math.random() * 45);
-  igh_pre.push(Math.random() * 50);
-  igh_on.push(Math.random() * 75);
-  igl_pre.push(Math.random() * 35);
-  igl_on.push(Math.random() * 45);
-  igk_pre.push(Math.random() * 35);
-  igk_on.push(Math.random() * 40);
+function the_mean(a) {
+  let sum = a.reduce((previous, current) => current += previous);
+  let avg = sum / a.length;
+  return avg;
 }
+
+var cdr3_pre = [];
+var cdr3_post = [];
+var cdr3_pre_x = [];
+var cdr3_post_x = [];
+
+d3.text("data/out/pre.csv", function (data) {
+  var cdr3_list = d3.csv.parseRows(data);
+  for (let i = 0; i < cdr3_list.length; i++) {
+
+    cdr3_pre[i] = [];
+
+    d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+
+      var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+      for (let j = 0; j < entries.length; j++) {
+
+        var wholeline = entries[j].toString();
+
+        if (wholeline.includes('IGL')) {
+          cdr3_pre[i]['IGL'] = cdr3_pre[i]['IGL'] || [];
+          cdr3_pre[i]['IGL'].push(entries[j][7].length);
+        } else if (wholeline.includes('IGK')) {
+          cdr3_pre[i]['IGK'] = cdr3_pre[i]['IGK'] || [];
+          cdr3_pre[i]['IGK'].push(entries[j][7].length);
+        } else if (wholeline.includes('IGH')) {
+          cdr3_pre[i]['IGH'] = cdr3_pre[i]['IGH'] || [];
+          cdr3_pre[i]['IGH'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRB')) {
+          cdr3_pre[i]['TRB'] = cdr3_pre[i]['TRB'] || [];
+          cdr3_pre[i]['TRB'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRA')) {
+          cdr3_pre[i]['TRA'] = cdr3_pre[i]['TRA'] || [];
+          cdr3_pre[i]['TRA'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRG')) {
+          cdr3_pre[i]['TRG'] = cdr3_pre[i]['TRG'] || [];
+          cdr3_pre[i]['TRG'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRD')) {
+          cdr3_pre[i]['TRD'] = cdr3_pre[i]['TRD'] || [];
+          cdr3_pre[i]['TRD'].push(entries[j][7].length);
+        }
+
+        if (j == (entries.length - 1)) {
+          if (typeof cdr3_pre[i]['IGL'] !== 'undefined') {
+          cdr3_pre_x['IGL'] = cdr3_pre_x['IGL'] || [];
+          cdr3_pre_x['IGL'].push(the_mean(cdr3_pre[i]['IGL']));
+          }
+          if (typeof cdr3_pre[i]['IGK'] !== 'undefined') {
+          cdr3_pre_x['IGK'] = cdr3_pre_x['IGK'] || [];
+          cdr3_pre_x['IGK'].push(the_mean(cdr3_pre[i]['IGK']));
+          }
+          if (typeof cdr3_pre[i]['IGH'] !== 'undefined') {
+          cdr3_pre_x['IGH'] = cdr3_pre_x['IGH'] || [];
+          cdr3_pre_x['IGH'].push(the_mean(cdr3_pre[i]['IGH']));
+          }
+          if (typeof cdr3_pre[i]['TRB'] !== 'undefined') {
+          cdr3_pre_x['TRB'] = cdr3_pre_x['TRB'] || [];
+          cdr3_pre_x['TRB'].push(the_mean(cdr3_pre[i]['TRB']));
+          }
+          if (typeof cdr3_pre[i]['TRA'] !== 'undefined') {
+          cdr3_pre_x['TRA'] = cdr3_pre_x['TRA'] || [];
+          cdr3_pre_x['TRA'].push(the_mean(cdr3_pre[i]['TRA']));
+          }
+          if (typeof cdr3_pre[i]['TRG'] !== 'undefined') {
+          cdr3_pre_x['TRG'] = cdr3_pre_x['TRG'] || [];
+          cdr3_pre_x['TRG'].push(the_mean(cdr3_pre[i]['TRG']));
+          }
+          if (typeof cdr3_pre[i]['TRD'] !== 'undefined') {
+          cdr3_pre_x['TRD'] = cdr3_pre_x['TRD'] || [];
+          cdr3_pre_x['TRD'].push(the_mean(cdr3_pre[i]['TRD']));
+          }
+        }
+
+      }
+
+    });
+
+  }
+
+});
+
+d3.text("data/out/post.csv", function (data) {
+  var cdr3_list = d3.csv.parseRows(data);
+  for (let i = 0; i < cdr3_list.length; i++) {
+
+    cdr3_post[i] = [];
+
+    d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+
+      var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+      for (let j = 0; j < entries.length; j++) {
+
+        var wholeline = entries[j].toString();
+
+        if (wholeline.includes('IGL')) {
+          cdr3_post[i]['IGL'] = cdr3_post[i]['IGL'] || [];
+          cdr3_post[i]['IGL'].push(entries[j][7].length);
+        } else if (wholeline.includes('IGK')) {
+          cdr3_post[i]['IGK'] = cdr3_post[i]['IGK'] || [];
+          cdr3_post[i]['IGK'].push(entries[j][7].length);
+        } else if (wholeline.includes('IGH')) {
+          cdr3_post[i]['IGH'] = cdr3_post[i]['IGH'] || [];
+          cdr3_post[i]['IGH'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRB')) {
+          cdr3_post[i]['TRB'] = cdr3_post[i]['TRB'] || [];
+          cdr3_post[i]['TRB'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRA')) {
+          cdr3_post[i]['TRA'] = cdr3_post[i]['TRA'] || [];
+          cdr3_post[i]['TRA'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRG')) {
+          cdr3_post[i]['TRG'] = cdr3_post[i]['TRG'] || [];
+          cdr3_post[i]['TRG'].push(entries[j][7].length);
+        } else if (wholeline.includes('TRD')) {
+          cdr3_post[i]['TRD'] = cdr3_post[i]['TRD'] || [];
+          cdr3_post[i]['TRD'].push(entries[j][7].length);
+        }
+
+        if (j == (entries.length - 1)) {
+          if (typeof cdr3_post[i]['IGL'] !== 'undefined') {
+          cdr3_post_x['IGL'] = cdr3_post_x['IGL'] || [];
+          cdr3_post_x['IGL'].push(the_mean(cdr3_post[i]['IGL']));
+          }
+          if (typeof cdr3_post[i]['IGK'] !== 'undefined') {
+          cdr3_post_x['IGK'] = cdr3_post_x['IGK'] || [];
+          cdr3_post_x['IGK'].push(the_mean(cdr3_post[i]['IGK']));
+          }
+          if (typeof cdr3_post[i]['IGH'] !== 'undefined') {
+          cdr3_post_x['IGH'] = cdr3_post_x['IGH'] || [];
+          cdr3_post_x['IGH'].push(the_mean(cdr3_post[i]['IGH']));
+          }
+          if (typeof cdr3_post[i]['TRB'] !== 'undefined') {
+          cdr3_post_x['TRB'] = cdr3_post_x['TRB'] || [];
+          cdr3_post_x['TRB'].push(the_mean(cdr3_post[i]['TRB']));
+          }
+          if (typeof cdr3_post[i]['TRA'] !== 'undefined') {
+          cdr3_post_x['TRA'] = cdr3_post_x['TRA'] || [];
+          cdr3_post_x['TRA'].push(the_mean(cdr3_post[i]['TRA']));
+          }
+          if (typeof cdr3_post[i]['TRG'] !== 'undefined') {
+          cdr3_post_x['TRG'] = cdr3_post_x['TRG'] || [];
+          cdr3_post_x['TRG'].push(the_mean(cdr3_post[i]['TRG']));
+          }
+          if (typeof cdr3_post[i]['TRD'] !== 'undefined') {
+          cdr3_post_x['TRD'] = cdr3_post_x['TRD'] || [];
+          cdr3_post_x['TRD'].push(the_mean(cdr3_post[i]['TRD']));
+          }
+        }
+
+      }
+
+    });
+
+  }
+
+});
 
 $(document).ready(function () {
 
@@ -80,21 +210,11 @@ $(document).ready(function () {
       x: 0,
       xanchor: 'left',
       y: 1.2,
-      yanchor: 'top',
-      buttons: [{
-        label: 'Show All',
-        method: 'restyle',
-        args: ['visible', true]
-      }, {
-        label: 'Hide All',
-        method: 'restyle',
-        args: ['visible', 'legendonly']
-      }]
+      yanchor: 'top'
     }]
   };
 
   Plotly.newPlot('plotDiv', data, layout);
-
 
 
 
@@ -259,21 +379,12 @@ $(document).ready(function () {
       x: 0,
       xanchor: 'left',
       y: 1.2,
-      yanchor: 'top',
-      buttons: [{
-        label: 'Show All',
-        method: 'restyle',
-        args: ['visible', true]
-      }, {
-        label: 'Hide All',
-        method: 'restyle',
-        args: ['visible', 'legendonly']
-      }]
+      yanchor: 'top'
     }]
   });
 
   var trace1 = {
-    x: tra_pre,
+    x: cdr3_pre_x['TRA'],
     name: 'Pre-treatment',
     type: "histogram",
     opacity: 0.5,
@@ -282,7 +393,7 @@ $(document).ready(function () {
     },
   };
   var trace2 = {
-    x: tra_on,
+    x: cdr3_post_x['TRA'],
     name: 'Post-treatment',
     type: "histogram",
     opacity: 0.6,
@@ -337,5 +448,12 @@ function chainChange(a, b, c) {
 
   $("#dropdownChain").text(c);
 
+}
+
+function hideOrShow(a, b) {
+  var update = {
+    visible: a
+  }
+  Plotly.restyle(b, update);
 }
 

@@ -20,7 +20,7 @@
   <script src="js/functions.js"></script>
   <script src="js/top_navbar.js"></script>
   <script src="js/plot.js"></script>
-
+  
   <title>Trust</title>
 
 </head>
@@ -140,6 +140,10 @@
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv"></div>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv')">Show All</button>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv')">Hide All</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save PNG</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save SVG</button>
             </div>
           </div>
         </div>
@@ -149,6 +153,10 @@
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv2"></div>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv2')">Show All</button>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv2')">Hide All</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv2, {format: 'png', width: 1600, height: 1200, filename: 'dynplot2'});">Save PNG</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv2, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot2'});">Save SVG</button>
             </div>
           </div>
         </div>
@@ -159,22 +167,22 @@
             <div class="col text-center">
               <div id="plotDiv3"></div>
               <div class="dropdown">
-                <button type="button" class="btn btn-secondary" disabled>Chain Selection</button>
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
                   aria-haspopup="true" aria-expanded="false">
-                  TRA
+                  Select Chain
                 </button>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" onclick="chainChange(tra_pre,tra_on,'TRA')">TRA</a>
-                  <a class="dropdown-item" onclick="chainChange(trb_pre,trb_on,'TRB')">TRB</a>
-                  <a class="dropdown-item" onclick="chainChange(trg_pre,trg_on,'TRG')">TRG</a>
-                  <a class="dropdown-item" onclick="chainChange(trd_pre,trd_on,'TRD')">TRD</a>
-                  <a class="dropdown-item" onclick="chainChange(igh_pre,igh_on,'IGH')">IGH</a>
-                  <a class="dropdown-item" onclick="chainChange(igl_pre,igl_on,'IGL')">IGL</a>
-                  <a class="dropdown-item" onclick="chainChange(igk_pre,igk_on,'IGK')">IGK</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRA'],cdr3_post_x['TRA'],'TRA')">TRA</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRB'],cdr3_post_x['TRB'],'TRB')">TRB</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRG'],cdr3_post_x['TRG'],'TRG')">TRG</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRD'],cdr3_post_x['TRA'],'TRD')">TRD</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGH'],cdr3_post_x['IGH'],'IGH')">IGH</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGL'],cdr3_post_x['IGL'],'IGL')">IGL</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGK'],cdr3_post_x['IGK'],'IGK')">IGK</a>
                 </div>
-              </div>
-
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'dynplot3'});">Save PNG</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot3'});">Save SVG</button>
+            </div>
             </div>
           </div>
         </div>
