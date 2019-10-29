@@ -6,14 +6,12 @@ function the_mean(a) {
 
 var cdr3_pre = [];
 var cdr3_post = [];
-var cdr3_pre_x = [];
-var cdr3_post_x = [];
 
 d3.text("data/out/pre.csv", function (data) {
   var cdr3_list = d3.csv.parseRows(data);
   for (let i = 0; i < cdr3_list.length; i++) {
 
-    cdr3_pre[i] = [];
+    cdr3_pre = [];
 
     d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
 
@@ -21,58 +19,42 @@ d3.text("data/out/pre.csv", function (data) {
       for (let j = 0; j < entries.length; j++) {
 
         var wholeline = entries[j].toString();
+        var count = Math.round(entries[j][9])
 
         if (wholeline.includes('IGL')) {
-          cdr3_pre[i]['IGL'] = cdr3_pre[i]['IGL'] || [];
-          cdr3_pre[i]['IGL'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['IGL'] = cdr3_pre['IGL'] || [];
+          cdr3_pre['IGL'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('IGK')) {
-          cdr3_pre[i]['IGK'] = cdr3_pre[i]['IGK'] || [];
-          cdr3_pre[i]['IGK'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['IGK'] = cdr3_pre['IGK'] || [];
+          cdr3_pre['IGK'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('IGH')) {
-          cdr3_pre[i]['IGH'] = cdr3_pre[i]['IGH'] || [];
-          cdr3_pre[i]['IGH'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['IGH'] = cdr3_pre['IGH'] || [];
+          cdr3_pre['IGH'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRB')) {
-          cdr3_pre[i]['TRB'] = cdr3_pre[i]['TRB'] || [];
-          cdr3_pre[i]['TRB'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['TRB'] = cdr3_pre['TRB'] || [];
+          cdr3_pre['TRB'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRA')) {
-          cdr3_pre[i]['TRA'] = cdr3_pre[i]['TRA'] || [];
-          cdr3_pre[i]['TRA'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['TRA'] = cdr3_pre['TRA'] || [];
+          cdr3_pre['TRA'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRG')) {
-          cdr3_pre[i]['TRG'] = cdr3_pre[i]['TRG'] || [];
-          cdr3_pre[i]['TRG'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['TRG'] = cdr3_pre['TRG'] || [];
+          cdr3_pre['TRG'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRD')) {
-          cdr3_pre[i]['TRD'] = cdr3_pre[i]['TRD'] || [];
-          cdr3_pre[i]['TRD'].push(entries[j][7].length);
-        }
-
-        if (j == (entries.length - 1)) {
-          if (typeof cdr3_pre[i]['IGL'] !== 'undefined') {
-          cdr3_pre_x['IGL'] = cdr3_pre_x['IGL'] || [];
-          cdr3_pre_x['IGL'].push(the_mean(cdr3_pre[i]['IGL']));
-          }
-          if (typeof cdr3_pre[i]['IGK'] !== 'undefined') {
-          cdr3_pre_x['IGK'] = cdr3_pre_x['IGK'] || [];
-          cdr3_pre_x['IGK'].push(the_mean(cdr3_pre[i]['IGK']));
-          }
-          if (typeof cdr3_pre[i]['IGH'] !== 'undefined') {
-          cdr3_pre_x['IGH'] = cdr3_pre_x['IGH'] || [];
-          cdr3_pre_x['IGH'].push(the_mean(cdr3_pre[i]['IGH']));
-          }
-          if (typeof cdr3_pre[i]['TRB'] !== 'undefined') {
-          cdr3_pre_x['TRB'] = cdr3_pre_x['TRB'] || [];
-          cdr3_pre_x['TRB'].push(the_mean(cdr3_pre[i]['TRB']));
-          }
-          if (typeof cdr3_pre[i]['TRA'] !== 'undefined') {
-          cdr3_pre_x['TRA'] = cdr3_pre_x['TRA'] || [];
-          cdr3_pre_x['TRA'].push(the_mean(cdr3_pre[i]['TRA']));
-          }
-          if (typeof cdr3_pre[i]['TRG'] !== 'undefined') {
-          cdr3_pre_x['TRG'] = cdr3_pre_x['TRG'] || [];
-          cdr3_pre_x['TRG'].push(the_mean(cdr3_pre[i]['TRG']));
-          }
-          if (typeof cdr3_pre[i]['TRD'] !== 'undefined') {
-          cdr3_pre_x['TRD'] = cdr3_pre_x['TRD'] || [];
-          cdr3_pre_x['TRD'].push(the_mean(cdr3_pre[i]['TRD']));
+          for (l = 0; l < count; l++) { 
+          cdr3_pre['TRD'] = cdr3_pre['TRD'] || [];
+          cdr3_pre['TRD'].push(entries[j][7].length);
           }
         }
 
@@ -88,7 +70,7 @@ d3.text("data/out/post.csv", function (data) {
   var cdr3_list = d3.csv.parseRows(data);
   for (let i = 0; i < cdr3_list.length; i++) {
 
-    cdr3_post[i] = [];
+    cdr3_post = [];
 
     d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
 
@@ -96,60 +78,45 @@ d3.text("data/out/post.csv", function (data) {
       for (let j = 0; j < entries.length; j++) {
 
         var wholeline = entries[j].toString();
+        var count = Math.round(entries[j][9])
 
         if (wholeline.includes('IGL')) {
-          cdr3_post[i]['IGL'] = cdr3_post[i]['IGL'] || [];
-          cdr3_post[i]['IGL'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['IGL'] = cdr3_post['IGL'] || [];
+          cdr3_post['IGL'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('IGK')) {
-          cdr3_post[i]['IGK'] = cdr3_post[i]['IGK'] || [];
-          cdr3_post[i]['IGK'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['IGK'] = cdr3_post['IGK'] || [];
+          cdr3_post['IGK'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('IGH')) {
-          cdr3_post[i]['IGH'] = cdr3_post[i]['IGH'] || [];
-          cdr3_post[i]['IGH'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['IGH'] = cdr3_post['IGH'] || [];
+          cdr3_post['IGH'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRB')) {
-          cdr3_post[i]['TRB'] = cdr3_post[i]['TRB'] || [];
-          cdr3_post[i]['TRB'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['TRB'] = cdr3_post['TRB'] || [];
+          cdr3_post['TRB'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRA')) {
-          cdr3_post[i]['TRA'] = cdr3_post[i]['TRA'] || [];
-          cdr3_post[i]['TRA'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['TRA'] = cdr3_post['TRA'] || [];
+          cdr3_post['TRA'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRG')) {
-          cdr3_post[i]['TRG'] = cdr3_post[i]['TRG'] || [];
-          cdr3_post[i]['TRG'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['TRG'] = cdr3_post['TRG'] || [];
+          cdr3_post['TRG'].push(entries[j][7].length);
+          }
         } else if (wholeline.includes('TRD')) {
-          cdr3_post[i]['TRD'] = cdr3_post[i]['TRD'] || [];
-          cdr3_post[i]['TRD'].push(entries[j][7].length);
+          for (l = 0; l < count; l++) { 
+          cdr3_post['TRD'] = cdr3_post['TRD'] || [];
+          cdr3_post['TRD'].push(entries[j][7].length);
+          }
         }
 
-        if (j == (entries.length - 1)) {
-          if (typeof cdr3_post[i]['IGL'] !== 'undefined') {
-          cdr3_post_x['IGL'] = cdr3_post_x['IGL'] || [];
-          cdr3_post_x['IGL'].push(the_mean(cdr3_post[i]['IGL']));
-          }
-          if (typeof cdr3_post[i]['IGK'] !== 'undefined') {
-          cdr3_post_x['IGK'] = cdr3_post_x['IGK'] || [];
-          cdr3_post_x['IGK'].push(the_mean(cdr3_post[i]['IGK']));
-          }
-          if (typeof cdr3_post[i]['IGH'] !== 'undefined') {
-          cdr3_post_x['IGH'] = cdr3_post_x['IGH'] || [];
-          cdr3_post_x['IGH'].push(the_mean(cdr3_post[i]['IGH']));
-          }
-          if (typeof cdr3_post[i]['TRB'] !== 'undefined') {
-          cdr3_post_x['TRB'] = cdr3_post_x['TRB'] || [];
-          cdr3_post_x['TRB'].push(the_mean(cdr3_post[i]['TRB']));
-          }
-          if (typeof cdr3_post[i]['TRA'] !== 'undefined') {
-          cdr3_post_x['TRA'] = cdr3_post_x['TRA'] || [];
-          cdr3_post_x['TRA'].push(the_mean(cdr3_post[i]['TRA']));
-          }
-          if (typeof cdr3_post[i]['TRG'] !== 'undefined') {
-          cdr3_post_x['TRG'] = cdr3_post_x['TRG'] || [];
-          cdr3_post_x['TRG'].push(the_mean(cdr3_post[i]['TRG']));
-          }
-          if (typeof cdr3_post[i]['TRD'] !== 'undefined') {
-          cdr3_post_x['TRD'] = cdr3_post_x['TRD'] || [];
-          cdr3_post_x['TRD'].push(the_mean(cdr3_post[i]['TRD']));
-          }
-        }
 
       }
 
@@ -384,7 +351,7 @@ $(document).ready(function () {
   });
 
   var trace1 = {
-    x: cdr3_pre_x['TRA'],
+    x: cdr3_pre['TRA'],
     name: 'Pre-treatment',
     type: "histogram",
     opacity: 0.5,
@@ -393,7 +360,7 @@ $(document).ready(function () {
     },
   };
   var trace2 = {
-    x: cdr3_post_x['TRA'],
+    x: cdr3_post['TRA'],
     name: 'Post-treatment',
     type: "histogram",
     opacity: 0.6,
@@ -407,7 +374,7 @@ $(document).ready(function () {
     barmode: "overlay",
     title: 'CDR3 Length',
     yaxis: {
-      title: 'Samples',
+      title: 'CDR3 Quantity',
       zeroline: false
     },
     xaxis: {

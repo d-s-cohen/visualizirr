@@ -64,9 +64,8 @@
                     Plot 2</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#DYN3" onclick="hide_others('#DYN3')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic
-                    Plot 3</a>
+                  <a class="nav-link" href="#CDR3" onclick="hide_others('#CDR3')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">CDR3 Length</a>
                 </li>
               </ul>
             </li>
@@ -161,8 +160,8 @@
           </div>
         </div>
 
-        <div class="content_row dynamic" id="content_dynplot3">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 3</h2>
+        <div class="content_row dynamic" id="content_CDR3">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">CDR3 Length</h2>
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv3"></div>
@@ -172,16 +171,16 @@
                   Select Chain
                 </button>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRA'],cdr3_post_x['TRA'],'TRA')">TRA</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRB'],cdr3_post_x['TRB'],'TRB')">TRB</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRG'],cdr3_post_x['TRG'],'TRG')">TRG</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['TRD'],cdr3_post_x['TRA'],'TRD')">TRD</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGH'],cdr3_post_x['IGH'],'IGH')">IGH</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGL'],cdr3_post_x['IGL'],'IGL')">IGL</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre_x['IGK'],cdr3_post_x['IGK'],'IGK')">IGK</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRA'],cdr3_post['TRA'],'TRA')">TRA</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRB'],cdr3_post['TRB'],'TRB')">TRB</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRG'],cdr3_post['TRG'],'TRG')">TRG</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRD'],cdr3_post['TRA'],'TRD')">TRD</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGH'],cdr3_post['IGH'],'IGH')">IGH</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGL'],cdr3_post['IGL'],'IGL')">IGL</a>
+                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGK'],cdr3_post['IGK'],'IGK')">IGK</a>
                 </div>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'dynplot3'});">Save PNG</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot3'});">Save SVG</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save PNG</button>
+              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save SVG</button>
             </div>
             </div>
           </div>
