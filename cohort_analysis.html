@@ -165,23 +165,44 @@
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv3"></div>
-              <div class="dropdown">
+
+              <div class="dropdown btn-group">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
                   aria-haspopup="true" aria-expanded="false">
                   Select Chain
                 </button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRA'],cdr3_post['TRA'],'TRA')">TRA</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRB'],cdr3_post['TRB'],'TRB')">TRB</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRG'],cdr3_post['TRG'],'TRG')">TRG</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['TRD'],cdr3_post['TRA'],'TRD')">TRD</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGH'],cdr3_post['IGH'],'IGH')">IGH</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGL'],cdr3_post['IGL'],'IGL')">IGL</a>
-                  <a class="dropdown-item" onclick="chainChange(cdr3_pre['IGK'],cdr3_post['IGK'],'IGK')">IGK</a>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;">
+                  <!-- <a class="dropdown-item" onclick="chainChange(cond1_data['TRA'],cond2_data['TRA'],'TRA')">TRA</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRB'],cond2_data['TRB'],'TRB')">TRB</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRG'],cond2_data['TRG'],'TRG')">TRG</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRD'],cond2_data['TRA'],'TRD')">TRD</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGH'],cond2_data['IGH'],'IGH')">IGH</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGL'],cond2_data['IGL'],'IGL')">IGL</a>
+                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGK'],cond2_data['IGK'],'IGK')">IGK</a> -->
+                  <a class="dropdown-item" onclick="chainChange('TRA')">TRA</a>
+                  <a class="dropdown-item" onclick="chainChange('TRB')">TRB</a>
+                  <a class="dropdown-item" onclick="chainChange('TRG')">TRG</a>
+                  <a class="dropdown-item" onclick="chainChange('TRD')">TRD</a>
+                  <a class="dropdown-item" onclick="chainChange('IGH')">IGH</a>
+                  <a class="dropdown-item" onclick="chainChange('IGL')">IGL</a>
+                  <a class="dropdown-item" onclick="chainChange('IGK')">IGK</a>
                 </div>
+              </div>
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  Select Condition
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;">
+                  <a class="dropdown-item" onclick="conditionChange('data/out/pre.csv','data/out/post.csv','Treatment','Pre-treatment','Post-treatment')">Treatment</a>
+                  <a class="dropdown-item" onclick="conditionChange('data/out/0.csv','data/out/1.csv','Gender','0','1')">Gender</a>
+                </div>
+              </div>
+
               <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save PNG</button>
               <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save SVG</button>
-            </div>
+
             </div>
           </div>
         </div>

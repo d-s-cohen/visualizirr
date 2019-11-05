@@ -4,127 +4,111 @@ function the_mean(a) {
   return avg;
 }
 
-var cdr3_pre = [];
-var cdr3_post = [];
+var cond1_data = [];
+var cond2_data = [];
 
-d3.text("data/out/pre.csv", function (data) {
-  var cdr3_list = d3.csv.parseRows(data);
-  for (let i = 0; i < cdr3_list.length; i++) {
+function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
 
-    cdr3_pre = [];
-
-    d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
-
-      var entries = d3.dsv("\t", "text/plain").parseRows(data2);
-      for (let j = 0; j < entries.length; j++) {
-
-        var wholeline = entries[j].toString();
-        var count = Math.round(entries[j][9])
-
-        if (wholeline.includes('IGL')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['IGL'] = cdr3_pre['IGL'] || [];
-          cdr3_pre['IGL'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('IGK')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['IGK'] = cdr3_pre['IGK'] || [];
-          cdr3_pre['IGK'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('IGH')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['IGH'] = cdr3_pre['IGH'] || [];
-          cdr3_pre['IGH'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRB')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['TRB'] = cdr3_pre['TRB'] || [];
-          cdr3_pre['TRB'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRA')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['TRA'] = cdr3_pre['TRA'] || [];
-          cdr3_pre['TRA'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRG')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['TRG'] = cdr3_pre['TRG'] || [];
-          cdr3_pre['TRG'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRD')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_pre['TRD'] = cdr3_pre['TRD'] || [];
-          cdr3_pre['TRD'].push(entries[j][7].length);
-          }
-        }
-
-      }
-
-    });
-
+  if (reload == true) {
+    hideOrShow(false, 'plotDiv3')
   }
 
-});
+  d3.text(cond1_file, function (data) {
+    var cdr3_list = d3.csv.parseRows(data);
+    for (let i = 0; i < cdr3_list.length; i++) {
 
-d3.text("data/out/post.csv", function (data) {
-  var cdr3_list = d3.csv.parseRows(data);
-  for (let i = 0; i < cdr3_list.length; i++) {
+      cond1_data = [];
 
-    cdr3_post = [];
+      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
 
-    d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+        var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+        for (let j = 0; j < entries.length; j++) {
 
-      var entries = d3.dsv("\t", "text/plain").parseRows(data2);
-      for (let j = 0; j < entries.length; j++) {
+          var wholeline = entries[j].toString();
+          var count = Math.round(entries[j][9])
 
-        var wholeline = entries[j].toString();
-        var count = Math.round(entries[j][9])
+          const chains = ['IGL', 'IGK', 'IGH', 'TRB', 'TRA', 'TRG', 'TRD'];
+          for (var i = 0; i < chains.length; i++) {
+            if (wholeline.includes(chains[i])) {
+              cond1_data[chains[i]] = cond1_data[chains[i]] || [];
+              length = entries[j][7].length
+              if (length > 99) {length = 100;}
+              if (typeof cond1_data[chains[i]][length] === 'undefined') {
+                cond1_data[chains[i]][length] = count;
+              } else {
+                cond1_data[chains[i]][length] = cond1_data[chains[i]][length] + count;
+              }
+              break;
+            }
+          }
 
-        if (wholeline.includes('IGL')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['IGL'] = cdr3_post['IGL'] || [];
-          cdr3_post['IGL'].push(entries[j][7].length);
+          if (j == (entries.length - 1)) {
+            if (reload == true) {
+              var update = {
+                x: [Object.keys(cond1_data[currentChain])],
+                y: [Object.values(cond1_data[currentChain])],
+                name: [cond1_name],
+                visible: true
+              }
+              Plotly.restyle('plotDiv3', update, 0);
+            }
           }
-        } else if (wholeline.includes('IGK')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['IGK'] = cdr3_post['IGK'] || [];
-          cdr3_post['IGK'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('IGH')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['IGH'] = cdr3_post['IGH'] || [];
-          cdr3_post['IGH'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRB')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['TRB'] = cdr3_post['TRB'] || [];
-          cdr3_post['TRB'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRA')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['TRA'] = cdr3_post['TRA'] || [];
-          cdr3_post['TRA'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRG')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['TRG'] = cdr3_post['TRG'] || [];
-          cdr3_post['TRG'].push(entries[j][7].length);
-          }
-        } else if (wholeline.includes('TRD')) {
-          for (l = 0; l < count; l++) { 
-          cdr3_post['TRD'] = cdr3_post['TRD'] || [];
-          cdr3_post['TRD'].push(entries[j][7].length);
-          }
+
         }
 
+      });
+    }
+  });
 
-      }
 
-    });
+  d3.text(cond2_file, function (data) {
+    var cdr3_list = d3.csv.parseRows(data);
+    for (let i = 0; i < cdr3_list.length; i++) {
 
-  }
+      cond2_data = [];
 
-});
+      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+
+        var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+        for (let j = 0; j < entries.length; j++) {
+
+          var wholeline = entries[j].toString();
+          var count = Math.round(entries[j][9])
+
+          const chains = ['IGL', 'IGK', 'IGH', 'TRB', 'TRA', 'TRG', 'TRD'];
+          for (var i = 0; i < chains.length; i++) {
+            if (wholeline.includes(chains[i])) {
+              cond2_data[chains[i]] = cond2_data[chains[i]] || [];
+              length = entries[j][7].length
+              if (length > 99) {length = 100;}
+              if (typeof cond2_data[chains[i]][length] === 'undefined') {
+                cond2_data[chains[i]][length] = count;
+              } else {
+                cond2_data[chains[i]][length] = cond2_data[chains[i]][length] + count;
+              }
+              break;
+            }
+          }
+
+          if (j == (entries.length - 1)) {
+            if (reload == true) {
+              var update = {
+                x: [Object.keys(cond2_data[currentChain])],
+                y: [Object.values(cond2_data[currentChain])],
+                name: [cond2_name],
+                visible: true
+              }
+              Plotly.restyle('plotDiv3', update, 1);
+            }
+          }
+
+        }
+
+      });
+
+    }
+  });
+}
 
 $(document).ready(function () {
 
@@ -351,34 +335,46 @@ $(document).ready(function () {
   });
 
   var trace1 = {
-    x: cdr3_pre['TRA'],
+    histfunc: "sum",
     name: 'Pre-treatment',
     type: "histogram",
     opacity: 0.5,
     marker: {
       color: 'green',
     },
+    xbins: {
+      end: 100,
+      size: 5,
+      start: 1
+    }
   };
   var trace2 = {
-    x: cdr3_post['TRA'],
+    histfunc: "sum",
     name: 'Post-treatment',
     type: "histogram",
     opacity: 0.6,
     marker: {
       color: 'red',
     },
+    xbins: {
+      end: 100,
+      size: 5,
+      start: 1
+    }
   };
 
   var data = [trace1, trace2];
   var layout = {
-    barmode: "overlay",
+    barmode: "stack",
     title: 'CDR3 Length',
     yaxis: {
       title: 'CDR3 Quantity',
       zeroline: false
     },
     xaxis: {
-      title: 'Average CDR3 length'
+      title: 'Average CDR3 length',
+      tickvals: [0,10,20,30,40,50,60,70,80,90,100],
+      ticktext: [0,10,20,30,40,50,60,70,80,90,'100+']
     }
   };
   Plotly.newPlot("plotDiv3", data, layout);
@@ -399,21 +395,40 @@ $(document).ready(function () {
       $(types[location.hash]).show();
     }
   }
+
+  data_load("data/out/pre.csv", "data/out/post.csv", true);
+
+  $("#dropdownCondition").text("Treatment");
+
+  $("#dropdownChain").text("TRA");
+
 });
 
+var currentChain = "TRA";
 
-
-function chainChange(a, b, c) {
+function chainChange(a) {
   var update = {
-    x: [a]
+    x: [Object.keys(cond1_data[a])],
+    y: [Object.values(cond1_data[a])],
   }
   Plotly.restyle('plotDiv3', update, 0);
   var update = {
-    x: [b]
+    x: [Object.keys(cond2_data[a])],
+    y: [Object.values(cond2_data[a])],
   }
   Plotly.restyle('plotDiv3', update, 1);
 
-  $("#dropdownChain").text(c);
+  $("#dropdownChain").text(a);
+
+  currentChain = a;
+
+}
+
+function conditionChange(a, b, c, d, e) {
+
+  data_load(a, b, true, d, e);
+
+  $("#dropdownCondition").text(c);
 
 }
 
@@ -423,4 +438,3 @@ function hideOrShow(a, b) {
   }
   Plotly.restyle(b, update);
 }
-
