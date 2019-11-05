@@ -55,8 +55,8 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			$("#info_title").text("Sample Info");
 		}
 	});
-	d3.text("data/" + current_sample + "/info.csv", function (data) {
-		var parsedCSV = d3.csv.parseRows(data);
+	d3.text("data/" + current_sample + "/info.csv").then(function(data) {
+		var parsedCSV = d3.csvParseRows(data);
 		var container = d3.select("#tableSpace")
 			.selectAll("tr")
 			.data(parsedCSV).enter()

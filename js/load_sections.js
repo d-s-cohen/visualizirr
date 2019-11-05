@@ -1,5 +1,4 @@
-// Load header and footer
+// Load header
 $(document).ready(function () {
 	$('#top_navbar').load('html/top_navbar.html');
-	$('#footer').load('html/footer.html');
 });	

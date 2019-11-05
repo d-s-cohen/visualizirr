@@ -7,21 +7,19 @@ function the_mean(a) {
 var cond1_data = [];
 var cond2_data = [];
 
-function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
+function data_load(cond1_file, cond2_file, cond1_name, cond2_name) {
 
-  if (reload == true) {
-    hideOrShow(false, 'plotDiv3')
-  }
+  hideOrShow(false, 'plotDiv3')
 
-  d3.text(cond1_file, function (data) {
-    var cdr3_list = d3.csv.parseRows(data);
+  d3.text(cond1_file).then(function(data) {
+    var cdr3_list = d3.csvParseRows(data);
     for (let i = 0; i < cdr3_list.length; i++) {
 
       cond1_data = [];
 
-      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out").then(function(data2) {
 
-        var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+        var entries = d3.tsvParseRows(data2);
         for (let j = 0; j < entries.length; j++) {
 
           var wholeline = entries[j].toString();
@@ -32,7 +30,7 @@ function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
             if (wholeline.includes(chains[i])) {
               cond1_data[chains[i]] = cond1_data[chains[i]] || [];
               length = entries[j][7].length
-              if (length > 99) {length = 100;}
+              if (length > 99) { length = 100; }
               if (typeof cond1_data[chains[i]][length] === 'undefined') {
                 cond1_data[chains[i]][length] = count;
               } else {
@@ -43,15 +41,13 @@ function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
           }
 
           if (j == (entries.length - 1)) {
-            if (reload == true) {
-              var update = {
-                x: [Object.keys(cond1_data[currentChain])],
-                y: [Object.values(cond1_data[currentChain])],
-                name: [cond1_name],
-                visible: true
-              }
-              Plotly.restyle('plotDiv3', update, 0);
+            var update = {
+              x: [Object.keys(cond1_data[currentChain])],
+              y: [Object.values(cond1_data[currentChain])],
+              name: [cond1_name],
+              visible: true
             }
+            Plotly.restyle('plotDiv3', update, 0);
           }
 
         }
@@ -60,16 +56,16 @@ function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
     }
   });
 
-
-  d3.text(cond2_file, function (data) {
-    var cdr3_list = d3.csv.parseRows(data);
+  d3.text(cond2_file).then(function(data) {
+    var cdr3_list = d3.csvParseRows(data);
     for (let i = 0; i < cdr3_list.length; i++) {
 
       cond2_data = [];
 
-      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out", function (data2) {
+      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out").then(function(data2) {
 
-        var entries = d3.dsv("\t", "text/plain").parseRows(data2);
+        var entries = d3.tsvParseRows(data2);
+
         for (let j = 0; j < entries.length; j++) {
 
           var wholeline = entries[j].toString();
@@ -80,7 +76,7 @@ function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
             if (wholeline.includes(chains[i])) {
               cond2_data[chains[i]] = cond2_data[chains[i]] || [];
               length = entries[j][7].length
-              if (length > 99) {length = 100;}
+              if (length > 99) { length = 100; }
               if (typeof cond2_data[chains[i]][length] === 'undefined') {
                 cond2_data[chains[i]][length] = count;
               } else {
@@ -91,15 +87,13 @@ function data_load(cond1_file, cond2_file, reload, cond1_name, cond2_name) {
           }
 
           if (j == (entries.length - 1)) {
-            if (reload == true) {
-              var update = {
-                x: [Object.keys(cond2_data[currentChain])],
-                y: [Object.values(cond2_data[currentChain])],
-                name: [cond2_name],
-                visible: true
-              }
-              Plotly.restyle('plotDiv3', update, 1);
+            var update = {
+              x: [Object.keys(cond2_data[currentChain])],
+              y: [Object.values(cond2_data[currentChain])],
+              name: [cond2_name],
+              visible: true
             }
+            Plotly.restyle('plotDiv3', update, 1);
           }
 
         }
@@ -373,8 +367,8 @@ $(document).ready(function () {
     },
     xaxis: {
       title: 'Average CDR3 length',
-      tickvals: [0,10,20,30,40,50,60,70,80,90,100],
-      ticktext: [0,10,20,30,40,50,60,70,80,90,'100+']
+      tickvals: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      ticktext: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, '100+']
     }
   };
   Plotly.newPlot("plotDiv3", data, layout);
@@ -396,7 +390,7 @@ $(document).ready(function () {
     }
   }
 
-  data_load("data/out/pre.csv", "data/out/post.csv", true);
+  data_load("data/out/pre.csv", "data/out/post.csv");
 
   $("#dropdownCondition").text("Treatment");
 
@@ -426,7 +420,7 @@ function chainChange(a) {
 
 function conditionChange(a, b, c, d, e) {
 
-  data_load(a, b, true, d, e);
+  data_load(a, b, d, e);
 
   $("#dropdownCondition").text(c);
 

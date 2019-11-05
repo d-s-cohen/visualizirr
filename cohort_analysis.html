@@ -12,7 +12,7 @@
   <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
-  <script src="lib/js/d3.v3.min.js"></script>
+  <script src="lib/js/d3.min.js"></script>
   <script src="lib/js/plotly-latest.min.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <script src="js/load_sections.js"></script>
@@ -20,7 +20,7 @@
   <script src="js/functions.js"></script>
   <script src="js/top_navbar.js"></script>
   <script src="js/plot.js"></script>
-  
+
   <title>Trust</title>
 
 </head>
@@ -65,7 +65,8 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#CDR3" onclick="hide_others('#CDR3')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">CDR3 Length</a>
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">CDR3
+                    Length</a>
                 </li>
               </ul>
             </li>
@@ -88,14 +89,14 @@
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">TCR Richness</h3>
               <a href="data/All/cohortAnalysis/TCR_richness.png"><img src="data/All/cohortAnalysis/TCR_richness.png"
-                  style="max-width:653px;width:100%;"></a>
+                  style="max-width:1024px;width:100%;"></a>
             </div>
           </div>
           <div class="row">
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">TCR Evenness</h3>
               <a href="data/All/cohortAnalysis/TCR_evenness.png"><img src="data/All/cohortAnalysis/TCR_evenness.png"
-                  style="max-width:653px;width:100%;"></a>
+                  style="max-width:1024px;width:100%;"></a>
             </div>
           </div>
         </div>
@@ -105,16 +106,16 @@
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">BCR Richness and Eveness</h2>
           <div class="row">
             <div class="col text-center">
-              <h3 class="h5" style="text-align:center">BCR richness</h3>
+              <h3 class="h5" style="text-align:center">BCR Richness</h3>
               <a href="data/All/cohortAnalysis/BCR_richness.png"><img src="data/All/cohortAnalysis/BCR_richness.png"
-                  style="max-width:653px;width:100%;"></a>
+                  style="max-width:1024px;width:100%;"></a>
             </div>
           </div>
           <div class="row">
             <div class="col text-center">
-              <h3 class="h5" style="text-align:center">BCR evenness</h3>
+              <h3 class="h5" style="text-align:center">BCR Evenness</h3>
               <a href="data/All/cohortAnalysis/BCR_evenness.png"><img src="data/All/cohortAnalysis/BCR_evenness.png"
-                  style="max-width:653px;width:100%;"></a>
+                  style="max-width:1024px;width:100%;"></a>
             </div>
           </div>
         </div>
@@ -140,9 +141,14 @@
             <div class="col text-center">
               <div id="plotDiv"></div>
               <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv')">Show All</button>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv')">Hide All</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save PNG</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save SVG</button>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv')">Hide
+                All</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save
+                SVG</button>
             </div>
           </div>
         </div>
@@ -153,9 +159,14 @@
             <div class="col text-center">
               <div id="plotDiv2"></div>
               <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv2')">Show All</button>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv2')">Hide All</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv2, {format: 'png', width: 1600, height: 1200, filename: 'dynplot2'});">Save PNG</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv2, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot2'});">Save SVG</button>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv2')">Hide
+                All</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv2, {format: 'png', width: 1600, height: 1200, filename: 'dynplot2'});">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv2, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot2'});">Save
+                SVG</button>
             </div>
           </div>
         </div>
@@ -172,13 +183,6 @@
                   Select Chain
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;">
-                  <!-- <a class="dropdown-item" onclick="chainChange(cond1_data['TRA'],cond2_data['TRA'],'TRA')">TRA</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRB'],cond2_data['TRB'],'TRB')">TRB</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRG'],cond2_data['TRG'],'TRG')">TRG</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['TRD'],cond2_data['TRA'],'TRD')">TRD</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGH'],cond2_data['IGH'],'IGH')">IGH</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGL'],cond2_data['IGL'],'IGL')">IGL</a>
-                  <a class="dropdown-item" onclick="chainChange(cond1_data['IGK'],cond2_data['IGK'],'IGK')">IGK</a> -->
                   <a class="dropdown-item" onclick="chainChange('TRA')">TRA</a>
                   <a class="dropdown-item" onclick="chainChange('TRB')">TRB</a>
                   <a class="dropdown-item" onclick="chainChange('TRG')">TRG</a>
@@ -190,18 +194,24 @@
               </div>
 
               <div class="dropdown btn-group">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Condition
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;">
-                  <a class="dropdown-item" onclick="conditionChange('data/out/pre.csv','data/out/post.csv','Treatment','Pre-treatment','Post-treatment')">Treatment</a>
-                  <a class="dropdown-item" onclick="conditionChange('data/out/0.csv','data/out/1.csv','Gender','0','1')">Gender</a>
+                  <a class="dropdown-item"
+                    onclick="conditionChange('data/out/pre.csv','data/out/post.csv','Treatment','Pre-treatment','Post-treatment')">Treatment</a>
+                  <a class="dropdown-item"
+                    onclick="conditionChange('data/out/0.csv','data/out/1.csv','Gender','0','1')">Gender</a>
                 </div>
               </div>
 
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save PNG</button>
-              <button type="button" class="btn btn-success" onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save SVG</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                SVG</button>
 
             </div>
           </div>
@@ -215,8 +225,6 @@
   </main>
   </div>
   </div>
-
-  <div id="footer"></div>
 
 </body>
 
