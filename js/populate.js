@@ -10,8 +10,7 @@ types['#IGK'] = '#content_igk';
 types['#TCR'] = '#content_tcr';
 types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
-types['#DYN1'] = '#content_dynplot1';
-types['#DYN2'] = '#content_dynplot2';
+types['#DIV'] = '#content_diversity';
 types['#CDR3'] = '#content_CDR3';
 types[''] = 'blank';
 // Get current sample value from URL

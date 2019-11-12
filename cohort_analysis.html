@@ -54,14 +54,8 @@
               <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
               <ul>
                 <li class="nav-item">
-                  <a class="nav-link" href="#DYN1" onclick="hide_others('#DYN1')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic
-                    Plot 1</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#DYN2" onclick="hide_others('#DYN2')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Dynamic
-                    Plot 2</a>
+                  <a class="nav-link" href="#DIV" onclick="hide_others('#DIV')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Diversity</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#CDR3" onclick="hide_others('#CDR3')"
@@ -89,14 +83,14 @@
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">TCR Richness</h3>
               <a href="data/All/cohortAnalysis/TCR_richness.png"><img src="data/All/cohortAnalysis/TCR_richness.png"
-                  style="max-width:1024px;width:100%;"></a>
+                  style="width:100%;"></a>
             </div>
           </div>
           <div class="row">
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">TCR Evenness</h3>
               <a href="data/All/cohortAnalysis/TCR_evenness.png"><img src="data/All/cohortAnalysis/TCR_evenness.png"
-                  style="max-width:1024px;width:100%;"></a>
+                  style="width:100%;"></a>
             </div>
           </div>
         </div>
@@ -108,14 +102,14 @@
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">BCR Richness</h3>
               <a href="data/All/cohortAnalysis/BCR_richness.png"><img src="data/All/cohortAnalysis/BCR_richness.png"
-                  style="max-width:1024px;width:100%;"></a>
+                  style="width:100%;"></a>
             </div>
           </div>
           <div class="row">
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">BCR Evenness</h3>
               <a href="data/All/cohortAnalysis/BCR_evenness.png"><img src="data/All/cohortAnalysis/BCR_evenness.png"
-                  style="max-width:1024px;width:100%;"></a>
+                  style="width:100%;"></a>
             </div>
           </div>
         </div>
@@ -129,14 +123,14 @@
                   style="max-width:469px;width:100%;"></a>
               <a href="data/All/cohortAnalysis/naive1_PCA.png"><img src="data/All/cohortAnalysis/naive1_PCA.png"
                   style="max-width:469px;width:100%;"></a>
-              <a href="data/All/cohortAnalysis/BCR_evenness.png"><img src="data/All/cohortAnalysis/all_sample_PCA.png"
+              <a href="data/All/cohortAnalysis/all_sample_PCA.png"><img src="data/All/cohortAnalysis/all_sample_PCA.png"
                   style="max-width:469px;width:100%;"></a>
             </div>
           </div>
         </div>
 
-        <div class="content_row dynamic" id="content_dynplot1">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 1</h2>
+        <div class="content_row dynamic" id="content_diversity">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Diversity</h2>
           <div class="row">
             <div class="col text-center">
               <div id="plotDiv"></div>
@@ -148,24 +142,6 @@
                 PNG</button>
               <button type="button" class="btn btn-success"
                 onclick="Plotly.downloadImage(plotDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save
-                SVG</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="content_row dynamic" id="content_dynplot2">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Dynamic Plot 2</h2>
-          <div class="row">
-            <div class="col text-center">
-              <div id="plotDiv2"></div>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv2')">Show All</button>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv2')">Hide
-                All</button>
-              <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv2, {format: 'png', width: 1600, height: 1200, filename: 'dynplot2'});">Save
-                PNG</button>
-              <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv2, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot2'});">Save
                 SVG</button>
             </div>
           </div>
