@@ -5,7 +5,7 @@ var cond_1 = [];
 var cdr3_length = [];
 var curr_cond = 1;
 var curr_chain = "TRA";
-var curr_func = "avg";
+var curr_func = "sum";
 var functionNames = {
   'sum': 'Sum',
   'avg': 'Average'
@@ -73,7 +73,7 @@ d3.text("data/out/meta.csv").then(function (data) {
               });
 
               cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
-                return (parseFloat(num) + (parseFloat(cdr3_rows[i].slice(2)[idx]) / meta_info[cond_name[k]][cond_0[k]].length));
+                return ((parseFloat(num) + parseFloat(cdr3_rows[i].slice(2)[idx])) / 2);
               });
 
             } else if (meta_info[cond_name[k]][cond_1[k]].includes(cdr3_rows[i][0])) {
@@ -89,7 +89,7 @@ d3.text("data/out/meta.csv").then(function (data) {
               });
 
               cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
-                return (parseFloat(num) + (parseFloat(cdr3_rows[i].slice(2)[idx]) / meta_info[cond_name[k]][cond_1[k]].length));
+                return ((parseFloat(num) + parseFloat(cdr3_rows[i].slice(2)[idx])) / 2);
               });
 
 
