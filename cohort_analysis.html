@@ -133,15 +133,15 @@
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Diversity</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="plotDiv"></div>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'plotDiv')">Show All</button>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','plotDiv')">Hide
+              <div id="diversityDiv"></div>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'diversityDiv')">Show All</button>
+              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','diversityDiv')">Hide
                 All</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save
+                onclick="Plotly.downloadImage(diversityDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save
+                onclick="Plotly.downloadImage(diversityDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save
                 SVG</button>
             </div>
           </div>
@@ -151,7 +151,7 @@
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">CDR3 Length</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="plotDiv3"></div>
+              <div id="cdr3Div"></div>
 
               <div class="dropdown btn-group">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
@@ -159,13 +159,13 @@
                   Select Chain
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;">
-                  <a class="dropdown-item" onclick="chainChange('TRA')">TRA</a>
-                  <a class="dropdown-item" onclick="chainChange('TRB')">TRB</a>
-                  <a class="dropdown-item" onclick="chainChange('TRG')">TRG</a>
-                  <a class="dropdown-item" onclick="chainChange('TRD')">TRD</a>
-                  <a class="dropdown-item" onclick="chainChange('IGH')">IGH</a>
-                  <a class="dropdown-item" onclick="chainChange('IGL')">IGL</a>
-                  <a class="dropdown-item" onclick="chainChange('IGK')">IGK</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRA',undefined)">TRA</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRB',undefined)">TRB</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRG',undefined)">TRG</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRD',undefined)">TRD</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGH',undefined)">IGH</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGL',undefined)">IGL</a>
+                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGK',undefined)">IGK</a>
                 </div>
               </div>
 
@@ -174,19 +174,28 @@
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Condition
                 </button>
-                <div class="dropdown-menu" style="position: relative; z-index: 10000;">
-                  <a class="dropdown-item"
-                    onclick="conditionChange('data/out/pre.csv','data/out/post.csv','Treatment','Pre-treatment','Post-treatment')">Treatment</a>
-                  <a class="dropdown-item"
-                    onclick="conditionChange('data/out/0.csv','data/out/1.csv','Gender','0','1')">Gender</a>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id = "condition_selection">
+                    <!-- <a class="dropdown-item" onclick="dataMorph(1,undefined,undefined)">Treatment</a>
+                    <a class="dropdown-item" onclick="dataMorph(2,undefined,undefined)">Gender</a> -->
                 </div>
               </div>
 
+              <div class="dropdown btn-group">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownFunction"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Function
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;">
+                      <a class="dropdown-item" onclick="dataMorph(undefined,undefined,'avg')">Average</a>
+                      <a class="dropdown-item" onclick="dataMorph(undefined,undefined,'sum')">Sum</a>
+                  </div>
+                </div>
+
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv3, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                onclick="Plotly.downloadImage(cdr3Div, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(plotDiv3, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                onclick="Plotly.downloadImage(cdr3Div, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save
                 SVG</button>
 
             </div>

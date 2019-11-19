@@ -1,115 +1,131 @@
-function the_mean(a) {
-  let sum = a.reduce((previous, current) => current += previous);
-  let avg = sum / a.length;
-  return avg;
-}
+var meta_info = [];
+var cond_name = [];
+var cond_0 = [];
+var cond_1 = [];
+var cdr3_length = [];
+var curr_cond = 1;
+var curr_chain = "TRA";
+var curr_func = "avg";
+var functionNames = {
+  'sum': 'Sum',
+  'avg': 'Average'
+};
 
-var cond1_data = [];
-var cond2_data = [];
+d3.text("data/out/meta.csv").then(function (data) {
 
-function data_load(cond1_file, cond2_file, cond1_name, cond2_name) {
+  var meta_rows = d3.csvParseRows(data);
 
-  hideOrShow(false, 'plotDiv3')
+  var meta_header = meta_rows[0];
 
-  d3.text(cond1_file).then(function (data) {
-    var cdr3_list = d3.csvParseRows(data);
-    for (let i = 0; i < cdr3_list.length; i++) {
+  for (let j = 1; j < meta_rows.length; j++) {
 
-      cond1_data = [];
+    if (j == 1) {
+      for (let j = 1; j < meta_header.length; j++) {
+        // Set up meta info and cdr3 length data structures
+        cond_name[j] = meta_header[j].split("|")[0];
+        cond_0[j] = meta_header[j].split("|")[1];
+        cond_1[j] = meta_header[j].split("|")[2];
+        meta_info[cond_name[j]] = [];
+        meta_info[cond_name[j]][cond_0[j]] = [];
+        meta_info[cond_name[j]][cond_1[j]] = [];
+        cdr3_length[cond_name[j]] = [];
+        cdr3_length[cond_name[j]][cond_0[j]] = [];
+        cdr3_length[cond_name[j]][cond_1[j]] = [];
 
-      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out").then(function (data2) {
-
-        var entries = d3.tsvParseRows(data2);
-        for (let j = 0; j < entries.length; j++) {
-
-          var wholeline = entries[j].toString();
-          var count = Math.round(entries[j][9])
-
-          const chains = ['IGL', 'IGK', 'IGH', 'TRB', 'TRA', 'TRG', 'TRD'];
-          for (var i = 0; i < chains.length; i++) {
-            if (wholeline.includes(chains[i])) {
-              cond1_data[chains[i]] = cond1_data[chains[i]] || [];
-              length = entries[j][7].length
-              if (length > 99) { length = 100; }
-              if (typeof cond1_data[chains[i]][length] === 'undefined') {
-                cond1_data[chains[i]][length] = count;
-              } else {
-                cond1_data[chains[i]][length] = cond1_data[chains[i]][length] + count;
-              }
-              break;
+        if (j == (meta_header.length - 1)) {
+          $(document).ready(function () {
+            for (let k = 1; k < cond_name.length; k++) {
+              $("#condition_selection").append("<a class='dropdown-item' onclick='dataMorph(" + k + ",undefined,undefined)'>" + cond_name[k] + "</a>");
             }
-          }
-
-          if (j == (entries.length - 1)) {
-            var update = {
-              x: [Object.keys(cond1_data[currentChain])],
-              y: [Object.values(cond1_data[currentChain])],
-              name: [cond1_name],
-              visible: true
-            }
-            Plotly.restyle('plotDiv3', update, 0);
-          }
-
+            $("#dropdownCondition").text(cond_name[curr_cond]);
+          });
         }
-
-      });
+      }
     }
-  });
 
-  d3.text(cond2_file).then(function (data) {
-    var cdr3_list = d3.csvParseRows(data);
-    for (let i = 0; i < cdr3_list.length; i++) {
+    for (let i = 1; i < meta_header.length; i++) {
+      // Populate available conditions
+      if (meta_rows[j][i] == "0") {
+        meta_info[cond_name[i]][cond_0[i]].push(meta_rows[j][0]);
+      } else if (meta_rows[j][i] == "1") {
+        meta_info[cond_name[i]][cond_1[i]].push(meta_rows[j][0]);
+      }
+    }
 
-      cond2_data = [];
+    if (j == (meta_rows.length - 1)) {
 
-      d3.text("data/out/TRUST_" + cdr3_list[i][0] + "_cdr3.out").then(function (data2) {
+      d3.text("data/out/cdr3_length.csv").then(function (data) {
 
-        var entries = d3.tsvParseRows(data2);
+        var cdr3_rows = d3.csvParseRows(data);
+        for (let i = 1; i < cdr3_rows.length; i++) {
 
-        for (let j = 0; j < entries.length; j++) {
-
-          var wholeline = entries[j].toString();
-          var count = Math.round(entries[j][9])
-
-          const chains = ['IGL', 'IGK', 'IGH', 'TRB', 'TRA', 'TRG', 'TRD'];
-          for (var i = 0; i < chains.length; i++) {
-            if (wholeline.includes(chains[i])) {
-              cond2_data[chains[i]] = cond2_data[chains[i]] || [];
-              length = entries[j][7].length
-              if (length > 99) { length = 100; }
-              if (typeof cond2_data[chains[i]][length] === 'undefined') {
-                cond2_data[chains[i]][length] = count;
-              } else {
-                cond2_data[chains[i]][length] = cond2_data[chains[i]][length] + count;
+          for (let k = 1; k < cond_name.length; k++) {
+            if (meta_info[cond_name[k]][cond_0[k]].includes(cdr3_rows[i][0])) {
+              // Populate if chain is undefined
+              if (cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] == undefined) {
+                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] = [];
+                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"] = Array(40).fill(0);
+                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"] = Array(40).fill(0);
               }
-              break;
+              // Add to existing numbers
+              cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"].map(function (num, idx) {
+                return parseInt(num) + parseInt(cdr3_rows[i].slice(2)[idx]);
+              });
+
+              cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
+                return ((parseFloat(num) + parseFloat(cdr3_rows[i].slice(2)[idx])) / 2);
+              });
+
+            } else if (meta_info[cond_name[k]][cond_1[k]].includes(cdr3_rows[i][0])) {
+              // Populate if chain is undefined
+              if (cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] == undefined) {
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] = [];
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"] = Array(40).fill(0);
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"] = Array(40).fill(0);
+              }
+              // Add to existing numbers
+              cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"].map(function (num, idx) {
+                return parseInt(num) + parseInt(cdr3_rows[i].slice(2)[idx]);
+              });
+
+              cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
+                return ((parseFloat(num) + parseFloat(cdr3_rows[i].slice(2)[idx])) / 2);
+              });
+
+
+            }
+
+            if (i == (cdr3_rows.length - 1)) {
+              // Update plot with accumulated values
+              var update = {
+                x: [[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120]],
+                y: [cdr3_length[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func]],
+                name: [cond_0[curr_cond]],
+                visible: true
+              }
+              Plotly.restyle('cdr3Div', update, 0);
+              // Update plot with accumulated values
+              var update = {
+                x: [[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120]],
+                y: [cdr3_length[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func]],
+                name: [cond_1[curr_cond]],
+                visible: true
+              }
+              Plotly.restyle('cdr3Div', update, 1);
+
             }
           }
-
-          if (j == (entries.length - 1)) {
-            var update = {
-              x: [Object.keys(cond2_data[currentChain])],
-              y: [Object.values(cond2_data[currentChain])],
-              name: [cond2_name],
-              visible: true
-            }
-            Plotly.restyle('plotDiv3', update, 1);
-          }
-
         }
-
-      });
-
+      })
     }
-  });
-}
+  }
+})
 
 div_pre = []
-
 div_post = []
 
 d3.text("data/out/diversity.csv").then(function (data) {
-
+  // Parse diversity CSV
   var entries = d3.csvParseRows(data);
   for (let j = 1; j < entries.length; j++) {
 
@@ -123,8 +139,8 @@ d3.text("data/out/diversity.csv").then(function (data) {
       var update = {
         visible: true
       }
-      Plotly.restyle('plotDiv', update, 0);
-      Plotly.restyle('plotDiv', update, 1);
+      Plotly.restyle('diversityDiv', update, 0);
+      Plotly.restyle('diversityDiv', update, 1);
     }
 
   }
@@ -171,40 +187,34 @@ $(document).ready(function () {
     }]
   };
 
-  Plotly.newPlot('plotDiv', data, layout);
+  Plotly.newPlot('diversityDiv', data, layout);
 
   var trace1 = {
     histfunc: "sum",
-    name: 'Pre-treatment',
     type: "histogram",
     opacity: 0.5,
     marker: {
       color: 'green',
     },
     xbins: {
-      end: 100,
-      size: 5,
-      start: 1
+      size: 3
     }
   };
   var trace2 = {
     histfunc: "sum",
-    name: 'Post-treatment',
     type: "histogram",
     opacity: 0.6,
     marker: {
       color: 'red',
     },
     xbins: {
-      end: 100,
-      size: 5,
-      start: 1
+      size: 3
     }
   };
 
   var data = [trace1, trace2];
   var layout = {
-    barmode: "stack",
+    barmode: "group",
     title: 'CDR3 Length',
     yaxis: {
       title: 'CDR3 Quantity',
@@ -212,12 +222,11 @@ $(document).ready(function () {
     },
     xaxis: {
       title: 'Average CDR3 length',
-      tickvals: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      ticktext: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, '100+']
+      tickvals: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120],
+      ticktext: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, "120+"]
     }
   };
-  Plotly.newPlot("plotDiv3", data, layout);
-
+  Plotly.newPlot("cdr3Div", data, layout);
 
   // URL location hash show/hide support
   if (window.location.pathname.split('/').pop() == 'cohort_analysis.html') {
@@ -235,42 +244,43 @@ $(document).ready(function () {
     }
   }
 
-  data_load("data/out/pre.csv", "data/out/post.csv");
-
-  $("#dropdownCondition").text("Treatment");
-
-  $("#dropdownChain").text("TRA");
+  $("#dropdownChain").text(curr_chain);
+  $("#dropdownFunction").text(functionNames[curr_func]);
 
 });
 
-var currentChain = "TRA";
-
-function chainChange(a) {
-  var update = {
-    x: [Object.keys(cond1_data[a])],
-    y: [Object.values(cond1_data[a])],
+function dataMorph(cond, chain, func) {
+  // Condition change
+  if (typeof cond != "undefined") {
+    curr_cond = cond;
+    $("#dropdownCondition").text(cond_name[curr_cond]);
   }
-  Plotly.restyle('plotDiv3', update, 0);
-  var update = {
-    x: [Object.keys(cond2_data[a])],
-    y: [Object.values(cond2_data[a])],
+  // Chain change
+  if (typeof chain != "undefined") {
+    curr_chain = chain;
+    $("#dropdownChain").text(curr_chain);
   }
-  Plotly.restyle('plotDiv3', update, 1);
+  if (typeof func != "undefined") {
+    curr_func = func;
+    $("#dropdownFunction").text(functionNames[curr_func]);
+  }
+  // Function change
+  var update = {
+    y: [cdr3_length[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func]],
+    name: [cond_0[curr_cond]],
+    visible: true
+  }
+  Plotly.restyle('cdr3Div', update, 0);
 
-  $("#dropdownChain").text(a);
-
-  currentChain = a;
+  var update = {
+    y: [cdr3_length[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func]],
+    name: [cond_1[curr_cond]],
+    visible: true
+  }
+  Plotly.restyle('cdr3Div', update, 1);
 
 }
-
-function conditionChange(a, b, c, d, e) {
-
-  data_load(a, b, d, e);
-
-  $("#dropdownCondition").text(c);
-
-}
-
+// Make plot visible or invisible
 function hideOrShow(a, b) {
   var update = {
     visible: a
