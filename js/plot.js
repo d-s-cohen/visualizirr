@@ -3,13 +3,10 @@ var cond_name = [];
 var cond_0 = [];
 var cond_1 = [];
 var cdr3_length = [];
+var cdr3_header = [];
 var curr_cond = 1;
 var curr_chain = "TRA";
-var curr_func = "avg";
-var functionNames = {
-  'sum': 'Sum',
-  'avg': 'Average'
-};
+var curr_func = "CDR3 Length";
 
 d3.text("data/out/meta.csv").then(function (data) {
 
@@ -57,48 +54,34 @@ d3.text("data/out/meta.csv").then(function (data) {
       d3.text("data/out/cdr3_length.csv").then(function (data) {
 
         var cdr3_rows = d3.csvParseRows(data);
+
+        cdr3_header = cdr3_rows[0].slice(2);
+
         for (let i = 1; i < cdr3_rows.length; i++) {
 
           for (let k = 1; k < cond_name.length; k++) {
             if (meta_info[cond_name[k]][cond_0[k]].includes(cdr3_rows[i][0])) {
               // Populate if chain is undefined
-              if (cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] == undefined) {
-                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] = [];
-                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"] = Array(40).fill(0);
-                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"] = Array(40).fill(0);
-              }
-              // Add to existing numbers
-              cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["sum"].map(function (num, idx) {
-                return parseInt(num) + parseInt(cdr3_rows[i].slice(2)[idx]);
-              });
-
-              cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
-                return (parseFloat(num) + (parseFloat(cdr3_rows[i].slice(2)[idx]) / meta_info[cond_name[k]][cond_0[k]].length));
-              });
-
+              cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] || [];
+              for (let m = 0; m < cdr3_header.length; m++) {    
+                  cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] || [];
+                  cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m+2])
+            }
             } else if (meta_info[cond_name[k]][cond_1[k]].includes(cdr3_rows[i][0])) {
               // Populate if chain is undefined
               if (cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] == undefined) {
                 cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] = [];
-                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"] = Array(40).fill(0);
-                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"] = Array(40).fill(0);
               }
-              // Add to existing numbers
-              cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["sum"].map(function (num, idx) {
-                return parseInt(num) + parseInt(cdr3_rows[i].slice(2)[idx]);
-              });
-
-              cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]]["avg"].map(function (num, idx) {
-                return (parseFloat(num) + (parseFloat(cdr3_rows[i].slice(2)[idx]) / meta_info[cond_name[k]][cond_1[k]].length));
-              });
-
+              for (let m = 0; m < cdr3_header.length; m++) {    
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]] || [];
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m+2])
+          }
 
             }
 
             if (i == (cdr3_rows.length - 1)) {
               // Update plot with accumulated values
               var update = {
-                x: [[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120]],
                 y: [cdr3_length[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func]],
                 name: [cond_0[curr_cond]],
                 visible: true
@@ -106,7 +89,6 @@ d3.text("data/out/meta.csv").then(function (data) {
               Plotly.restyle('cdr3Div', update, 0);
               // Update plot with accumulated values
               var update = {
-                x: [[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120]],
                 y: [cdr3_length[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func]],
                 name: [cond_1[curr_cond]],
                 visible: true
@@ -115,6 +97,15 @@ d3.text("data/out/meta.csv").then(function (data) {
 
             }
           }
+          if (i == (cdr3_rows.length - 1)) {
+          $(document).ready(function () {
+            for (let n = 0; n < cdr3_header.length; n++) {
+
+              $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined,"+n+")'>" + cdr3_header[n] + "</a>");
+            }
+            $("#dropdownFondition").text(cdr3_header[curr_func]);
+          });
+        }
         }
       })
     }
@@ -190,42 +181,41 @@ $(document).ready(function () {
   Plotly.newPlot('diversityDiv', data, layout);
 
   var trace1 = {
-    histfunc: "sum",
-    type: "histogram",
-    opacity: 0.5,
-    marker: {
-      color: 'green',
-    },
-    xbins: {
-      size: 3
-    }
+    marker: { color: '#3D9970' },
+    type: 'box',
+    boxpoints: 'all'
   };
+
   var trace2 = {
-    histfunc: "sum",
-    type: "histogram",
-    opacity: 0.6,
-    marker: {
-      color: 'red',
-    },
-    xbins: {
-      size: 3
-    }
+    marker: { color: '#FF4136' },
+    type: 'box',
+    boxpoints: 'all'
   };
 
   var data = [trace1, trace2];
+
   var layout = {
-    barmode: "group",
-    title: 'CDR3 Length',
+    title: 'Inter-Cohort Analysis',
     yaxis: {
-      title: 'CDR3 Quantity',
+      title: curr_func,
       zeroline: false
     },
     xaxis: {
-      title: 'CDR3 length (nucleotides)',
-      tickvals: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120],
-      ticktext: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, "120+"]
-    }
+      title: 'Group'
+    },
+    boxmode: 'group',
+    updatemenus: [{
+      direction: 'left',
+      showactive: false,
+      type: 'buttons',
+      x: 0,
+      xanchor: 'left',
+      y: 1.2,
+      yanchor: 'top'
+    }]
   };
+
+
   Plotly.newPlot("cdr3Div", data, layout);
 
   // URL location hash show/hide support
@@ -245,7 +235,7 @@ $(document).ready(function () {
   }
 
   $("#dropdownChain").text(curr_chain);
-  $("#dropdownFunction").text(functionNames[curr_func]);
+  $("#dropdownFunction").text(curr_func);
 
 });
 
@@ -260,11 +250,17 @@ function dataMorph(cond, chain, func) {
     curr_chain = chain;
     $("#dropdownChain").text(curr_chain);
   }
-  if (typeof func != "undefined") {
-    curr_func = func;
-    $("#dropdownFunction").text(functionNames[curr_func]);
-  }
   // Function change
+  if (typeof func != "undefined") {
+    curr_func = cdr3_header[func];
+    $("#dropdownFunction").text(curr_func);
+    var update = {    yaxis: {
+      title: curr_func,
+      zeroline: false
+    },}
+    Plotly.relayout('cdr3Div', update)
+  }
+
   var update = {
     y: [cdr3_length[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func]],
     name: [cond_0[curr_cond]],
