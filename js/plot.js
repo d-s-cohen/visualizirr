@@ -63,19 +63,19 @@ d3.text("data/out/meta.csv").then(function (data) {
             if (meta_info[cond_name[k]][cond_0[k]].includes(cdr3_rows[i][0])) {
               // Populate if chain is undefined
               cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]] || [];
-              for (let m = 0; m < cdr3_header.length; m++) {    
-                  cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] || [];
-                  cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m+2])
-            }
+              for (let m = 0; m < cdr3_header.length; m++) {
+                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] = cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]] || [];
+                cdr3_length[cond_name[k]][cond_0[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m + 2])
+              }
             } else if (meta_info[cond_name[k]][cond_1[k]].includes(cdr3_rows[i][0])) {
               // Populate if chain is undefined
               if (cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] == undefined) {
                 cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]] = [];
               }
-              for (let m = 0; m < cdr3_header.length; m++) {    
+              for (let m = 0; m < cdr3_header.length; m++) {
                 cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]] = cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]] || [];
-                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m+2])
-          }
+                cdr3_length[cond_name[k]][cond_1[k]][cdr3_rows[i][1]][cdr3_header[m]].push(cdr3_rows[i][m + 2])
+              }
 
             }
 
@@ -98,14 +98,14 @@ d3.text("data/out/meta.csv").then(function (data) {
             }
           }
           if (i == (cdr3_rows.length - 1)) {
-          $(document).ready(function () {
-            for (let n = 0; n < cdr3_header.length; n++) {
+            $(document).ready(function () {
+              for (let n = 0; n < cdr3_header.length; n++) {
 
-              $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined,"+n+")'>" + cdr3_header[n] + "</a>");
-            }
-            $("#dropdownFondition").text(cdr3_header[curr_func]);
-          });
-        }
+                $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + cdr3_header[n] + "</a>");
+              }
+              $("#dropdownFondition").text(cdr3_header[curr_func]);
+            });
+          }
         }
       })
     }
@@ -254,10 +254,12 @@ function dataMorph(cond, chain, func) {
   if (typeof func != "undefined") {
     curr_func = cdr3_header[func];
     $("#dropdownFunction").text(curr_func);
-    var update = {    yaxis: {
-      title: curr_func,
-      zeroline: false
-    },}
+    var update = {
+      yaxis: {
+        title: curr_func,
+        zeroline: false
+      },
+    }
     Plotly.relayout('cdr3Div', update)
   }
 
