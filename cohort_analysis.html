@@ -54,13 +54,8 @@
               <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
               <ul>
                 <li class="nav-item">
-                  <a class="nav-link" href="#DIV" onclick="hide_others('#DIV')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Diversity</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#CDR3" onclick="hide_others('#CDR3')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">CDR3
-                    Length</a>
+                  <a class="nav-link" href="#ICA" onclick="hide_others('#ICA')"
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Intracohort Analysis</a>
                 </li>
               </ul>
             </li>
@@ -129,29 +124,11 @@
           </div>
         </div>
 
-        <div class="content_row dynamic" id="content_diversity">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Diversity</h2>
+        <div class="content_row dynamic" id="content_ICA">
+          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Intracohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="diversityDiv"></div>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow(true,'diversityDiv')">Show All</button>
-              <button type="button" class="btn btn-primary" onclick="hideOrShow('legendonly','diversityDiv')">Hide
-                All</button>
-              <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(diversityDiv, {format: 'png', width: 1600, height: 1200, filename: 'dynplot'});">Save
-                PNG</button>
-              <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(diversityDiv, {format: 'svg', width: 1600, height: 1200, filename: 'dynplot'});">Save
-                SVG</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="content_row dynamic" id="content_CDR3">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">CDR3 Length</h2>
-          <div class="row">
-            <div class="col text-center">
-              <div id="cdr3Div"></div>
+              <div id="intracohortDiv"></div>
 
               <div class="dropdown btn-group">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
@@ -186,15 +163,15 @@
                     Select Function
                   </button>
                   <div class="dropdown-menu" style="position: relative; z-index: 10000;" id ="function_selection">
-                      <!-- <a class="dropdown-item" onclick="dataMorph(undefined,undefined,'CDR3 Length')">CDR3 Length</a> -->
+                      <!-- <a class="dropdown-item" onclick="dataMorph(undefined,undefined,'ICA Length')">ICA Length</a> -->
                   </div>
                 </div>
 
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(cdr3Div, {format: 'png', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                onclick="Plotly.downloadImage(intracohortDiv, {format: 'png', width: 1600, height: 1200, filename: 'cohort_analysis'});">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(cdr3Div, {format: 'svg', width: 1600, height: 1200, filename: 'cdrlength'});">Save
+                onclick="Plotly.downloadImage(intracohortDiv, {format: 'svg', width: 1600, height: 1200, filename: 'cohort_analysis'});">Save
                 SVG</button>
 
             </div>

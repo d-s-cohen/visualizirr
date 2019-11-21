@@ -11,7 +11,7 @@ types['#TCR'] = '#content_tcr';
 types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
 types['#DIV'] = '#content_diversity';
-types['#CDR3'] = '#content_CDR3';
+types['#ICA'] = '#content_ICA';
 types[''] = 'blank';
 // Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
