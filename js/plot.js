@@ -4,7 +4,7 @@ var cond_0 = [];
 var cond_1 = [];
 var intracohort_data = [];
 var intracohort_header = [];
-var curr_cond = 1;
+var curr_cond = 0;
 var curr_chain = "TRA";
 var curr_func = "CDR3 Length";
 
@@ -12,12 +12,12 @@ d3.text("data/out/meta.csv").then(function (data) {
 
   var meta_rows = d3.csvParseRows(data);
 
-  var meta_header = meta_rows[0];
+  var meta_header = meta_rows[0].slice(1);
 
   for (let j = 1; j < meta_rows.length; j++) {
 
     if (j == 1) {
-      for (let j = 1; j < meta_header.length; j++) {
+      for (let j = 0; j < meta_header.length; j++) {
         // Set up meta info and intracohort data structures
         cond_name[j] = meta_header[j].split("|")[0];
         cond_0[j] = meta_header[j].split("|")[1];
@@ -31,7 +31,7 @@ d3.text("data/out/meta.csv").then(function (data) {
 
         if (j == (meta_header.length - 1)) {
           $(document).ready(function () {
-            for (let k = 1; k < cond_name.length; k++) {
+            for (let k = 0; k < cond_name.length; k++) {
               $("#condition_selection").append("<a class='dropdown-item' onclick='dataMorph(" + k + ",undefined,undefined)'>" + cond_name[k] + "</a>");
             }
             $("#dropdownCondition").text(cond_name[curr_cond]);
@@ -40,11 +40,11 @@ d3.text("data/out/meta.csv").then(function (data) {
       }
     }
 
-    for (let i = 1; i < meta_header.length; i++) {
+    for (let i = 0; i < meta_header.length; i++) {
       // Populate available conditions
-      if (meta_rows[j][i] == "0") {
+      if (meta_rows[j][i+1] == "0") {
         meta_info[cond_name[i]][cond_0[i]].push(meta_rows[j][0]);
-      } else if (meta_rows[j][i] == "1") {
+      } else if (meta_rows[j][i+1] == "1") {
         meta_info[cond_name[i]][cond_1[i]].push(meta_rows[j][0]);
       }
     }
@@ -59,7 +59,7 @@ d3.text("data/out/meta.csv").then(function (data) {
 
         for (let i = 1; i < intracohort_rows.length; i++) {
 
-          for (let k = 1; k < cond_name.length; k++) {
+          for (let k = 0; k < cond_name.length; k++) {
             if (meta_info[cond_name[k]][cond_0[k]].includes(intracohort_rows[i][0])) {
               // Populate if chain is undefined
               intracohort_data[cond_name[k]][cond_0[k]][intracohort_rows[i][1]] = intracohort_data[cond_name[k]][cond_0[k]][intracohort_rows[i][1]] || [];
@@ -94,6 +94,12 @@ d3.text("data/out/meta.csv").then(function (data) {
                 visible: true
               }
               Plotly.restyle('intracohortDiv', update, 1);
+
+              var update = {
+                title: String("Intracohort Analysis<br><sub>p-value: "+mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func],intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'less')["p"].toFixed(5)+ "</sub>")
+              }
+
+              Plotly.relayout('intracohortDiv', update);
 
             }
           }
@@ -137,7 +143,7 @@ $(document).ready(function () {
     xaxis: {
       title: 'Group'
     },
-    boxmode: 'group',
+    //boxmode: 'group',
     updatemenus: [{
       direction: 'left',
       showactive: false,
@@ -192,7 +198,7 @@ function dataMorph(cond, chain, func) {
       yaxis: {
         title: curr_func,
         zeroline: false
-      },
+      }
     }
     Plotly.relayout('intracohortDiv', update)
   }
@@ -210,6 +216,11 @@ function dataMorph(cond, chain, func) {
     visible: true
   }
   Plotly.restyle('intracohortDiv', update, 1);
+
+  var update = {
+    title: String("Intracohort Analysis<br><sub>p-value: "+mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func],intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'less')["p"].toFixed(5)+ "</sub>")
+  }
+  Plotly.relayout('intracohortDiv', update)
 
 }
 // Make plot visible or invisible
