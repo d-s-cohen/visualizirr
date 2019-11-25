@@ -56,7 +56,8 @@
               <ul>
                 <li class="nav-item">
                   <a class="nav-link" href="#ICA" onclick="hide_others('#ICA')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Intracohort Analysis</a>
+                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Intracohort
+                    Analysis</a>
                 </li>
               </ul>
             </li>
@@ -129,21 +130,15 @@
           <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Intracohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="intracohortDiv"></div>
+              <div id="intracohortDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+                class="d-flex justify-content-center"></div>
 
               <div class="dropdown btn-group">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
                   aria-haspopup="true" aria-expanded="false">
                   Select Chain
                 </button>
-                <div class="dropdown-menu" style="position: relative; z-index: 10000;">
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRA',undefined)">TRA</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRB',undefined)">TRB</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRG',undefined)">TRG</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'TRD',undefined)">TRD</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGH',undefined)">IGH</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGL',undefined)">IGL</a>
-                  <a class="dropdown-item" onclick="dataMorph(undefined,'IGK',undefined)">IGK</a>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection">
                 </div>
               </div>
 
@@ -152,27 +147,33 @@
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Condition
                 </button>
-                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id = "condition_selection">
-                    <!-- <a class="dropdown-item" onclick="dataMorph(1,undefined,undefined)">Treatment</a>
-                    <a class="dropdown-item" onclick="dataMorph(2,undefined,undefined)">Gender</a> -->
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection">
                 </div>
               </div>
 
-              <div class="dropdown btn-group">
-                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownFunction"
+              <div class="dropdown btn-group" id="button2nd_condition" style="display:none;">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdown2ndCondition"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Select Function
+                    Select Secondary Condition
                   </button>
-                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id ="function_selection">
-                      <!-- <a class="dropdown-item" onclick="dataMorph(undefined,undefined,'ICA Length')">ICA Length</a> -->
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition2nd_selection">
                   </div>
                 </div>
 
+              <div class="dropdown btn-group">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownFunction"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select Function
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection">
+                </div>
+              </div>
+
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(intracohortDiv, {format: 'png', width: 1600, height: 1200, filename: 'cohort_analysis'});">Save
+                onclick="Plotly.downloadImage(intracohortDiv, {format: 'png', width: 1200, height: 900, filename: 'cohort_analysis'});">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(intracohortDiv, {format: 'svg', width: 1600, height: 1200, filename: 'cohort_analysis'});">Save
+                onclick="Plotly.downloadImage(intracohortDiv, {format: 'svg', width: 1200, height: 900, filename: 'cohort_analysis'});">Save
                 SVG</button>
 
             </div>
