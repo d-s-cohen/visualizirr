@@ -11,6 +11,9 @@ var condition_2nd_x = [[], []];
 var in_chain = [];
 var curr_cond_2nd = 0;
 var activated_cond_2nd = false;
+var curr_0 = [];
+var curr_1 = [];
+var pval_arrays = [[],[],[],[]];
 
 d3.text("data/meta.csv").then(function (data) {
 
@@ -107,9 +110,20 @@ d3.text("data/meta.csv").then(function (data) {
               Plotly.restyle('intracohortDiv', update, 1);
 
               var update = {
-                title: String("Intracohort Analysis<br><sub>p-value: " + mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func], intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5) + "</sub>")
+                annotations: [{
+                  showarrow: false,
+                  text: "p-value: " + mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func], intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5),
+                  x: 0.5,
+                  xref: 'paper',
+                  y: -.175,
+                  yref: 'paper',
+                  font: {
+                    size: 12,
+                    color: 'black'
+                  }
+                }
+                ]
               }
-
               Plotly.relayout('intracohortDiv', update);
 
             }
@@ -226,9 +240,21 @@ function dataMorph(cond, chain, func) {
   Plotly.restyle('intracohortDiv', update, 1);
 
   var update = {
-    title: String("Intracohort Analysis<br><sub>p-value: " + mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func], intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5) + "</sub>")
+    annotations: [{
+      showarrow: false,
+      text: "p-value: " + mannwhitneyu.test(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func], intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5),
+      x: 0.5,
+      xref: 'paper',
+      y: -.175,
+      yref: 'paper',
+      font: {
+        size: 12,
+        color: 'black'
+      }
+    }
+    ]
   }
-  Plotly.relayout('intracohortDiv', update)
+  Plotly.relayout('intracohortDiv', update);
 
   if (activated_cond_2nd == true) {
     condition_2nd(curr_cond_2nd);
@@ -249,33 +275,70 @@ function condition_2nd(cond_2nd_name) {
 
   activated_cond_2nd = true;
 
-  condition_2nd_x = [[], []];
+  condition_2nd_x = [[],[]];
+
+  pval_arrays = [[],[],[],[]];
 
   var current_sample = [meta_info[cond_name[curr_cond]][cond_0[curr_cond]], meta_info[cond_name[curr_cond]][cond_1[curr_cond]]]
 
+  curr_0 = [];
+  curr_1 = [];
+
   for (let i = 0; i < current_sample.length; i++) {
+    var count  = 0;
     for (let j = 0; j < current_sample[i].length; j++) {
       var sample = current_sample[i][j];
       var chain_included = in_chain[curr_chain].includes(sample);
       if (meta_info[cond_name[cond_2nd_name]][cond_0[cond_2nd_name]].includes(sample) && chain_included) {
+
         condition_2nd_x[i].push(cond_0[cond_2nd_name]);
+
+        if (i == 0) {
+          curr_0.push(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func][count]);
+          pval_arrays[0].push(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func][count]);
+        } else if (i == 1) {
+          curr_1.push(intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func][count]);
+          pval_arrays[1].push(intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func][count]);
+        }
+
       } else if (meta_info[cond_name[cond_2nd_name]][cond_1[cond_2nd_name]].includes(sample) && chain_included) {
+
         condition_2nd_x[i].push(cond_1[cond_2nd_name]);
-      } else if (chain_included) {
-        condition_2nd_x[i].push("Unknown");
+
+        if (i == 0) {
+          curr_0.push(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func][count]);
+          pval_arrays[2].push(intracohort_data[cond_name[curr_cond]][cond_0[curr_cond]][curr_chain][curr_func][count]);
+        } else if (i == 1) {
+          curr_1.push(intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func][count]);
+          pval_arrays[3].push(intracohort_data[cond_name[curr_cond]][cond_1[curr_cond]][curr_chain][curr_func][count]);
+        }
+
+      } else if (chain_included == false) {
+        count = count - 1;
       }
+      count = count + 1;
     }
   }
 
   var update = {
-    x: [condition_2nd_x[0]]
+    x: [condition_2nd_x[0]],
+    y: [curr_0]
   }
   Plotly.restyle('intracohortDiv', update, 0);
   // Update plot with accumulated values
   var update = {
-    x: [condition_2nd_x[1]]
+    x: [condition_2nd_x[1]],
+    y: [curr_1]
   }
   Plotly.restyle('intracohortDiv', update, 1);
+
+  var update = {
+    xaxis: {
+      tickvals: [cond_0[cond_2nd_name],cond_1[cond_2nd_name]],
+      ticktext: [cond_0[cond_2nd_name] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[0],pval_arrays[1], alternative = 'two-sided')["p"].toFixed(5),cond_1[cond_2nd_name] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[2],pval_arrays[3], alternative = 'two-sided')["p"].toFixed(5)]
+    }
+  }
+  Plotly.relayout('intracohortDiv', update)
 
   $("#dropdown2ndCondition").text(cond_name[cond_2nd_name]);
 
