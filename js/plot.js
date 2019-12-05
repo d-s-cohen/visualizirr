@@ -4,8 +4,8 @@ var cond_group = [];
 var ica_data = [];
 var ica_header = [];
 var curr_cond = 0;
-var curr_chain = "TRB";
-var curr_func = "CDR3 Length";
+var curr_chain = "";
+var curr_func = "";
 var condition_2nd_x = [];
 var in_chain = [];
 var curr_cond_2nd = 0;
@@ -93,39 +93,14 @@ d3.text("data/meta.csv").then(function (data) {
                 }
               }
             }
-
-            var data = [];
-            // On last data table row...
+            // On last data table row draw plot
             if (i == (data_rows.length - 1)) {
-              for (let l = 0; l < cond_group[curr_cond].length; l++) {
-                // Update plot with accumulated values
-                var trace = {
-                  y: [ica_data[cond_name[curr_cond]][cond_group[curr_cond][l]][curr_chain][curr_func]],
-                  name: [cond_group[curr_cond][l]],
-                  visible: true,
-                  type: 'box',
-                  boxpoints: 'all'
-                }
-                data.push(trace);
-              }
-
               $(document).ready(function () {
-
-                var layout = {
-                  title: 'Intracohort Analysis',
-                  yaxis: {
-                    title: curr_func,
-                    zeroline: false
-                  },
-                  boxmode: 'group',
-                  xaxis: {
-                    title: "p-value: " + mannwhitneyu.test(ica_data[cond_name[curr_cond]][cond_group[curr_cond][0]][curr_chain][curr_func], ica_data[cond_name[curr_cond]][cond_group[curr_cond][1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5)
-                  }
-                };
-                // Draw plot
-                Plotly.newPlot("intracohortDiv", data, layout);
+                curr_func = ica_header[0];
+                curr_chain = Object.keys(in_chain)[0];
+                $("#dropdownChain").text(curr_chain);
+                $("#dropdownFunction").text(curr_func);
                 dataMorph(undefined, undefined, undefined);
-
               });
             }
           }
@@ -165,10 +140,6 @@ $(document).ready(function () {
       $(types[location.hash]).show();
     }
   }
-
-  $("#dropdownChain").text(curr_chain);
-  $("#dropdownFunction").text(curr_func);
-
 });
 
 function dataMorph(cond, chain, func) {
@@ -192,53 +163,35 @@ function dataMorph(cond, chain, func) {
   if (typeof func != "undefined") {
     curr_func = ica_header[func];
     $("#dropdownFunction").text(curr_func);
-    var update = {
-      yaxis: {
-        title: curr_func,
-        zeroline: false
-      }
-    }
-    Plotly.relayout('intracohortDiv', update)
   }
 
-  // If current amount of traces is less than current condition groups...
-  if (intracohortDiv.data.length < cond_group[curr_cond].length) {
-    // Fill in missing traces
-    var data_length = intracohortDiv.data.length
-    for (let l = data_length; l < cond_group[curr_cond].length; l++) {
-      // Make and add blank trace
-      var trace = {
-        visible: true,
-        type: 'box',
-        boxpoints: 'all'
-      }
-      Plotly.addTraces('intracohortDiv', trace);
-    }
-    // If current amount of traces is greater than current condition groups...
-  } else if (intracohortDiv.data.length > cond_group[curr_cond].length) {
-    var data_length = intracohortDiv.data.length
-    // Remove extra traces
-    for (let l = cond_group[curr_cond].length; l < data_length; l++) {
-      Plotly.deleteTraces('intracohortDiv', cond_group[curr_cond].length);
-    }
-  }
+  var data = [];
 
-  for (let l = 0; l < cond_group[curr_cond].length; l++) {
-    // Populate traces with current condition values
-    var update = {
-      y: [ica_data[cond_name[curr_cond]][cond_group[curr_cond][l]][curr_chain][curr_func]],
-      name: [cond_group[curr_cond][l]],
+  for (let k = 0; k < cond_group[curr_cond].length; k++) {
+    // Populate trace data (Just primary condition data)
+    var trace = {
+      type: 'box',
+      boxpoints: 'all',
+      y: ica_data[cond_name[curr_cond]][cond_group[curr_cond][k]][curr_chain][curr_func],
+      name: cond_group[curr_cond][k],
       visible: true
-    }
-    Plotly.restyle('intracohortDiv', update, l);
+    };
+    data.push(trace);
   }
 
-  var update = {
+  var layout = {
+    title: 'Intracohort Analysis',
+    yaxis: {
+      title: curr_func,
+      zeroline: false
+    },
+    boxmode: 'group',
     xaxis: {
-      title: "p-value: " + mannwhitneyu.test(ica_data[cond_name[curr_cond]][cond_group[curr_cond][0]][curr_chain][curr_func], ica_data[cond_name[curr_cond]][cond_group[curr_cond][1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5)
+      // title: "p-value: " + mannwhitneyu.test(ica_data[cond_name[curr_cond]][cond_group[curr_cond][0]][curr_chain][curr_func], ica_data[cond_name[curr_cond]][cond_group[curr_cond][1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5)
     }
-  }
-  Plotly.relayout('intracohortDiv', update);
+  };
+  // Render plot
+  Plotly.newPlot("intracohortDiv", data, layout);
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
     condition_2nd(curr_cond_2nd);
@@ -341,9 +294,7 @@ function clear_2nd() {
       name: cond_group[curr_cond][k],
       visible: true
     };
-
     data.push(trace)
-
   }
 
   var layout = {
