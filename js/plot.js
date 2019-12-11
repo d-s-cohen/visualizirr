@@ -33,6 +33,17 @@ d3.text("data/meta.csv").then(function (data) {
         ica_data[cond_name[j]] = [];
         cond_group[j] = meta_header[j].split("|").slice(1);
 
+        if (meta_header[j].split("|").slice(1).length == 0) {
+          var group_set = [];
+          for (let k = 1; k < meta_rows.length; k++) {
+            var grouping = meta_rows[k][j + 1];
+            if (grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
+              group_set.push(grouping);
+            }
+          }
+          cond_group[j] = [...new Set(group_set)].sort();
+        }
+
         for (let k = 0; k < cond_group[j].length; k++) {
           ica_meta[cond_name[j]][cond_group[j][k]] = [];
           ica_data[cond_name[j]][cond_group[j][k]] = [];
@@ -66,8 +77,12 @@ d3.text("data/meta.csv").then(function (data) {
     // Populate available conditions
     for (let i = 0; i < meta_header.length; i++) {
       var grouping = meta_rows[j][i + 1];
-      if (isNaN(grouping) == false) {
-        ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
+      if (typeof grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
+        if (meta_header[i].split("|").slice(1).length == 0) {
+          ica_meta[cond_name[i]][grouping].push(meta_rows[j][0]);
+        } else {
+          ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
+        }
       }
     }
     // On last meta table row...
@@ -180,13 +195,6 @@ function dataMorph(cond, chain, func) {
   }
 
 }
-// Make plot visible or invisible
-function hideOrShow(a, b) {
-  var update = {
-    visible: a
-  }
-  Plotly.restyle(b, update);
-}
 
 function condition_2nd(cond_2nd_idx) {
 
@@ -198,14 +206,12 @@ function condition_2nd(cond_2nd_idx) {
   activated_cond_2nd = true;
 
   condition_2nd_x = [];
-
   var curr_sample = [];
   curr_y = [];
 
   if (curr_group.length == 2) {
     pval_arrays = [[], []];
   }
-
   // Loop through groups in current condition and push data for them
   for (let i = 0; i < curr_group.length; i++) {
     curr_sample.push(ica_meta[curr_cond][curr_group[i]]);
@@ -243,7 +249,9 @@ function condition_2nd(cond_2nd_idx) {
 
   if (curr_group.length == 2) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
-      x_text.push(curr_group_2nd[k] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[0][k], pval_arrays[1][k], alternative = 'two-sided')["p"].toFixed(5));
+      if (typeof pval_arrays[0][k] !== 'undefined' && typeof pval_arrays[1][k] !== 'undefined') {
+        x_text.push(curr_group_2nd[k] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[0][k], pval_arrays[1][k], alternative = 'two-sided')["p"].toFixed(5));
+      } else { x_text.push(""); }
     }
   } else { x_text = curr_group_2nd };
 
@@ -310,9 +318,12 @@ function draw_traces() {
     data.push(trace);
     // p-value annotation
     if (k < curr_group.length - 1) {
+      if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
+      var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+      } else { var the_pval = ""; }
       var anno = {
         showarrow: false,
-        text: "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5),
+        text: the_pval,
         x: k + .5,
         xref: 'x',
         y: -.175,
@@ -347,27 +358,35 @@ function draw_traces() {
     if (activated_cond_2nd == false) {
       pval_vis[$(this).parent().index()] = !(pval_vis[$(this).parent().index()]);
       var pvals = [];
-      for (let k = 0; k < pval_vis.length; k++) {
-        if (k < pval_vis.length - 1) {
-          if (pval_vis[k] == true && pval_vis[k + 1] == true) {
-            var anno = {
-              showarrow: false,
-              text: "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5),
-              x: k + .5,
-              xref: 'x',
-              y: -.175,
-              yref: 'paper',
-              font: {
-                size: 12,
-                color: 'black'
-              },
-            }
-            pvals.push(anno);
+      for (let k = 0; k < pval_vis.length - 1; k++) {
+        if (pval_vis[k] == true && pval_vis[k + 1] == true) {
+          if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
+            var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+            } else { var the_pval = ""; }
+          var anno = {
+            showarrow: false,
+            text: the_pval,
+            x: k + .5,
+            xref: 'x',
+            y: -.175,
+            yref: 'paper',
+            font: {
+              size: 12,
+              color: 'black'
+            },
           }
+          pvals.push(anno);
         }
       }
       var update = { annotations: pvals };
       Plotly.relayout('intracohortDiv', update);
     }
   })
+}
+// Make plot visible or invisible
+function hideOrShow(a, b) {
+  var update = {
+    visible: a
+  }
+  Plotly.restyle(b, update);
 }
