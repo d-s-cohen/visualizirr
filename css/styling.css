@@ -1,0 +1,16 @@
+.nav-pad {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.imageEmbed {
+    image-rendering:-webkit-optimize-contrast;
+    width:100%;
+}
+
+h2.h3 {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}

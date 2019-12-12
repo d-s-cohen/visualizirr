@@ -16,6 +16,7 @@
   <script src="lib/js/plotly-latest.min.js"></script>
   <script src="lib/js/mannwhitneyu.js"></script>
   <!-- CSS and JS specifically for HTML report -->
+  <link rel="stylesheet" href="css/styling.css">
   <script src="js/load_sections.js"></script>
   <script src="js/populate.js"></script>
   <script src="js/functions.js"></script>
@@ -40,24 +41,19 @@
               <a class="nav-link" href="#STAT" onclick="show_class('.static')" style="font-size: 1rem">Static Plots</a>
               <ul>
                 <li class="nav-item">
-                  <a class="nav-link" href="#TCR" onclick="hide_others('#TCR')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">TCR</a>
+                  <a class="nav-link nav-pad" href="#TCR" onclick="hide_others('#TCR')">TCR</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#BCR" onclick="hide_others('#BCR')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">BCR</a>
+                  <a class="nav-link nav-pad" href="#BCR" onclick="hide_others('#BCR')">BCR</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#PCA" onclick="hide_others('#PCA')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">PCA</a>
+                  <a class="nav-link nav-pad" href="#PCA" onclick="hide_others('#PCA')">PCA</a>
                 </li>
               </ul>
               <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
               <ul>
                 <li class="nav-item">
-                  <a class="nav-link" href="#ICA" onclick="hide_others('#ICA')"
-                    style="padding-top: 0.25rem;padding-bottom: 0.25rem;padding-left: 0.25rem;padding-right: 0.25rem;">Intracohort
-                    Analysis</a>
+                  <a class="nav-link nav-pad" href="#ICA" onclick="hide_others('#ICA')">Intracohort Analysis</a>
                 </li>
               </ul>
             </li>
@@ -75,7 +71,7 @@
 
         <!-- TCR  -->
         <div class="content_row static" id="content_tcr">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">TCR Richness and Eveness</h2>
+          <h2 class="h3">TCR Richness and Eveness</h2>
           <div class="row">
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">TCR Richness</h3>
@@ -94,7 +90,7 @@
 
         <!-- BCR  -->
         <div class="content_row static" id="content_bcr">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">BCR Richness and Eveness</h2>
+          <h2 class="h3">BCR Richness and Eveness</h2>
           <div class="row">
             <div class="col text-center">
               <h3 class="h5" style="text-align:center">BCR Richness</h3>
@@ -113,7 +109,7 @@
 
         <!-- PCA  -->
         <div class="content_row static" id="content_pca">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Principal Component Analysis</h2>
+          <h2 class="h3">Principal Component Analysis</h2>
           <div class="row">
             <div class="col text-center">
               <a href="data/All/cohortAnalysis/naive0_PCA.png"><img src="data/All/cohortAnalysis/naive0_PCA.png"
@@ -127,33 +123,33 @@
         </div>
 
         <div class="content_row dynamic" id="content_ICA">
-          <h2 class="h3" style="padding-top: 10px;padding-bottom: 10px;">Intracohort Analysis</h2>
+          <h2 class="h3">Intracohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
               <div id="intracohortDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
-                
+
               <div class="dropdown btn-group">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChain" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChain"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Chain
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection">
                 </div>
               </div>
 
-              <div class ="btn-group-vertical">
+              <div class="btn-group-vertical">
 
-              <div class="dropdown btn-group">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Select Condition
-                </button>
-                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection">
+                <div class="dropdown btn-group">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Condition
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection">
+                  </div>
                 </div>
-              </div>
 
-              <div class="dropdown btn-group" id="button2nd_condition" style="display:none;">
+                <div class="dropdown btn-group" id="button2nd_condition" style="display:none;">
                   <button class="btn btn-primary dropdown-toggle" type="button" id="dropdown2ndCondition"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Select Secondary Condition
@@ -165,8 +161,8 @@
               </div>
 
               <div class="dropdown btn-group">
-                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunction"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunction" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
                   Select Function
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection">

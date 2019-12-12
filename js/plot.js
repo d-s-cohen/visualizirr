@@ -251,7 +251,7 @@ function condition_2nd(cond_2nd_idx) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
       if (typeof pval_arrays[0][k] !== 'undefined' && typeof pval_arrays[1][k] !== 'undefined') {
         x_text.push(curr_group_2nd[k] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[0][k], pval_arrays[1][k], alternative = 'two-sided')["p"].toFixed(5));
-      } else { x_text.push(""); }
+      } else { x_text.push(curr_group_2nd[k]); }
     }
   } else { x_text = curr_group_2nd };
 
@@ -319,7 +319,7 @@ function draw_traces() {
     // p-value annotation
     if (k < curr_group.length - 1) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-      var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+        var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
       } else { var the_pval = ""; }
       var anno = {
         showarrow: false,
@@ -362,7 +362,7 @@ function draw_traces() {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
             var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
-            } else { var the_pval = ""; }
+          } else { var the_pval = ""; }
           var anno = {
             showarrow: false,
             text: the_pval,
