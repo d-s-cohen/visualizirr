@@ -67,3 +67,10 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			.text(function (d) { return d; });
 	});
 }
+
+if (window.location.pathname.split('/').pop() == "help.html") {
+d3.text("README.md").then(function (data) {
+	var md = window.markdownit();
+	$('#markdown').html(md.render(data));
+  });
+}

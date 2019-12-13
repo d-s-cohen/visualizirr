@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- CSS and JS libraries-->
+  <link rel="stylesheet" href="lib/css/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
+  <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
+  <script src="lib/js/bootstrap.min.js"></script>
+  <script src="lib/js/jquery.min.js"></script>
+  <script src="lib/js/d3.min.js"></script>
+  <script src="lib/js/markdown-it.min.js"></script>
+
+  <link rel="stylesheet" href="css/table.css">
+  <script src="js/load_sections.js"></script>
+  <script src="js/populate.js"></script>
+  <script src="js/functions.js"></script>
+  <script src="js/top_navbar.js"></script>
+
+  <title>Immune Repertoire</title>
+
+</head>
+
+<body>
+
+  <div id="top_navbar"></div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar collapse bd-links">
+        <div class="sidebar-sticky" style="padding-top: 1rem">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#info" style="font-size: 1rem">Help</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4" style="margin-bottom: 6rem;margin-top: 1rem;">
+        <!-- Cohort/Sample information -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+          <h1 class="h2">Help</h1>
+        </div>
+        <div id="markdown"></div>
+      </main>
+    </div>
+  </div>
+
+</body>
+
+</html>
