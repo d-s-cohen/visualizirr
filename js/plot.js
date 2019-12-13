@@ -134,7 +134,7 @@ d3.text("data/meta.csv").then(function (data) {
               }
               $("#dropdownFondition").text(func_name[curr_func]);
               // Populate chain options in html
-              var available_chains = Object.keys(in_chain);
+              var available_chains = Object.keys(in_chain).sort();
               for (let n = 0; n < available_chains.length; n++) {
                 $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
               }
@@ -231,7 +231,7 @@ function condition_2nd(cond_2nd_idx) {
         // Loop through secondary condition groups
         for (let k = 0; k < curr_group_2nd.length; k++) {
           // If primary condition group includes sample...
-          if (ica_meta[curr_cond_2nd][curr_group_2nd[k]].includes(sample) && chain_included) {
+          if (ica_meta[curr_cond_2nd][curr_group_2nd[k]].includes(sample)) {
             // Push corresponding x (secondary condition grouping) and y (primary condition value)
             condition_2nd_x[i].push(k);
             curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j - skip]);
@@ -257,7 +257,8 @@ function condition_2nd(cond_2nd_idx) {
 
   for (let k = 0; k < condition_2nd_x.length; k++) {
     var update = {
-      x: [condition_2nd_x[k]]
+      x: [condition_2nd_x[k]],
+      y: [curr_y[k]]
     }
     Plotly.restyle('intracohortDiv', update, k);
   }
