@@ -19,13 +19,21 @@ if (current_sample == "") {
 	current_sample = "All";
 }
 // Populate figures based off of sample ID
-if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html']) >= 0) {
+if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 'cdr3_length.html',"cohort_analysis.html"]) >= 0) {
 	$(document).ready(function () {
-		$('.imageLink').attr("href", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
-		$('.imageEmbed').attr("src", function () { return "data/" + current_sample + "/" + $(this).attr("id") });
+		if (sessionStorage.getItem('path_val') != null) {
+			var data_path = sessionStorage.getItem('path_val')
+		} else {
+			var data_path = "data/"
+		}
+		$('.imageLink').attr("href", function () { return data_path + current_sample + "/" + $(this).attr("id") });
+		$('.imageEmbed').attr("src", function () { return data_path + current_sample + "/" + $(this).attr("id") });
 		$(".imageEmbed").on("error", function () {
 			var content_id = $(this).closest('.content_row').attr("id");
 			$(this).closest('.col-6').remove();
+			if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
+				$(this).closest('.col').remove();
+			}
 			if ($('#' + content_id).find('img').length == 0) {
 				$('#' + content_id).remove();
 				$('#' + content_id + '_nav').remove();
@@ -54,7 +62,12 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			$("#info_title").text("Sample Info");
 		}
 	});
-	d3.text("data/" + current_sample + "/info.csv").then(function(data) {
+	if (sessionStorage.getItem('path_val') != null) {
+		var data_path = sessionStorage.getItem('path_val')
+	} else {
+		var data_path = "data/"
+	}
+	d3.text(data_path + current_sample + "/info.csv").then(function (data) {
 		var parsedCSV = d3.csvParseRows(data);
 		var container = d3.select("#tableSpace")
 			.selectAll("tr")
@@ -69,8 +82,18 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 }
 
 if (window.location.pathname.split('/').pop() == "help.html") {
-d3.text("README.md").then(function (data) {
-	var md = window.markdownit();
-	$('#markdown').html(md.render(data));
-  });
+	$(document).ready(function () {
+		$('#path_field').attr('value', sessionStorage.getItem('path_val'));
+		$('#path_select').on('click', function () {
+			var path_val = $('#path_field').val();
+			path_val = path_val.replace(/\/?$/, '/');
+			sessionStorage.setItem('path_val', path_val);
+			location.reload(); 
+		});
+
+		d3.text("README.md").then(function (data) {
+			var md = window.markdownit();
+			$('#markdown').html(md.render(data));
+		});
+	});
 }

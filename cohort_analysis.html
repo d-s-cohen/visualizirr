@@ -40,13 +40,7 @@
               <a class="nav-link" href="#" onclick="show_all()" style="font-size: 1rem">Show All</a>
               <a class="nav-link" href="#STAT" onclick="show_class('.static')" style="font-size: 1rem">Static Plots</a>
               <ul>
-                <li class="nav-item">
-                  <a class="nav-link nav-pad" href="#TCR" onclick="hide_others('#TCR')">TCR</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link nav-pad" href="#BCR" onclick="hide_others('#BCR')">BCR</a>
-                </li>
-                <li class="nav-item">
+                <li class="nav-item" id="content_pca_nav">
                   <a class="nav-link nav-pad" href="#PCA" onclick="hide_others('#PCA')">PCA</a>
                 </li>
               </ul>
@@ -69,54 +63,16 @@
           <h1 class="h2">Cohort Analysis</h1>
         </div>
 
-        <!-- TCR  -->
-        <div class="content_row static" id="content_tcr">
-          <h2 class="h3">TCR Richness and Eveness</h2>
-          <div class="row">
-            <div class="col text-center">
-              <h3 class="h5" style="text-align:center">TCR Richness</h3>
-              <a href="data/All/cohortAnalysis/TCR_richness.png"><img src="data/All/cohortAnalysis/TCR_richness.png"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:1500px;width:100%;"></a>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col text-center">
-              <h3 class="h5" style="text-align:center">TCR Evenness</h3>
-              <a href="data/All/cohortAnalysis/TCR_evenness.png"><img src="data/All/cohortAnalysis/TCR_evenness.png"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:1500px;width:100%;"></a>
-            </div>
-          </div>
-        </div>
-
-        <!-- BCR  -->
-        <div class="content_row static" id="content_bcr">
-          <h2 class="h3">BCR Richness and Eveness</h2>
-          <div class="row">
-            <div class="col text-center">
-              <h3 class="h5" style="text-align:center">BCR Richness</h3>
-              <a href="data/All/cohortAnalysis/BCR_richness.png"><img src="data/All/cohortAnalysis/BCR_richness.png"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:1500px;width:100%;"></a>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col text-center">
-              <h3 class="h5" style="text-align:center">BCR Evenness</h3>
-              <a href="data/All/cohortAnalysis/BCR_evenness.png"><img src="data/All/cohortAnalysis/BCR_evenness.png"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:1500px;width:100%;"></a>
-            </div>
-          </div>
-        </div>
-
         <!-- PCA  -->
         <div class="content_row static" id="content_pca">
           <h2 class="h3">Principal Component Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <a href="data/All/cohortAnalysis/naive0_PCA.png"><img src="data/All/cohortAnalysis/naive0_PCA.png"
+              <a id = "cohortAnalysis/naive0_PCA.png" class = "imageLink"><img id = "cohortAnalysis/naive0_PCA.png" class = "imageEmbed"
                   style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
-              <a href="data/All/cohortAnalysis/naive1_PCA.png"><img src="data/All/cohortAnalysis/naive1_PCA.png"
+              <a id = "cohortAnalysis/naive1_PCA.png" class = "imageLink"><img id = "cohortAnalysis/naive1_PCA.png" class = "imageEmbed"
                   style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
-              <a href="data/All/cohortAnalysis/all_sample_PCA.png"><img src="data/All/cohortAnalysis/all_sample_PCA.png"
+              <a id = "cohortAnalysis/all_sample_PCA.png" class = "imageLink"><img id = "cohortAnalysis/all_sample_PCA.png" class = "imageEmbed"
                   style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
             </div>
           </div>

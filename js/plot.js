@@ -18,7 +18,13 @@ var activated_cond_2nd = false;
 var curr_y = [];
 var pval_arrays = [];
 
-d3.text("data/meta.csv").then(function (data) {
+if (sessionStorage.getItem('path_val') != null) {
+  var data_path = sessionStorage.getItem('path_val')
+} else {
+  var data_path = "data/"
+}
+
+d3.text(data_path + "meta.csv").then(function (data) {
 
   var meta_rows = d3.csvParseRows(data);
   var meta_header = meta_rows[0].slice(1);
@@ -88,7 +94,7 @@ d3.text("data/meta.csv").then(function (data) {
     // On last meta table row...
     if (j == (meta_rows.length - 1)) {
 
-      d3.text("data/intracohort_data.csv").then(function (data) {
+      d3.text(data_path + "intracohort_data.csv").then(function (data) {
 
         var data_rows = d3.csvParseRows(data);
         func_name = data_rows[0].slice(2);
