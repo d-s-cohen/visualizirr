@@ -1,7 +1,7 @@
 var current_pathname = $(location).attr('pathname');
 // For cohort_analysis, don't assign URLs in page based off of current pathname
 if (current_pathname.split('/').pop() == "cohort_analysis.html") {
-	current_pathname = current_pathname.replace(/cohort_analysis.html$/, "index.html");
+	current_pathname = current_pathname.replace(/cohort_analysis.html$/, "info.html");
 }
 // Show only one section
 function hide_others(fragment) {

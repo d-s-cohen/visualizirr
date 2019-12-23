@@ -54,7 +54,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 	});
 }
 // Populate information table from info.csv
-if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
+if ($.inArray(window.location.pathname.split('/').pop(), ['info.html']) >= 0) {
 	$(document).ready(function () {
 		if (current_sample == "All") {
 			$("#info_title").text("Cohort Info");
@@ -81,7 +81,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 	});
 }
 
-if (window.location.pathname.split('/').pop() == "help.html") {
+if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
 	$(document).ready(function () {
 		$('#path_field').attr('value', sessionStorage.getItem('path_val'));
 		$('#path_select').on('click', function () {

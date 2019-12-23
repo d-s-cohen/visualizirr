@@ -1,4 +1,4 @@
-**Structure of data folder (include in this directory):**
+**Data folder structure:**
 
 ```
 data
@@ -39,7 +39,7 @@ All chain directories (sample level and cohort level)
 should contain the files shown under the data>All>IGH directory shown above.
 Chains and figures that aren't available will not be shown in the report.
 
-the default data path is 'data/'. If you wish to change this path for the session, you may do so on the help page.
+the default data path is 'data/'. If you wish to change this path for the current session, you may do so at the top of the home page.
 
 ---
 
@@ -93,3 +93,8 @@ SampleName2,IGH,63.51,4.11,0.3,3.31,0.85,0.82,45
 SampleName2,IGL,35.3,2.27,0.27,3.71,0.86,0.72,153
 SampleName2,IGK,32.71,3.38,0.23,4.28,0.87,0.82,279
 ```
+
+---
+
+**info.csv** files aren't required to be a particular structure and can be populated with whatever info the user desires. 
+The leftmost column displays in bold.

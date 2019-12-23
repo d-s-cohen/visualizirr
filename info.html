@@ -12,7 +12,6 @@
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
   <script src="lib/js/d3.min.js"></script>
-  <script src="lib/js/markdown-it.min.js"></script>
 
   <link rel="stylesheet" href="css/table.css">
   <script src="js/load_sections.js"></script>
@@ -34,7 +33,7 @@
         <div class="sidebar-sticky" style="padding-top: 1rem">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="#info" style="font-size: 1rem">Help</a>
+              <a class="nav-link" href="#info" style="font-size: 1rem">Information</a>
             </li>
           </ul>
         </div>
@@ -43,22 +42,9 @@
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4" style="margin-bottom: 6rem;margin-top: 1rem;">
         <!-- Cohort/Sample information -->
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-          <h1 class="h2">Help</h1>
+          <h1 class="h2" id="info_title"></h1>
         </div>
-        <div class="content_row static" id="cohort_select">
-          <h2 class="h3">Cohort Path Selection</h2>
-          <div class="input-group mb-3">
-            <input id="path_field" type="text" class="form-control" placeholder="data/" aria-label="Enter path"
-              aria-describedby="basic-addon2">
-            <div class="input-group-append">
-              <button id="path_select" class="btn btn-outline-secondary" type="button">Select</button>
-            </div>
-          </div>
-        </div>
-        <div class="content_row static" id="documentation">
-          <h2 class="h3">Documentation</h2>
-          <div id="markdown"></div>
-        </div>
+        <table class="table" style="font-size: 15px" id="tableSpace"></table>
       </main>
     </div>
   </div>

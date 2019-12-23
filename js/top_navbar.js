@@ -5,12 +5,13 @@ $(function () {
 			// Wait until navbar is loaded
 			var current_pathname = $(location).attr('pathname');
 			// For cohort_analysis, don't assign URLs in page based off of current pathname
-			if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "help.html"]) >= 0) {
-				current_pathname = current_pathname.replace(/cohort_analysis.html$/, "index.html");
-				current_pathname = current_pathname.replace(/help.html$/, "index.html");
+			if (current_pathname.split('/').pop() == "cohort_analysis.html") {
+				current_pathname = current_pathname.replace(/cohort_analysis.html$/, "info.html");
+			} else if ($.inArray(window.location.pathname.split('/').pop(), ["index.html", ""]) >= 0) {
+				current_pathname = "info.html"
 			}
 			// Prepend 'All" selection to dropdown menu
-			if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "help.html"]) == -1) {
+			if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "index.html", ""]) == -1) {
 				$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + "?sample=All" + location.hash + '">All</a>');
 			} else {
 				$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + '?sample=All">All</a>');
@@ -24,7 +25,7 @@ $(function () {
 			}
 			jQuery.get(sample_list_path, function (data) {
 				var lines = data.split("\n");
-				if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "help.html"]) == -1) {
+				if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "index.html", ""]) == -1) {
 					for (var i = 0; i < lines.length; i++) {
 						$('#dropdown-populate').append('<a class="sampleSelect sampleSearch dropdown-item" id="' + lines[i] + '" href="' + current_pathname + "?sample=" + lines[i] + location.hash + '">' + lines[i] + '</a>');
 					}
@@ -36,8 +37,8 @@ $(function () {
 			}, dataType = 'text');
 			// Modify navbar links based off current URL
 			$(document).ready(function () {
-				$("#info").attr("href", "index.html?sample=" + current_sample);
-				if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "help.html"]) == -1) {
+				$("#info").attr("href", "info.html?sample=" + current_sample);
+				if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "index.html", ""]) == -1) {
 					$("#segment_usage").attr("href", "segment_usage.html?sample=" + current_sample + location.hash);
 					$("#cdr3_length").attr("href", "cdr3_length.html?sample=" + current_sample + location.hash);
 				} else {
