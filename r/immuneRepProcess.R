@@ -1,0 +1,672 @@
+#!/usr/bin/env Rscript
+args = commandArgs(trailingOnly=TRUE)
+
+# CONFIG DEFAULTS 
+sample_level_run = TRUE
+cohort_level_run = TRUE
+intracohort_run = TRUE
+chains_search = c("TRB", "TRA", "TRG", "TRD", "IGH", "IGL", "IGK")
+file_prefix = ""
+file_suffix = ""
+sumMax = 10
+vjMax = 5
+clonotypeMax = 7
+
+if (length(args)==0) {
+  if(file.exists("config.R")){
+    source("config.R")
+  } else {
+    stop("'Usage: Rscript static_figures.R config.R'", call.=FALSE)
+  }
+} else if (length(args)==1) {
+  source(args[1])
+} else {
+  stop("'Usage: Rscript static_figures.R config.R'", call.=FALSE)
+}
+
+if (!(exists("input_format") & exists("input_dir") & exists("output_dir"))) {
+  stop("'Define input_format, input_dir, and output_dir in config file'", call.=FALSE)
+}
+
+list.of.packages <- c("data.table", "ggplot2","viridis","tcR")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+suppressMessages(library(data.table))
+suppressMessages(library(ggplot2))
+suppressMessages(library(viridis))
+suppressMessages(library(tcR))
+
+intracohort_values_template <- data.frame(matrix(ncol = 9, nrow = 0))
+
+colnames(intracohort_values_template) <-
+  c("sample", "chain", "CDR3 Length", "True Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Unique CDR3 Count")
+
+if (input_format == "TRUST4"){
+  if (!"Biostrings" %in% installed.packages()[,"Package"]){
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+    BiocManager::install("Biostrings")
+  }
+  suppressMessages(library(Biostrings))
+}
+
+input_dir = sub("/$","",input_dir)
+output_dir = sub("/$","",output_dir)
+
+files <-
+  list.files(
+    path = input_dir,
+    pattern = paste("^",file_prefix,".*",file_suffix,"$",sep=""),
+    full.names = F,
+    recursive = F
+  )
+
+files <- gsub(paste("(",file_prefix,"|",file_suffix,"$)",sep=""),"", files)
+
+dir.create(output_dir, showWarnings = FALSE)
+
+if (sample_level_run == TRUE || intracohort_run == TRUE) {
+  
+  if (sample_level_run == TRUE) {
+    sample_list <- vector()
+  }
+  
+  for (current_sample in files) {
+    
+    if (sample_level_run == TRUE) {
+      if (match(current_sample,files) == 1) {print("Generating sample-level figures")}
+    }
+    if (sample_level_run == TRUE && intracohort_run == TRUE) {
+      if (match(current_sample,files) == 1) {print("&")}
+    }  
+    if (intracohort_run == TRUE) {
+      if (match(current_sample,files) == 1) {print("Generating intracohort analysis table")}
+    }  
+    
+    print(paste("Sample",match(current_sample,files),"/",length(files),"-",current_sample))
+    
+    if (input_format == "TRUST4") {
+      
+      sample_table <-
+        read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = F)
+      
+      if (ncol(sample_table) == 10) {
+        colnames(sample_table) <-
+          c(
+            "consensus_id",
+            "index_within_consensus",
+            "V_gene",
+            "J_gene",
+            "C_gene",
+            "CDR1",
+            "CDR2",
+            "CDR3",
+            "CDR3_score",
+            "read_fragment_count"
+          )
+      } else if (ncol(sample_table) == 11) {
+        colnames(sample_table) <-
+          c(
+            "consensus_id",
+            "index_within_consensus",
+            "V_gene",
+            "D_gene",
+            "J_gene",
+            "C_gene",
+            "CDR1",
+            "CDR2",
+            "CDR3",
+            "CDR3_score",
+            "read_fragment_count"
+          )
+      }
+      
+      # remove partials
+      sample_table <- sample_table[(sample_table$CDR3_score != 0.00), ]
+      
+      sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
+      
+    } else if (input_format == "MIXCR") {
+      
+      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = T)
+      
+      colnames(sample_table)[which(names(sample_table) == "allVHitsWithScore")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "allJHitsWithScore")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "allCHitsWithScore")] <- "C_gene"
+      colnames(sample_table)[which(names(sample_table) == "nSeqCDR3")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "aaSeqCDR3")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "cloneCount")] <- "read_fragment_count"
+      
+    } else if (input_format == "ADAPTIVE") {
+      
+      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = T)
+      
+      colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+      
+    }
+    
+    # in-frame only  
+    sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
+                                             chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
+    
+    if (dim(sample_table)[1] != 0) {
+      
+      if (sample_level_run == TRUE) {
+        sample_list <- append(sample_list,current_sample)
+      }
+      
+      dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
+      
+      if (input_format %in% c("MIXCR","TRUST4")){
+        sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
+        sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
+      }
+      
+      for (current_chain in chains_search) {
+        
+        if (input_format == "ADAPTIVE"){
+          which_chain <-
+            t(apply(sample_table[c("V_gene", "D_gene", "J_gene")], 1, function(u)
+              grepl(current_chain, u)))        
+        } else {
+          which_chain <-
+            t(apply(sample_table[c("V_gene", "J_gene", "C_gene")], 1, function(u)
+              grepl(current_chain, u)))
+        }
+        
+        chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
+        
+        if (dim(chain_table_unprocessed)[1] != 0) {
+          
+          if (sample_level_run == TRUE) {
+            
+            dir.create(paste(output_dir,current_sample,current_chain,sep="/"), showWarnings = FALSE)
+            
+            count_sum = sum(chain_table_unprocessed$read_fragment_count)
+            chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
+            
+            # cdr3aalength
+            
+            chain_table <- chain_table_unprocessed
+            
+            if (nrow(chain_table)>1) {
+              chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+            } else {
+              chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+            }
+            
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
+            
+            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_count), stat="identity",color='light blue',fill='light blue') + 
+                    xlab('CDR3 Length, AA')+ylab('count') +
+                    theme_grey(base_size = 35))
+            
+            dev.off()
+            
+            # clonotype
+            
+            chain_table <- chain_table_unprocessed
+            
+            if (nrow(chain_table)>1) {
+              chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+            } else {
+              chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+            }
+            
+            chain_table <- aggregate(read_fragment_freq~CDR3_AA+cdr3length, chain_table, sum)
+            
+            chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+            
+            chain_table$CDR3_AA <- as.character(chain_table$CDR3_AA)
+            x <- as.character(chain_table$CDR3_AA) %in% c('*','')
+            chain_table <- rbind(chain_table[!x,], chain_table[x,])
+            if (nrow(chain_table) > clonotypeMax){
+              chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
+            }
+            chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
+            names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
+            
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+            
+            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
+                    xlab('CDR3 length, bp') +
+                    scale_fill_viridis_d( alpha = 1, begin = 0, end = 1, direction = -1, option = "inferno", aesthetics = "fill") +
+                    ylab('frequency' ) +
+                    theme_grey(base_size = 35)) + theme(legend.title = element_text(size = 24), 
+                                                        legend.text = element_text(size = 24),axis.title = element_text(size = 24), 
+                                                        axis.text = element_text(size = 24))
+            
+            dev.off()
+            
+            # vsumbarplot
+            
+            chain_table <- chain_table_unprocessed
+            
+            chain_table <- aggregate(read_fragment_freq~V_gene, chain_table, sum)
+            
+            chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+            
+            x <- as.character(chain_table$V_gene) %in% c('*','')
+            chain_table <- chain_table[!x,]
+            if (nrow(chain_table) > 0){
+              sumV <- subset(unique(chain_table$V_gene)[c(1:sumMax)], (!is.na(unique(chain_table$V_gene)[c(1:sumMax)])))
+              vjV <- subset(unique(chain_table$V_gene)[c(1:vjMax)], (!is.na(unique(chain_table$V_gene)[c(1:vjMax)])))
+              chain_table <- chain_table[chain_table$V_gene %in% sumV, ]
+              
+              chain_table$V_gene <- factor(chain_table$V_gene)
+              
+              png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vsumBarplot.png',sep=""), width=1024,height=542)
+              
+              print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='light green') + 
+                      xlab('Vgene')+ylab('frequency')+
+                      theme_grey(base_size = 35)+ theme(axis.text.x = element_text(angle = 90, hjust = 1)))
+              
+              dev.off()
+            }
+            
+            # jsumbarplot
+            
+            chain_table <- chain_table_unprocessed
+            
+            chain_table <- aggregate(read_fragment_freq~J_gene, chain_table, sum)
+            
+            chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+            
+            x <- as.character(chain_table$J_gene) %in% c('*','')
+            chain_table <- chain_table[!x,]
+            if (nrow(chain_table) > 0){
+              sumJ <- subset(unique(chain_table$J_gene)[c(1:sumMax)], (!is.na(unique(chain_table$J_gene)[c(1:sumMax)])))
+              vjJ <- subset(unique(chain_table$J_gene)[c(1:vjMax)], (!is.na(unique(chain_table$J_gene)[c(1:vjMax)])))
+              chain_table <- chain_table[chain_table$J_gene %in% sumJ, ]
+              
+              chain_table$J_gene <- factor(chain_table$J_gene)
+              
+              png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/jsumBarplot.png',sep=""), width=1024,height=542)
+              
+              print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='yellow') + 
+                      xlab('Jgene')+ylab('frequency')+
+                      theme_grey(base_size = 35)+theme(axis.text.x = element_text(angle = 90, hjust = 1)))
+              
+              dev.off()
+            }
+            
+            # vj
+            
+            chain_table <- chain_table_unprocessed
+            
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vjStackBar.png',sep=""), width=1024,height=542)
+            
+            x <- as.character(chain_table$J_gene) %in% c('*','')
+            chain_table <- chain_table[!x,]
+            
+            x <- as.character(chain_table$V_gene) %in% c('*','')
+            chain_table <- chain_table[!x,]
+            
+            if (nrow(chain_table) > 0){
+              
+              chain_table <- chain_table[chain_table$J_gene %in% vjJ, ]
+              chain_table <- chain_table[chain_table$V_gene %in% vjV, ]
+              
+              names(chain_table)[names(chain_table) == 'J_gene'] <- 'Jgene'
+              
+              print(ggplot(chain_table) + geom_bar(aes(x=V_gene,y=read_fragment_freq,fill=Jgene), stat="identity") + 
+                      xlab('Vgene')+ylab(NULL) +
+                      scale_fill_viridis_d( alpha = 1, begin = 0, end = 1,
+                                            direction = 1, option = "D", aesthetics = "fill") + ylab('frequency') +
+                      theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.title = element_text(size = 18), 
+                            legend.text = element_text(size = 18), axis.title = element_text(size = 18), 
+                            axis.text = element_text(size = 18)))
+              
+              dev.off()  
+            }
+          }
+          if (intracohort_run == TRUE) {
+            intracohort_values <- intracohort_values_template
+            
+            chain_table_div <- chain_table_unprocessed
+            
+            chain_table_cdr3 <- chain_table_div[c("read_fragment_count", "CDR3")]
+            if (nrow(chain_table_cdr3) != 1){
+              chain_table_cdr3$CDR3 <-
+                data.frame(names = chain_table_cdr3$CDR3,
+                           chr = apply(chain_table_cdr3, 2, nchar))$chr.CDR3
+            } else {
+              chain_table_cdr3$CDR3 <- nchar(as.character(chain_table_cdr3$CDR3))
+            }
+            
+            names(chain_table_div)[names(chain_table_div) == 'read_fragment_count'] <- 'Read.count'
+            names(chain_table_div)[names(chain_table_div) == 'CDR3'] <- 'CDR3.nucleotide.sequence'
+            names(chain_table_div)[names(chain_table_div) == 'V_gene'] <- 'J.gene'
+            names(chain_table_div)[names(chain_table_div) == 'J_gene'] <- 'V.gene'
+            
+            if (nrow(chain_table_cdr3) != 1){
+              chain_table_cdr3 <-
+                aggregate(
+                  chain_table_cdr3$read_fragment_count,
+                  by = list(Category = chain_table_cdr3$CDR3),
+                  FUN = sum
+                )
+            }
+            
+            if (nrow(chain_table_cdr3) != 1){
+              colnames(chain_table_cdr3) <- c("count","CDR3")
+            }
+            
+            total_count <- 0
+            cdr3_aggregate <- 0
+            
+            if (nrow(chain_table_cdr3) != 1){
+              for (i in 1:nrow(chain_table_cdr3)) {
+                total_count <- total_count + chain_table_cdr3[i, 2]
+                cdr3_aggregate <- cdr3_aggregate + (chain_table_cdr3[i, 1]*chain_table_cdr3[i, 2])
+              }
+            } 
+            intracohort_values[1, 1] <- current_sample
+            intracohort_values[1, 2] <- current_chain
+            if (nrow(chain_table_cdr3) != 1){
+              intracohort_values[1, 3] <- round(cdr3_aggregate/total_count,4)
+            } else {
+              intracohort_values[1, 3] <- chain_table_cdr3[1, 2]
+            }
+            suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
+            suppressMessages(intracohort_values[1, 5] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
+            suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
+            suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
+            suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
+            intracohort_values[1, 9] <- length(unique(chain_table_div$CDR3.nucleotide.sequence))
+            
+            if (exists("intracohort_table")) {
+              intracohort_table <- rbind(intracohort_table, intracohort_values)
+            } else {
+              intracohort_table <- intracohort_values
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+if (intracohort_run == TRUE) {
+  write.table(
+    intracohort_table,
+    file = paste(output_dir,'/intracohort_data.csv',sep=""),
+    quote = F,
+    sep = ",",
+    row.names = F
+  )
+}
+
+if (sample_level_run == TRUE) {
+  write.table(
+    sample_list,
+    file = paste(output_dir,'/sample_list.csv',sep=""),
+    quote = F,
+    sep = ",",
+    row.names = F,
+    col.names = F
+  )
+}
+
+if (cohort_level_run == TRUE) {
+  
+  print("Generating cohort-level figures. This may take a while for a larger set.")
+  
+  sample_table = NULL
+  
+  if (input_format == "TRUST4") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = F)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    if (ncol(sample_table) == 10) {
+      colnames(sample_table) <-
+        c(
+          "consensus_id",
+          "index_within_consensus",
+          "V_gene",
+          "J_gene",
+          "C_gene",
+          "CDR1",
+          "CDR2",
+          "CDR3",
+          "CDR3_score",
+          "read_fragment_count"
+        )
+    } else if (ncol(sample_table) == 11) {
+      colnames(sample_table) <-
+        c(
+          "consensus_id",
+          "index_within_consensus",
+          "V_gene",
+          "D_gene",
+          "J_gene",
+          "C_gene",
+          "CDR1",
+          "CDR2",
+          "CDR3",
+          "CDR3_score",
+          "read_fragment_count"
+        )
+    }
+    
+    # remove partials
+    sample_table <- sample_table[(sample_table$CDR3_score != 0.00), ]
+    
+    sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
+    
+  } else if (input_format == "MIXCR") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = T)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    colnames(sample_table)[which(names(sample_table) == "allVHitsWithScore")] <- "V_gene"
+    colnames(sample_table)[which(names(sample_table) == "allJHitsWithScore")] <- "J_gene"
+    colnames(sample_table)[which(names(sample_table) == "allCHitsWithScore")] <- "C_gene"
+    colnames(sample_table)[which(names(sample_table) == "nSeqCDR3")] <- "CDR3"
+    colnames(sample_table)[which(names(sample_table) == "aaSeqCDR3")] <- "CDR3_AA"
+    colnames(sample_table)[which(names(sample_table) == "cloneCount")] <- "read_fragment_count"
+    
+  } else if (input_format == "ADAPTIVE") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = T)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
+    colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
+    colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
+    colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
+    colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
+    colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+    
+  }
+  
+  # in-frame only  
+  sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
+                                           chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
+  
+  current_sample = "All"
+  
+  dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
+  
+  if (input_format %in% c("MIXCR","TRUST4")){
+    sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
+    sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
+  }
+  
+  sample_table <- sample_table[order(-sample_table$read_fragment_count),] 
+  
+  for (current_chain in chains_search) {
+    
+    if (input_format == "ADAPTIVE"){
+      which_chain <-
+        t(apply(sample_table[c("V_gene", "D_gene", "J_gene")], 1, function(u)
+          grepl(current_chain, u)))        
+    } else {
+      which_chain <-
+        t(apply(sample_table[c("V_gene", "J_gene", "C_gene")], 1, function(u)
+          grepl(current_chain, u)))
+    }
+    
+    chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
+    
+    if (dim(chain_table_unprocessed)[1] != 0) {
+      
+      dir.create(paste(output_dir,current_sample,current_chain,sep="/"), showWarnings = FALSE)
+      
+      count_sum = sum(chain_table_unprocessed$read_fragment_count)
+      chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
+      
+      # cdr3aalength
+      
+      chain_table <- chain_table_unprocessed
+      
+      if (nrow(chain_table)>1) {
+        chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+      } else {
+        chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+      }
+      
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
+      
+      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_count), stat="identity",color='light blue',fill='light blue') + 
+              xlab('CDR3 Length, AA')+ylab('count') +
+              theme_grey(base_size = 35))
+      
+      dev.off()
+      
+      # clonotype
+      
+      chain_table <- chain_table_unprocessed
+      
+      if (nrow(chain_table)>1) {
+        chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+      } else {
+        chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+      }
+      
+      chain_table <- aggregate(read_fragment_freq~CDR3_AA+cdr3length, chain_table, sum)
+      
+      chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+      
+      chain_table$CDR3_AA <- as.character(chain_table$CDR3_AA)
+      x <- as.character(chain_table$CDR3_AA) %in% c('*','')
+      chain_table <- rbind(chain_table[!x,], chain_table[x,])
+      if (nrow(chain_table) > clonotypeMax){
+        chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
+      }
+      chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
+      names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
+      
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+      
+      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
+              xlab('CDR3 length, bp') +
+              scale_fill_viridis_d( alpha = 1, begin = 0, end = 1, direction = -1, option = "inferno", aesthetics = "fill") +
+              ylab('frequency') +
+              theme_grey(base_size = 35)) + theme(legend.title = element_text(size = 24), 
+                                                  legend.text = element_text(size = 24),axis.title = element_text(size = 24), 
+                                                  axis.text = element_text(size = 24))
+      
+      dev.off()
+      
+      # vsumbarplot
+      
+      chain_table <- chain_table_unprocessed
+      
+      chain_table <- aggregate(read_fragment_freq~V_gene, chain_table, sum)
+      
+      chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+      
+      x <- as.character(chain_table$V_gene) %in% c('*','')
+      chain_table <- chain_table[!x,]
+      if (nrow(chain_table) > 0){
+        
+        sumV <- subset(unique(chain_table$V_gene)[c(1:sumMax)], (!is.na(unique(chain_table$V_gene)[c(1:sumMax)])))
+        vjV <- subset(unique(chain_table$V_gene)[c(1:vjMax)], (!is.na(unique(chain_table$V_gene)[c(1:vjMax)])))
+        chain_table <- chain_table[chain_table$V_gene %in% sumV, ]
+        
+        chain_table$V_gene <- factor(chain_table$V_gene)
+        
+        png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vsumBarplot.png',sep=""), width=1024,height=542)
+        
+        print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='light green') + 
+                xlab('Vgene')+ylab('frequency')+
+                theme_grey(base_size = 35)+ theme(axis.text.x = element_text(angle = 90, hjust = 1)))
+        
+        dev.off()
+      }
+      
+      # jsumbarplot
+      
+      chain_table <- chain_table_unprocessed
+      
+      chain_table <- aggregate(read_fragment_freq~J_gene, chain_table, sum)
+      
+      chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
+      
+      x <- as.character(chain_table$J_gene) %in% c('*','')
+      chain_table <- chain_table[!x,]
+      if (nrow(chain_table) > 0){
+        sumJ <- subset(unique(chain_table$J_gene)[c(1:sumMax)], (!is.na(unique(chain_table$J_gene)[c(1:sumMax)])))
+        vjJ <- subset(unique(chain_table$J_gene)[c(1:vjMax)], (!is.na(unique(chain_table$J_gene)[c(1:vjMax)])))
+        chain_table <- chain_table[chain_table$J_gene %in% sumJ, ]
+        
+        chain_table$J_gene <- factor(chain_table$J_gene)
+        
+        png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/jsumBarplot.png',sep=""), width=1024,height=542)
+        
+        print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='yellow') + 
+                xlab('Jgene')+ylab('frequency')+
+                theme_grey(base_size = 35)+theme(axis.text.x = element_text(angle = 90, hjust = 1)))
+        
+        dev.off()
+      }
+      
+      # vj
+      
+      chain_table <- chain_table_unprocessed
+      
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vjStackBar.png',sep=""), width=1024,height=542)
+      
+      x <- as.character(chain_table$J_gene) %in% c('*','')
+      chain_table <- chain_table[!x,]
+      
+      x <- as.character(chain_table$V_gene) %in% c('*','')
+      chain_table <- chain_table[!x,]
+      
+      if (nrow(chain_table) > 0){
+        
+        chain_table <- chain_table[chain_table$J_gene %in% vjJ, ]
+        chain_table <- chain_table[chain_table$V_gene %in% vjV, ]
+        
+        names(chain_table)[names(chain_table) == 'J_gene'] <- 'Jgene'
+        
+        print(ggplot(chain_table) + geom_bar(aes(x=V_gene,y=read_fragment_freq,fill=Jgene), stat="identity") + 
+                xlab('Vgene')+ylab(NULL) +
+                scale_fill_viridis_d( alpha = 1, begin = 0, end = 1,
+                                      direction = 1, option = "D", aesthetics = "fill") + ylab('frequency') +
+                theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.title = element_text(size = 18), 
+                      legend.text = element_text(size = 18), axis.title = element_text(size = 18), 
+                      axis.text = element_text(size = 18)))
+        
+        dev.off()  
+      }
+    }
+  }
+}

@@ -96,5 +96,17 @@ SampleName2,IGK,32.71,3.38,0.23,4.28,0.87,0.82,279
 
 ---
 
-**info.csv** files aren't required to be a particular structure and can be populated with whatever info the user desires. 
+**info.csv** files aren't required to have a particular structure and can be populated with whatever info the user desires. 
 The leftmost column displays in bold.
+
+---
+
+**ImmuneRepProcess.R** can be run to generate static figures, intracohort_data.csv, and sample_list.csv.
+
+Usage:
+```
+Rscript immuneRepProcess.R config.R
+```
+
+**config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template is included.
+Support is included for TRUST4, MiXCR, and Adaptive clonesets.
