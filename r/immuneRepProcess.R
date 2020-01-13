@@ -601,7 +601,7 @@ if (cohort_level_run == TRUE) {
       png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
       
       print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
-              xlab('CDR3 length, bp') + scale_fill_brewer(palette="Spectral") +
+              xlab('CDR3 length, AA') + scale_fill_brewer(palette="Spectral") +
               ylab('frequency') + scale_x_continuous(breaks= pretty_breaks()) +
               theme_grey(base_size = 35)) + theme(legend.title = element_text(size = 24), 
                                                   legend.text = element_text(size = 24),axis.title = element_text(size = 24), 
