@@ -26,7 +26,7 @@ sumMax = 10
 vjMax = 5
 
 # CDR3 nucleotides length barplots - Maximum number of clonotypes to display
-clonotypeMax = 7
+clonotypeMax = 8
 
 # Components to run
 sample_level_run = TRUE

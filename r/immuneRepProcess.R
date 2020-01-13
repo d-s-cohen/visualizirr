@@ -10,7 +10,7 @@ file_prefix = ""
 file_suffix = ""
 sumMax = 10
 vjMax = 5
-clonotypeMax = 7
+clonotypeMax = 8
 
 if (length(args)==0) {
   if(file.exists("config.R")){
@@ -28,19 +28,21 @@ if (!(exists("input_format") & exists("input_dir") & exists("output_dir"))) {
   stop("'Define input_format, input_dir, and output_dir in config file'", call.=FALSE)
 }
 
-list.of.packages <- c("data.table", "ggplot2","viridis","tcR")
+list.of.packages <- c("data.table", "ggplot2","tcR","RColorBrewer","scales") # viridis
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
 suppressMessages(library(data.table))
 suppressMessages(library(ggplot2))
-suppressMessages(library(viridis))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(scales))
+#suppressMessages(library(viridis))
 suppressMessages(library(tcR))
 
 intracohort_values_template <- data.frame(matrix(ncol = 9, nrow = 0))
 
 colnames(intracohort_values_template) <-
-  c("sample", "chain", "CDR3 Length", "True Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Unique CDR3 Count")
+  c("sample", "chain", "CDR3 Length", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Unique CDR3 Count")
 
 if (input_format == "TRUST4"){
   if (!"Biostrings" %in% installed.packages()[,"Package"]){
@@ -152,8 +154,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
     }
     
     # in-frame only  
-    sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
-                                             chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
+    #sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
+    #                                         chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
     
     if (dim(sample_table)[1] != 0) {
       
@@ -182,6 +184,10 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         
         chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
         
+        chain_table_unprocessed_allframe <- chain_table_unprocessed
+        chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
+                                                 chr = apply(chain_table_unprocessed, 2, nchar))$chr.CDR3 %% 3 == 0), ]
+        
         if (dim(chain_table_unprocessed)[1] != 0) {
           
           if (sample_level_run == TRUE) {
@@ -191,9 +197,9 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             count_sum = sum(chain_table_unprocessed$read_fragment_count)
             chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
             
-            # cdr3aalength
+            # cdr3ntlength
             
-            chain_table <- chain_table_unprocessed
+            chain_table <- chain_table_unprocessed_allframe
             
             if (nrow(chain_table)>1) {
               chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
@@ -201,13 +207,15 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
             }
             
-            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
             
-            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_count), stat="identity",color='light blue',fill='light blue') + 
-                    xlab('CDR3 Length, AA')+ylab('count') +
+            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_count), stat="identity",fill='#4483b6') + 
+                    xlab('CDR3 Length, bp')+ylab('count') + scale_x_continuous(breaks= pretty_breaks()) +
                     theme_grey(base_size = 35))
             
             dev.off()
+            
+            rm(chain_table_unprocessed_allframe)
             
             # clonotype
             
@@ -229,15 +237,21 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             if (nrow(chain_table) > clonotypeMax){
               chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
             }
+            
+            for (i in c(1:pmin(nrow(chain_table),clonotypeMax))) {
+              if (nchar(chain_table$CDR3_AA[i])>16){
+                chain_table$CDR3_AA[i] <- sub( '(?<=.{14})', '...\n', chain_table$CDR3_AA[i], perl=TRUE )
+              }
+            }            
+            
             chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
             names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
             
-            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
             
-            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
-                    xlab('CDR3 length, bp') +
-                    scale_fill_viridis_d( alpha = 1, begin = 0, end = 1, direction = -1, option = "inferno", aesthetics = "fill") +
-                    ylab('frequency' ) +
+            print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
+                    xlab('CDR3 length, AA') + scale_fill_brewer(palette="Spectral") +
+                    ylab('frequency' ) + scale_x_continuous(breaks= pretty_breaks()) +
                     theme_grey(base_size = 35)) + theme(legend.title = element_text(size = 24), 
                                                         legend.text = element_text(size = 24),axis.title = element_text(size = 24), 
                                                         axis.text = element_text(size = 24))
@@ -263,7 +277,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               
               png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vsumBarplot.png',sep=""), width=1024,height=542)
               
-              print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='light green') + 
+              print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",fill='#e4744e') + 
                       xlab('Vgene')+ylab('frequency')+
                       theme_grey(base_size = 35)+ theme(axis.text.x = element_text(angle = 90, hjust = 1)))
               
@@ -289,7 +303,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               
               png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/jsumBarplot.png',sep=""), width=1024,height=542)
               
-              print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='yellow') + 
+              print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",fill='#7dc0a6') + 
                       xlab('Jgene')+ylab('frequency')+
                       theme_grey(base_size = 35)+theme(axis.text.x = element_text(angle = 90, hjust = 1)))
               
@@ -316,9 +330,9 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               names(chain_table)[names(chain_table) == 'J_gene'] <- 'Jgene'
               
               print(ggplot(chain_table) + geom_bar(aes(x=V_gene,y=read_fragment_freq,fill=Jgene), stat="identity") + 
-                      xlab('Vgene')+ylab(NULL) +
-                      scale_fill_viridis_d( alpha = 1, begin = 0, end = 1,
-                                            direction = 1, option = "D", aesthetics = "fill") + ylab('frequency') +
+                      xlab('Vgene')+ ylab(NULL) +
+                      scale_fill_brewer(palette="Spectral") +
+                      ylab('frequency') +
                       theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.title = element_text(size = 18), 
                             legend.text = element_text(size = 18), axis.title = element_text(size = 18), 
                             axis.text = element_text(size = 18)))
@@ -345,23 +359,21 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             names(chain_table_div)[names(chain_table_div) == 'V_gene'] <- 'J.gene'
             names(chain_table_div)[names(chain_table_div) == 'J_gene'] <- 'V.gene'
             
-            if (nrow(chain_table_cdr3) != 1){
-              chain_table_cdr3 <-
-                aggregate(
-                  chain_table_cdr3$read_fragment_count,
-                  by = list(Category = chain_table_cdr3$CDR3),
-                  FUN = sum
-                )
-            }
-            
-            if (nrow(chain_table_cdr3) != 1){
-              colnames(chain_table_cdr3) <- c("count","CDR3")
+            if (length(unique(chain_table_cdr3$CDR3)) != 1) {
+              if (nrow(chain_table_cdr3) != 1){
+                chain_table_cdr3 <-
+                  aggregate(
+                    chain_table_cdr3$read_fragment_count,
+                    by = list(Category = chain_table_cdr3$CDR3),
+                    FUN = sum
+                  )
+              }
             }
             
             total_count <- 0
             cdr3_aggregate <- 0
             
-            if (nrow(chain_table_cdr3) != 1){
+            if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
               for (i in 1:nrow(chain_table_cdr3)) {
                 total_count <- total_count + chain_table_cdr3[i, 2]
                 cdr3_aggregate <- cdr3_aggregate + (chain_table_cdr3[i, 1]*chain_table_cdr3[i, 2])
@@ -369,17 +381,20 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             } 
             intracohort_values[1, 1] <- current_sample
             intracohort_values[1, 2] <- current_chain
-            if (nrow(chain_table_cdr3) != 1){
+            if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
               intracohort_values[1, 3] <- round(cdr3_aggregate/total_count,4)
             } else {
               intracohort_values[1, 3] <- chain_table_cdr3[1, 2]
             }
+            
             suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
-            suppressMessages(intracohort_values[1, 5] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
-            suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
+            if (nrow(chain_table_cdr3) != 1){
+            suppressMessages(intracohort_values[1, 5] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
+            suppressMessages(intracohort_values[1, 6] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
             suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
             suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
-            intracohort_values[1, 9] <- length(unique(chain_table_div$CDR3.nucleotide.sequence))
+            } 
+            intracohort_values[1, 9] <- length(unique(chain_table_div$CDR3.nucleotide.sequence)) 
             
             if (exists("intracohort_table")) {
               intracohort_table <- rbind(intracohort_table, intracohort_values)
@@ -399,7 +414,8 @@ if (intracohort_run == TRUE) {
     file = paste(output_dir,'/intracohort_data.csv',sep=""),
     quote = F,
     sep = ",",
-    row.names = F
+    row.names = F,
+    na = ""
   )
 }
 
@@ -496,10 +512,6 @@ if (cohort_level_run == TRUE) {
     
   }
   
-  # in-frame only  
-  sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
-                                           chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
-  
   current_sample = "All"
   
   dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
@@ -525,6 +537,11 @@ if (cohort_level_run == TRUE) {
     
     chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
     
+    # in-frame only  
+    chain_table_unprocessed_allframe <- chain_table_unprocessed
+    chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
+                                             chr = apply(chain_table_unprocessed, 2, nchar))$chr.CDR3 %% 3 == 0), ]
+    
     if (dim(chain_table_unprocessed)[1] != 0) {
       
       dir.create(paste(output_dir,current_sample,current_chain,sep="/"), showWarnings = FALSE)
@@ -532,9 +549,9 @@ if (cohort_level_run == TRUE) {
       count_sum = sum(chain_table_unprocessed$read_fragment_count)
       chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
       
-      # cdr3aalength
+      # cdr3ntlength
       
-      chain_table <- chain_table_unprocessed
+      chain_table <- chain_table_unprocessed_allframe
       
       if (nrow(chain_table)>1) {
         chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
@@ -542,13 +559,14 @@ if (cohort_level_run == TRUE) {
         chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
       }
       
-      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
-      
-      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_count), stat="identity",color='light blue',fill='light blue') + 
-              xlab('CDR3 Length, AA')+ylab('count') +
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_count), stat="identity",fill='#4483b6') + 
+              xlab('CDR3 Length, bp') + ylab('count') + scale_x_continuous(breaks= pretty_breaks()) + 
               theme_grey(base_size = 35))
       
       dev.off()
+      
+      rm(chain_table_unprocessed_allframe)
       
       # clonotype
       
@@ -570,15 +588,21 @@ if (cohort_level_run == TRUE) {
       if (nrow(chain_table) > clonotypeMax){
         chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
       }
+      
+      for (i in c(1:pmin(nrow(chain_table),clonotypeMax))) {
+        if (nchar(chain_table$CDR3_AA[i])>16){
+          chain_table$CDR3_AA[i] <- sub( '(?<=.{14})', '...\n', chain_table$CDR3_AA[i], perl=TRUE )
+        }
+      } 
+      
       chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
       names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
       
-      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3aaLength.png',sep=""), width=1024,height=542)
       
-      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
-              xlab('CDR3 length, bp') +
-              scale_fill_viridis_d( alpha = 1, begin = 0, end = 1, direction = -1, option = "inferno", aesthetics = "fill") +
-              ylab('frequency') +
+      print(ggplot(chain_table) + geom_bar(aes(x=cdr3length/3, y=read_fragment_freq,group=Clonotype,fill=Clonotype), stat="identity") + 
+              xlab('CDR3 length, bp') + scale_fill_brewer(palette="Spectral") +
+              ylab('frequency') + scale_x_continuous(breaks= pretty_breaks()) +
               theme_grey(base_size = 35)) + theme(legend.title = element_text(size = 24), 
                                                   legend.text = element_text(size = 24),axis.title = element_text(size = 24), 
                                                   axis.text = element_text(size = 24))
@@ -605,7 +629,7 @@ if (cohort_level_run == TRUE) {
         
         png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/vsumBarplot.png',sep=""), width=1024,height=542)
         
-        print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='light green') + 
+        print(ggplot(chain_table) + geom_bar(aes(x=reorder(V_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",fill='#e4744e') + 
                 xlab('Vgene')+ylab('frequency')+
                 theme_grey(base_size = 35)+ theme(axis.text.x = element_text(angle = 90, hjust = 1)))
         
@@ -631,7 +655,7 @@ if (cohort_level_run == TRUE) {
         
         png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/jsumBarplot.png',sep=""), width=1024,height=542)
         
-        print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",color='black',fill='yellow') + 
+        print(ggplot(chain_table) + geom_bar(aes(x=reorder(J_gene, -read_fragment_freq), y=read_fragment_freq), stat="identity",fill='#7dc0a6') + 
                 xlab('Jgene')+ylab('frequency')+
                 theme_grey(base_size = 35)+theme(axis.text.x = element_text(angle = 90, hjust = 1)))
         
@@ -659,8 +683,8 @@ if (cohort_level_run == TRUE) {
         
         print(ggplot(chain_table) + geom_bar(aes(x=V_gene,y=read_fragment_freq,fill=Jgene), stat="identity") + 
                 xlab('Vgene')+ylab(NULL) +
-                scale_fill_viridis_d( alpha = 1, begin = 0, end = 1,
-                                      direction = 1, option = "D", aesthetics = "fill") + ylab('frequency') +
+                scale_fill_brewer(palette="Spectral") + 
+                ylab('frequency') + 
                 theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.title = element_text(size = 18), 
                       legend.text = element_text(size = 18), axis.title = element_text(size = 18), 
                       axis.text = element_text(size = 18)))

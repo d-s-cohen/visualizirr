@@ -75,7 +75,7 @@ Not all chains need to be included for the csv to parsed.
 
 intracohort_data.csv template:
 ```
-sample,chain,CDR3 Length,True Diversity,Shannon Entropy Measure,1 / Shannon Entropy Measure,Gini Coefficient,Gini-Simpson Index,Unique CDR3 Count
+sample,chain,CDR3 Length,Raw Diversity,Shannon Entropy Measure,1 / Shannon Entropy Measure,Gini Coefficient,Gini-Simpson Index,Unique CDR3 Count
 SampleName0,TRB,45.47,2.93,0.45,2.23,0.36,0.74,6
 SampleName0,TRA,41.5,5.21,0.38,2.64,0.25,0.83,7
 SampleName0,IGH,52.18,11.92,0.25,3.96,0.44,0.93,20
