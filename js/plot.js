@@ -69,12 +69,6 @@ d3.text(data_path + "meta.csv").then(function (data) {
               } else if (cond_name.length == 1 && k == 0) {
                 $("#button2nd_condition").remove();
               }
-              if (k == cond_name.length - 1) {
-                // Hide secondary condition option which is the current primary condition
-                $("#condition2nd_selection").children().filter(function () {
-                  return $(this).text() === curr_cond;
-                }).css("display", "none");
-              }
             }
           });
         }
@@ -128,6 +122,10 @@ d3.text(data_path + "meta.csv").then(function (data) {
                 $("#dropdownChain").text(curr_chain);
                 $("#dropdownFunction").text(curr_func);
                 $("#dropdownCondition").text(curr_cond);
+                // Hide secondary condition option which is the current primary condition
+                $("#condition2nd_selection").children().filter(function () {
+                  return $(this).text() === curr_cond;
+                }).css("display", "none");
                 dataMorph();
               });
             }
@@ -289,6 +287,7 @@ function condition_2nd(cond_2nd_idx) {
   // Display cancel button
   if ($("#cancel_2nd").length == 0) {
     $("#button2nd_condition").prepend('<button id="cancel_2nd" type="button" onclick="clear_2nd()" class="btn btn-danger">&times;</button>');
+    $("#button2nd_condition").prepend('<button id="swap_2nd" type="button" onclick="swap_conds()" class="btn btn-warning">&UpArrowDownArrow;</button>');
   }
 
 }
@@ -301,9 +300,18 @@ function clear_2nd() {
   // Refresh secondary condition selection
   $("#dropdown2ndCondition").text("Select Secondary Condition");
   $("#cancel_2nd").remove();
+  $("#swap_2nd").remove();
   $("#condition_selection").children().filter(function () {
     return $(this).text() == curr_cond_2nd;
   }).removeAttr('style');
+
+}
+
+function swap_conds(){
+
+  new_2nd = cond_name.indexOf(curr_cond);
+  dataMorph(cond_name.indexOf(curr_cond_2nd),undefined,undefined);
+  condition_2nd(new_2nd);
 
 }
 
