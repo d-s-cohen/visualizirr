@@ -90,9 +90,9 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 
 		$('#path_field').attr('value', sessionStorage.getItem('path_val'));
 		$('#path_select').on('click', function () {
+			var path_val = $('#path_field').val();
 			path_val = path_val.replace(/\/?$/, '/');
 			sessionStorage.setItem('path_val', path_val);
-			$('#path_field').trigger("reset");
 			location.reload(); 
 		});
 

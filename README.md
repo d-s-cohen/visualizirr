@@ -94,6 +94,9 @@ SampleName2,IGL,35.3,2.27,0.27,3.71,0.86,0.72,153
 SampleName2,IGK,32.71,3.38,0.23,4.28,0.87,0.82,279
 ```
 
+Due to the nature of this format, you may append any column you like as an additional function for comparison in the analysis. 
+It will be processed the same as the others.
+
 ---
 
 **info.csv** files aren't required to have a particular structure and can be populated with whatever info the user desires. 
