@@ -83,13 +83,25 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['info.html']) >= 0) {
 
 if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
 	$(document).ready(function () {
+
+		if (sessionStorage.getItem('path_val') == null) {
+			sessionStorage.setItem('path_val', 'data/');
+		  } 
+
 		$('#path_field').attr('value', sessionStorage.getItem('path_val'));
 		$('#path_select').on('click', function () {
-			var path_val = $('#path_field').val();
 			path_val = path_val.replace(/\/?$/, '/');
 			sessionStorage.setItem('path_val', path_val);
+			$('#path_field').trigger("reset");
 			location.reload(); 
 		});
+
+		jQuery.get("cohort_list.csv", function (data) {
+			var lines = data.split("\n");
+				for (var i = 0; i < lines.length; i++) {
+					$( "#cohort_select" ).append( "<button type='button' class='btn btn-outline-secondary btn-sm mr-1' onclick='change_path_val(&quot;"+lines[i].split(",")[0]+"&quot;)'>"+lines[i].split(",")[1]+"</button>" );
+				}
+		}, dataType = 'text');
 
 		d3.text("README.md").then(function (data) {
 			var md = window.markdownit();

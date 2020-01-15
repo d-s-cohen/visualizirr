@@ -27,3 +27,9 @@ function show_class(showclass) {
 	$('.content_row').hide();
 	$(showclass).show();
 }
+// Change path value
+function change_path_val(path_val){
+	path_val = path_val.replace(/\/?$/, '/');
+	sessionStorage.setItem('path_val', path_val);
+	location.reload(); 
+}

@@ -110,3 +110,14 @@ Rscript immuneRepProcess.R config.R
 
 **config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template is included.
 Support is included for TRUST4, MiXCR, and Adaptive clonesets.
+
+---
+
+**cohort_list.csv** can optionally be placed in this directory in order to enable shortcuts to different cohort selections.
+These shortcuts appear under 'Cohort Path Selection' above.
+
+cohort_list.csv template:
+```
+path/to/cohort1,Cohort 1
+path/to/cohort2,Cohort 2
+```
