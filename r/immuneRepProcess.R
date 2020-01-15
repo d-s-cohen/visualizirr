@@ -11,6 +11,7 @@ file_suffix = ""
 sumMax = 10
 vjMax = 5
 clonotypeMax = 8
+clonotypeAbundance = NULL
 
 if (length(args)==0) {
   if(file.exists("config.R")){
@@ -39,12 +40,20 @@ suppressMessages(library(scales))
 #suppressMessages(library(viridis))
 suppressMessages(library(tcR))
 
-intracohort_values_template <- data.frame(matrix(ncol = 9, nrow = 0))
+functionNum = 11
+functionNum = functionNum + length(clonotypeAbundance)
 
-colnames(intracohort_values_template) <-
-  c("sample", "chain", "CDR3 Length", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Unique CDR3 Count")
+intracohort_values_template <- data.frame(matrix(ncol = functionNum, nrow = 0))
 
-if (input_format == "TRUST4"){
+intracohortColNames = c("sample", "chain", "CDR3 Length", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index","Unique CDR3 Count")
+
+if (length(clonotypeAbundance)>0) {
+  colnames(intracohort_values_template) <- c(intracohortColNames,paste(clonotypeAbundance, "Frequency", sep=" "))
+} else {
+  colnames(intracohort_values_template) <- intracohortColNames
+}
+
+if (input_format %in% c("TRUST4","CUSTOM")){
   if (!"Biostrings" %in% installed.packages()[,"Package"]){
     if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
@@ -151,11 +160,18 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
       colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
       
+    } else if (input_format == "CUSTOM") {
+      
+      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = custom_header)     
+      
+      colnames(sample_table)[custom_cdr3] <- "CDR3"
+      colnames(sample_table)[custom_v] <- "V_gene"
+      colnames(sample_table)[custom_j] <- "J_gene"      
+      colnames(sample_table)[custom_count] <- "read_fragment_count"
+      
+      sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
+      
     }
-    
-    # in-frame only  
-    #sample_table <- sample_table[(data.frame(names = sample_table$CDR3,
-    #                                         chr = apply(sample_table, 2, nchar))$chr.CDR3 %% 3 == 0), ]
     
     if (dim(sample_table)[1] != 0) {
       
@@ -176,6 +192,10 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
           which_chain <-
             t(apply(sample_table[c("V_gene", "D_gene", "J_gene")], 1, function(u)
               grepl(current_chain, u)))        
+        } else if (input_format == "CUSTOM"){
+          which_chain <-
+            t(apply(sample_table[c("V_gene", "J_gene")], 1, function(u)
+              grepl(current_chain, u)))               
         } else {
           which_chain <-
             t(apply(sample_table[c("V_gene", "J_gene", "C_gene")], 1, function(u)
@@ -188,14 +208,14 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
                                                  chr = apply(chain_table_unprocessed, 2, nchar))$chr.CDR3 %% 3 == 0), ]
         
+        count_sum = sum(chain_table_unprocessed$read_fragment_count)
+        chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
+        
         if (dim(chain_table_unprocessed)[1] != 0) {
           
           if (sample_level_run == TRUE) {
             
             dir.create(paste(output_dir,current_sample,current_chain,sep="/"), showWarnings = FALSE)
-            
-            count_sum = sum(chain_table_unprocessed$read_fragment_count)
-            chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
             
             # cdr3ntlength
             
@@ -386,15 +406,25 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             } else {
               intracohort_values[1, 3] <- chain_table_cdr3[1, 2]
             }
-            
             suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
             if (nrow(chain_table_cdr3) != 1){
             suppressMessages(intracohort_values[1, 5] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
             suppressMessages(intracohort_values[1, 6] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
             suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
             suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
+            suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "inv.simp", "read.count"),4))
+            suppressMessages(intracohort_values[1, 10] <- round(repDiversity(chain_table_div, "chao1", "read.count")[1],4))
             } 
-            intracohort_values[1, 9] <- length(unique(chain_table_div$CDR3.nucleotide.sequence)) 
+            intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.nucleotide.sequence)) 
+            
+            if (length(clonotypeAbundance)>0){
+              for (i in c(1:length(clonotypeAbundance))){
+                foundClonotype = format(sum(chain_table_div[which(chain_table_div$CDR3_AA == clonotypeAbundance[i]), ]$Read.count), scientific = FALSE)
+                #if (foundClonotype > 0){
+                  intracohort_values[1, 11+i] <- foundClonotype
+                #}
+              }
+            }
             
             if (exists("intracohort_table")) {
               intracohort_table <- rbind(intracohort_table, intracohort_values)
@@ -510,6 +540,21 @@ if (cohort_level_run == TRUE) {
     colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
     colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
     
+  } else if (input_format == "CUSTOM") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = custom_header)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    colnames(sample_table)[custom_cdr3] <- "CDR3"
+    colnames(sample_table)[custom_v] <- "V_gene"
+    colnames(sample_table)[custom_j] <- "J_gene"      
+    colnames(sample_table)[custom_count] <- "read_fragment_count"
+    
+    sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
+    
   }
   
   current_sample = "All"
@@ -529,6 +574,10 @@ if (cohort_level_run == TRUE) {
       which_chain <-
         t(apply(sample_table[c("V_gene", "D_gene", "J_gene")], 1, function(u)
           grepl(current_chain, u)))        
+    } else if (input_format == "CUSTOM"){
+      which_chain <-
+        t(apply(sample_table[c("V_gene", "J_gene")], 1, function(u)
+          grepl(current_chain, u)))  
     } else {
       which_chain <-
         t(apply(sample_table[c("V_gene", "J_gene", "C_gene")], 1, function(u)

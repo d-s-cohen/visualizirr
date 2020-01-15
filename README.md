@@ -112,7 +112,7 @@ Rscript immuneRepProcess.R config.R
 ```
 
 **config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template is included.
-Support is included for TRUST4, MiXCR, and Adaptive clonesets.
+Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 
 ---
 
