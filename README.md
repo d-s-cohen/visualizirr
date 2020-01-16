@@ -95,23 +95,23 @@ Not all chains need to be included for the csv to parsed.
 
 intracohort_data.csv template:
 ```
-sample,chain,CDR3 Length,Raw Diversity,Shannon Entropy Measure,1 / Shannon Entropy Measure,Gini Coefficient,Gini-Simpson Index,Unique CDR3 Count
-SampleName0,TRB,45.47,2.93,0.45,2.23,0.36,0.74,6
-SampleName0,TRA,41.5,5.21,0.38,2.64,0.25,0.83,7
-SampleName0,IGH,52.18,11.92,0.25,3.96,0.44,0.93,20
-SampleName0,IGL,36.87,8.76,0.23,4.36,0.58,0.93,34
-SampleName0,IGK,33.26,8.08,0.2,5.02,0.66,0.94,75
-SampleName1,TRB,42.9,10.18,0.21,4.87,0.48,0.95,45
-SampleName1,TRA,39.42,10.09,0.24,4.2,0.45,0.93,26
-SampleName1,TRG,32.18,2.98,0.5,2,0.33,0.71,5
-SampleName1,IGH,54.54,16.36,0.18,5.5,0.72,0.96,115
-SampleName1,IGL,38.86,15.43,0.17,5.87,0.76,0.96,215
-SampleName1,IGK,33.35,14.99,0.17,5.88,0.85,0.96,403
-SampleName2,TRB,42.58,3.74,0.36,2.78,0.39,0.81,9
-SampleName2,TRA,41.1,8.9,0.29,3.5,0.29,0.9,13
-SampleName2,IGH,63.51,4.11,0.3,3.31,0.85,0.82,45
-SampleName2,IGL,35.3,2.27,0.27,3.71,0.86,0.72,153
-SampleName2,IGK,32.71,3.38,0.23,4.28,0.87,0.82,279
+sample,chain,CDR3 Length,Raw Diversity,Shannon Entropy Measure,1 / Shannon Entropy Measure,Gini Coefficient,Gini-Simpson Index,Inverse Simpson Index,Chao1 Index,Unique CDR3 Count
+SampleName0,TRB,45.4737,2.9321,2.234,0.4476,0.3596,0.7424,3.8817,6.9474,6
+SampleName0,TRA,41.5,5.2083,2.6416,0.3786,0.254,0.8272,5.7857,8.8889,7
+SampleName0,IGH,52.1838,11.9151,3.9613,0.2524,0.438,0.9275,13.7923,23.9951,20
+SampleName0,IGL,36.8694,8.7584,4.3559,0.2296,0.5775,0.928,13.8959,37.6653,34
+SampleName0,IGK,33.2624,8.0779,5.0241,0.199,0.6614,0.9378,16.0727,101.0339,75
+SampleName1,TRB,42.8963,10.1811,4.8674,0.2054,0.4751,0.9469,18.8347,55.8225,45
+SampleName1,TRA,39.4239,10.0928,4.2038,0.2379,0.4515,0.9296,14.2013,34.012,26
+SampleName1,TRG,32.1818,2.9768,2.0049,0.4988,0.3273,0.7107,3.4571,7.7273,5
+SampleName1,IGH,54.5441,16.3617,5.5002,0.1818,0.7249,0.9633,27.2493,143.8969,115
+SampleName1,IGL,38.8631,15.4276,5.8725,0.1703,0.7615,0.9632,27.1583,244.8357,215
+SampleName1,IGK,33.3506,14.9937,5.8826,0.17,0.8477,0.9581,23.8882,550.0341,403
+SampleName2,TRB,42.5769,3.7416,2.7759,0.3602,0.3932,0.8136,5.3651,11.1635,9
+SampleName2,TRA,41.1,8.9017,3.4981,0.2859,0.2872,0.9022,10.2273,19.0417,13
+SampleName2,IGH,63.5094,4.1071,3.3117,0.302,0.8537,0.8248,5.7078,67.56,45
+SampleName2,IGL,35.2986,2.2675,3.7059,0.2698,0.8553,0.7198,3.5692,181.3025,153
+SampleName2,IGK,32.707,3.3842,4.2796,0.2337,0.866,0.8199,5.5511,394.038,279
 ```
 
 Due to the nature of this format, you may append any column you like as an additional function for comparison in the analysis. 
