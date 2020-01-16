@@ -227,7 +227,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
             }
             
-            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+            png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3ntLength.png',sep=""), width=1024,height=542)
             
             print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_count), stat="identity",fill='#4483b6') + 
                     xlab('CDR3 Length, bp')+ylab('count') + scale_x_continuous(breaks= pretty_breaks()) +
@@ -608,7 +608,7 @@ if (cohort_level_run == TRUE) {
         chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
       }
       
-      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/fancyspectra.png',sep=""), width=1024,height=542)
+      png(filename=paste(output_dir,'/',current_sample,'/',current_chain,'/cdr3ntLength.png',sep=""), width=1024,height=542)
       print(ggplot(chain_table) + geom_bar(aes(x=cdr3length, y=read_fragment_count), stat="identity",fill='#4483b6') + 
               xlab('CDR3 Length, bp') + ylab('count') + scale_x_continuous(breaks= pretty_breaks()) + 
               theme_grey(base_size = 35))

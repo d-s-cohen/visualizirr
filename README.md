@@ -9,7 +9,7 @@ data
 │   │   └── naive1_PCA.png
 │   ├── IGH
 │   │   ├── cdr3aaLength.png
-│   │   ├── fancyspectra.png
+│   │   ├── cdr3ntLength.png
 │   │   ├── jsumBarplot.png
 │   │   ├── vjpairHeatmap.png
 │   │   ├── vjStackBar.png
@@ -40,6 +40,26 @@ should contain the files shown under the data>All>IGH directory shown above.
 Chains and figures that aren't available will not be shown in the report.
 
 the default data path is 'data/'. If you wish to change this path for the current session, you may do so at the top of the home page.
+
+---
+
+**Information in Report**
+
+* Cohort and sample level 
+    * Segment Usage
+        * V gene and J gene usage
+        * Combined V and J gene usage 
+    * CDR3 Info
+        * Amino acid length distribution
+        * Nucleotide length distribution
+        * Top clonotypes
+    * User customized meta information 
+* Intracohort Analysis
+    * Diversity and clonality measures
+        * CDR3 Length, Raw Diversity, Shannon Entropy Measure, 1 / Shannon Entropy Measure, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Unique CDR3 Count
+        * Comparison between sub-cohort groups of these measures
+* Everything is split between different chains 
+    * TRB, TRA, TRG, TRD, IGH, IGL, IGK
 
 ---
 
