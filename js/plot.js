@@ -259,12 +259,18 @@ function condition_2nd(cond_2nd_idx) {
     }
   } else { x_text = curr_group_2nd };
 
+  k_count = 0;
+
   for (let k = 0; k < condition_2nd_x.length; k++) {
+    if (condition_2nd_x[k].length >0){
     var update = {
       x: [condition_2nd_x[k]],
       y: [curr_y[k]]
     }
-    Plotly.restyle('intracohortDiv', update, k);
+    Plotly.restyle('intracohortDiv', update, k_count);
+    k_count = k_count + 1;
+  } 
+
   }
 
   var update = {
@@ -322,6 +328,7 @@ function draw_traces() {
 
   for (let k = 0; k < curr_group.length; k++) {
     // Populate trace data (Just primary condition data)
+    if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined') {
     var trace = {
       type: 'box',
       boxpoints: 'all',
@@ -331,11 +338,13 @@ function draw_traces() {
       visible: true
     };
     data.push(trace);
+  }
     // p-value annotation
     if (k < curr_group.length - 1) {
-      if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
+      if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined'){
+       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
         var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
-      } else { var the_pval = ""; }
+      }} else { var the_pval = ""; }
       var anno = {
         showarrow: false,
         text: the_pval,

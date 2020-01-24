@@ -44,10 +44,14 @@ intracohort_run = TRUE
 # Whether or not input contains a header
 #custom_header = TRUE
 # Column number containing cdr3 nucleotide sequence
-#custom_cdr3 = 6
+#custom_cdr3 = 1
 # Column number containing Vgene
-#custom_v = 3
+#custom_v = 2
+# Column number containing Dgene
+#custom_d = 3
 # Column number containing Jgene
 #custom_j = 4
+# Column number containing Cgene
+#custom_c = 5
 # Column number containing clonotype count
-#custom_count = 8
+#custom_count = 6
