@@ -912,11 +912,16 @@ if (cohort_level_run == TRUE) {
 }
 
 if (!is.null(report_dir)) {
-  cohort_list <- read.table(paste(report_dir,"/cohort_list.csv",sep=""),stringsAsFactors=FALSE, header=FALSE,sep=",")
   
-  if (any(cohort_list$V1==output_dir) != TRUE) {
-    cohort_list = rbind(c(output_dir,output_name),cohort_list)
-    write.table(cohort_list,paste(report_dir,"/cohort_list.csv",sep=""),row.names=FALSE,col.names=FALSE,quote=FALSE,sep=",")
+  if (file.exists(paste(report_dir,"/cohort_list.csv",sep=""))) {
+    cohort_list <- read.table(paste(report_dir,"/cohort_list.csv",sep=""),stringsAsFactors=FALSE, header=FALSE,sep=",")
+    
+    if (any(cohort_list$V1==output_dir) != TRUE) {
+      cohort_list = rbind(c(output_dir,output_name),cohort_list)
+      write.table(cohort_list,paste(report_dir,"/cohort_list.csv",sep=""),row.names=FALSE,col.names=FALSE,quote=FALSE,sep=",")
+    }
+    
+  } else {
+    write.table(rbind(c(output_dir,output_name)),paste(report_dir,"/cohort_list.csv",sep=""),row.names=FALSE,col.names=FALSE,quote=FALSE,sep=",")
   }
 }
-
