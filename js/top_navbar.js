@@ -17,11 +17,17 @@ $(function () {
 				$('#dropdown-populate').prepend('<a class="sampleSelect dropdown-item" id="All" href="' + current_pathname + '?sample=All">All</a>');
 			}
 			// Populate sample selection based off of sample_list.csv
+			var sample_list_path = "data/sample_list.csv"
 			if (sessionStorage.getItem('path_val') != null) {
 				var path_val = sessionStorage.getItem('path_val')
 				var sample_list_path = path_val + "sample_list.csv"
 			} else {
-				var sample_list_path = "data/sample_list.csv"
+				jQuery.get("cohort_list.csv", function (data) {
+					var path_val = data.split("\n")[0].split(",")[0]
+					path_val = path_val.replace(/\/?$/, '/');
+					sessionStorage.setItem('path_val', path_val);
+					sample_list_path = path_val + "sample_list.csv"
+				  }, dataType = 'text');
 			}
 			jQuery.get(sample_list_path, function (data) {
 				var lines = data.split("\n");

@@ -18,10 +18,16 @@ var activated_cond_2nd = false;
 var curr_y = [];
 var pval_arrays = [];
 
+var data_path = 'data/'
 if (sessionStorage.getItem('path_val') != null) {
-  var data_path = sessionStorage.getItem('path_val')
+  data_path = sessionStorage.getItem('path_val')
 } else {
-  var data_path = "data/"
+  jQuery.get("cohort_list.csv", function (data) {
+    var path_val = data.split("\n")[0].split(",")[0]
+    path_val = path_val.replace(/\/?$/, '/');
+    sessionStorage.setItem('path_val', path_val);
+    data_path = sessionStorage.getItem('path_val')
+  }, dataType = 'text');
 }
 
 d3.text(data_path + "meta.csv").then(function (data) {
@@ -262,14 +268,14 @@ function condition_2nd(cond_2nd_idx) {
   k_count = 0;
 
   for (let k = 0; k < condition_2nd_x.length; k++) {
-    if (condition_2nd_x[k].length >0){
-    var update = {
-      x: [condition_2nd_x[k]],
-      y: [curr_y[k]]
+    if (condition_2nd_x[k].length > 0) {
+      var update = {
+        x: [condition_2nd_x[k]],
+        y: [curr_y[k]]
+      }
+      Plotly.restyle('intracohortDiv', update, k_count);
+      k_count = k_count + 1;
     }
-    Plotly.restyle('intracohortDiv', update, k_count);
-    k_count = k_count + 1;
-  } 
 
   }
 
@@ -313,10 +319,10 @@ function clear_2nd() {
 
 }
 
-function swap_conds(){
+function swap_conds() {
 
   new_2nd = cond_name.indexOf(curr_cond);
-  dataMorph(cond_name.indexOf(curr_cond_2nd),undefined,undefined);
+  dataMorph(cond_name.indexOf(curr_cond_2nd), undefined, undefined);
   condition_2nd(new_2nd);
 
 }
@@ -329,22 +335,23 @@ function draw_traces() {
   for (let k = 0; k < curr_group.length; k++) {
     // Populate trace data (Just primary condition data)
     if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined') {
-    var trace = {
-      type: 'box',
-      boxpoints: 'all',
-      y: ica_data[curr_cond][curr_group[k]][curr_chain][curr_func],
-      x: Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k),
-      name: curr_group[k],
-      visible: true
-    };
-    data.push(trace);
-  }
+      var trace = {
+        type: 'box',
+        boxpoints: 'all',
+        y: ica_data[curr_cond][curr_group[k]][curr_chain][curr_func],
+        x: Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k),
+        name: curr_group[k],
+        visible: true
+      };
+      data.push(trace);
+    }
     // p-value annotation
     if (k < curr_group.length - 1) {
-      if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined'){
-       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-        var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
-      }} else { var the_pval = ""; }
+      if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
+        if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
+          var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+        }
+      } else { var the_pval = ""; }
       var anno = {
         showarrow: false,
         text: the_pval,

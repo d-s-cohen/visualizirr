@@ -14,6 +14,8 @@ clonotypeMax = 8
 clonotypeAbundance = NULL
 custom_c = NULL
 custom_d = NULL
+report_dir = NULL
+output_name = paste("Cohort", Sys.Date())
 
 if (length(args)==0) {
   if(file.exists("config.R")){
@@ -65,6 +67,9 @@ if (input_format %in% c("TRUST4","CUSTOM")){
 
 input_dir = sub("/$","",input_dir)
 output_dir = sub("/$","",output_dir)
+if (!is.null(report_dir)) {
+  report_dir = sub("/$","",report_dir)
+}
 
 files <-
   list.files(
@@ -905,3 +910,13 @@ if (cohort_level_run == TRUE) {
     }
   }
 }
+
+if (!is.null(report_dir)) {
+  cohort_list <- read.table(paste(report_dir,"/cohort_list.csv",sep=""),stringsAsFactors=FALSE, header=FALSE,sep=",")
+  
+  if (any(cohort_list$V1==output_dir) != TRUE) {
+    cohort_list = rbind(c(output_dir,output_name),cohort_list)
+    write.table(cohort_list,paste(report_dir,"/cohort_list.csv",sep=""),row.names=FALSE,col.names=FALSE,quote=FALSE,sep=",")
+  }
+}
+

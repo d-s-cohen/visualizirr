@@ -12,6 +12,12 @@ input_dir = "~/in"
 # Change to path where you wish to store output figures
 output_dir = "~/out"
 
+# Name and path of cohort (for modifying cohort list)
+output_name = "Cohort"
+
+# Path of report (for modifying cohort list)
+report_dir = "~/ImmuneRepVis/"
+
 # Chains to search for (reduce size for shorter runtime)
 chains_search = c("TRB", "TRA", "TRG", "TRD", "IGH", "IGL", "IGK")
 
