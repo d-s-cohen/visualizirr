@@ -26,7 +26,8 @@ if (sessionStorage.getItem('path_val') != null) {
     var path_val = data.split("\n")[0].split(",")[0]
     path_val = path_val.replace(/\/?$/, '/');
     sessionStorage.setItem('path_val', path_val);
-    data_path = sessionStorage.getItem('path_val')
+    data_path = sessionStorage.getItem('path_val');
+    location.reload();
   }, dataType = 'text');
 }
 
@@ -266,7 +267,7 @@ function condition_2nd(cond_2nd_idx) {
   } else { x_text = curr_group_2nd };
 
   k_count = 0;
-
+  // Populate available traces
   for (let k = 0; k < condition_2nd_x.length; k++) {
     if (condition_2nd_x[k].length > 0) {
       var update = {
@@ -276,7 +277,10 @@ function condition_2nd(cond_2nd_idx) {
       Plotly.restyle('intracohortDiv', update, k_count);
       k_count = k_count + 1;
     }
-
+  }
+  // Delete extra remaining traces
+  for (let k = k_count; k < intracohortDiv.data.length; k++) {  
+    Plotly.deleteTraces('intracohortDiv', k_count);
   }
 
   var update = {
@@ -379,7 +383,8 @@ function draw_traces() {
       tickvals: Object.keys(curr_group),
       ticktext: curr_group
     },
-    annotations: pvals
+    annotations: pvals,
+    showlegend: true
   };
   // Render plot
   Plotly.newPlot("intracohortDiv", data, layout);

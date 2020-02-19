@@ -1,3 +1,5 @@
+#### Immune Repertoire Visualization Report
+
 **Data folder structure:**
 
 ```
@@ -39,7 +41,7 @@ All chain directories (sample level and cohort level)
 should contain the files shown under the data>All>IGH directory shown above.
 Chains and figures that aren't available will not be shown in the report.
 
-the default data path is 'data/'. If you wish to change this path for the current session, you may do so at the top of the home page.
+the default data path is 'data/' if cohort_list.csv hasn't been implemented. If you wish to change this path for the current session, you may do so at the top of the home page.
 
 ---
 
@@ -137,7 +139,7 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 ---
 
 **cohort_list.csv** can optionally be placed in this directory in order to enable shortcuts to different cohort selections.
-These shortcuts appear under 'Cohort Path Selection' above.
+These shortcuts appear under 'Cohort Path Selection' above. ImmuneRepProcess.R has an option to automatically update this list when running new cohorts.
 
 cohort_list.csv template:
 ```

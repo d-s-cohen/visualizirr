@@ -92,16 +92,16 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
   for (current_sample in files) {
     
     if (sample_level_run == TRUE) {
-      if (match(current_sample,files) == 1) {print("Generating sample-level figures")}
+      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating sample-level figures"))}
     }
     if (sample_level_run == TRUE && intracohort_run == TRUE) {
       if (match(current_sample,files) == 1) {print("&")}
     }  
     if (intracohort_run == TRUE) {
-      if (match(current_sample,files) == 1) {print("Generating intracohort analysis table")}
+      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating intracohort analysis table"))}
     }  
     
-    print(paste("Sample",match(current_sample,files),"/",length(files),"-",current_sample))
+    print(paste(Sys.time(),"Sample",match(current_sample,files),"/",length(files),"-",current_sample))
     
     if (input_format == "TRUST4") {
       
@@ -551,7 +551,7 @@ if (sample_level_run == TRUE) {
 
 if (cohort_level_run == TRUE) {
   
-  print("Generating cohort-level figures. This may take a while for a larger set.")
+  print(paste(Sys.time(),"Generating cohort-level figures. This may take a while for a larger set."))
   
   sample_table = NULL
   

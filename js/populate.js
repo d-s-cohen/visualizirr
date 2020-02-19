@@ -29,7 +29,8 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 				var path_val = data.split("\n")[0].split(",")[0]
 				path_val = path_val.replace(/\/?$/, '/');
 				sessionStorage.setItem('path_val', path_val);
-				data_path = sessionStorage.getItem('path_val')
+				data_path = sessionStorage.getItem('path_val');
+				location.reload();
 			}, dataType = 'text');
 		}
 		$('.imageLink').attr("href", function () { return data_path + current_sample + "/" + $(this).attr("id") });
@@ -76,7 +77,8 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['info.html']) >= 0) {
 			var path_val = data.split("\n")[0].split(",")[0]
 			path_val = path_val.replace(/\/?$/, '/');
 			sessionStorage.setItem('path_val', path_val);
-			data_path = sessionStorage.getItem('path_val')
+			data_path = sessionStorage.getItem('path_val');
+			location.reload();
 		}, dataType = 'text');
 	}
 	d3.text(data_path + current_sample + "/info.csv").then(function (data) {
