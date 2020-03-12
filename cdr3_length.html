@@ -12,11 +12,12 @@
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
   <script src="lib/js/d3.min.js"></script>
+  <script src="lib/js/plotly-latest.min.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <link rel="stylesheet" href="css/styling.css">
   <script src="js/load_sections.js"></script>
-  <script src="js/populate.js"></script>
   <script src="js/functions.js"></script>
+  <script src="js/populate.js"></script>
   <script src="js/top_navbar.js"></script>
 
   <title>Immune Repertoire</title>
@@ -75,12 +76,10 @@
           <h2 class="h3">TRA</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="TRA/cdr3aaLength.png" class="imageLink"><img id="TRA/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="TRA/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="TRA/cdr3ntLength.png" class="imageLink"><img id="TRA/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="TRA/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -90,12 +89,10 @@
           <h2 class="h3">TRB</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="TRB/cdr3aaLength.png" class="imageLink"><img id="TRB/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="TRB/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="TRB/cdr3ntLength.png" class="imageLink"><img id="TRB/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="TRB/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -105,12 +102,10 @@
           <h2 class="h3">TRG</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="TRG/cdr3aaLength.png" class="imageLink"><img id="TRG/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="TRG/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="TRG/cdr3ntLength.png" class="imageLink"><img id="TRG/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="TRG/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -120,12 +115,10 @@
           <h2 class="h3">TRD</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="TRD/cdr3aaLength.png" class="imageLink"><img id="TRD/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="TRD/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="TRD/cdr3ntLength.png" class="imageLink"><img id="TRD/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="TRD/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -135,12 +128,10 @@
           <h2 class="h3">IGH</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="IGH/cdr3aaLength.png" class="imageLink"><img id="IGH/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="IGH/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="IGH/cdr3ntLength.png" class="imageLink"><img id="IGH/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="IGH/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -150,12 +141,10 @@
           <h2 class="h3">IGL</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="IGL/cdr3aaLength.png" class="imageLink"><img id="IGL/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="IGL/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="IGL/cdr3ntLength.png" class="imageLink"><img id="IGL/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="IGL/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>
@@ -165,12 +154,10 @@
           <h2 class="h3">IGK</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 amino acid length distribution</h3>
-              <a id="IGK/cdr3aaLength.png" class="imageLink"><img id="IGK/cdr3aaLength.png" class="imageEmbed"></a>
+              <div id="IGK/cdr3aaLength.csv" class="plotlyStackedBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">CDR3 nucleotide length distribution</h3>
-              <a id="IGK/cdr3ntLength.png" class="imageLink"><img id="IGK/cdr3ntLength.png" class="imageEmbed"></a>
+              <div id="IGK/cdr3ntLength.csv" class="plotlyBar"></div>
             </div>
           </div>
         </div>

@@ -13,6 +13,17 @@ types['#PCA'] = '#content_pca';
 types['#DIV'] = '#content_diversity';
 types['#ICA'] = '#content_ICA';
 types[''] = 'blank';
+
+// Associate location hash with content IDs
+var plot_labels = {};
+plot_labels['cdr3aaLength'] = ['CDR3 amino acid length distribution','CDR3 Length, AA','Frequency','Clonotype'];
+plot_labels['cdr3ntLength'] = ['CDR3 nucleotide length distribution','CDR3 Length, bp','Count'];
+plot_labels['vsumBarplot'] = ['V Gene Usage','V Gene','Frequency'];
+plot_labels['dsumBarplot'] = ['D Gene Usage','D Gene','Frequency'];
+plot_labels['jsumBarplot'] = ['J Gene Usage','J Gene','Frequency'];
+plot_labels['csumBarplot'] = ['C Gene Usage','C Gene','Frequency'];
+plot_labels['vjStackBar'] = ['V-J Gene Usage','V Gene','Frequency','J Gene'];
+
 // Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
 if (current_sample == "") {
@@ -33,31 +44,8 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 				location.reload();
 			}, dataType = 'text');
 		}
-		$('.imageLink').attr("href", function () { return data_path + current_sample + "/" + $(this).attr("id") });
-		$('.imageEmbed').attr("src", function () { return data_path + current_sample + "/" + $(this).attr("id") });
-		$(".imageEmbed").on("error", function () {
-			var content_id = $(this).closest('.content_row').attr("id");
-			$(this).closest('.col-6').remove();
-			if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
-				$(this).closest('.col').remove();
-			}
-			if ($('#' + content_id).find('img').length == 0) {
-				$('#' + content_id).remove();
-				$('#' + content_id + '_nav').remove();
-				if (types[location.hash] == '#' + content_id) {
-					window.location.replace(window.location.pathname.split('/').pop() + "?sample=" + current_sample);
-				}
-			}
-		});
-		$(".imageEmbed").on("load", function () {
-			var content_id = $(this).closest('.content_row').attr("id");
-			if ($('#' + content_id).find('img').length > 0) {
-				$('#' + content_id + '_nav').show();
-				if ($.inArray(types[location.hash], ['blank', '#' + content_id]) >= 0) {
-					$('#' + content_id).show();
-				}
-			}
-		});
+		$('.plotlyBar').each(function () { load_plotly_bar(data_path,$(this).attr("id")); });
+		$('.plotlyStackedBar').each(function () { load_plotly_stacked_bar(data_path,$(this).attr("id")); });
 	});
 }
 // Populate information table from info.csv

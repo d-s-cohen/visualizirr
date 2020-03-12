@@ -18,7 +18,7 @@ output_name = "Cohort"
 # Path of report (for modifying cohort list)
 report_dir = "~/ImmuneRepVis/"
 
-# Chains to search for (reduce size for shorter runtime)
+# Chains to search for (less chains = shorter runtime) - Options: TRB, TRA, TRG, TRD, IGH, IGL, IGK
 chains_search = c("TRB", "TRA", "TRG", "TRD", "IGH", "IGL", "IGK")
 
 # Prefix of files, suffix of files (both are removed from output)

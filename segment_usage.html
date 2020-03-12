@@ -12,11 +12,12 @@
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
   <script src="lib/js/d3.min.js"></script>
+  <script src="lib/js/plotly-latest.min.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <link rel="stylesheet" href="css/styling.css">
   <script src="js/load_sections.js"></script>
-  <script src="js/populate.js"></script>
   <script src="js/functions.js"></script>
+  <script src="js/populate.js"></script>
   <script src="js/top_navbar.js"></script>
 
   <title>Immune Repertoire</title>
@@ -75,20 +76,13 @@
           <h2 class="h3">TRA</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="TRA/vsumBarplot.png" class="imageLink"><img id="TRA/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRA/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="TRA/jsumBarplot.png" class="imageLink"><img id="TRA/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRA/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="TRA/vjStackBar.png" class="imageLink"><img id="TRA/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRA/vjpairHeatmap.png" class="imageLink"><img id="TRA/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="TRA/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -98,24 +92,17 @@
           <h2 class="h3">TRB</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="TRB/vsumBarplot.png" class="imageLink"><img id="TRB/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRB/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
                 <h3 class="h5">Dgene usage</h3>
-                <a id="TRB/dsumBarplot.png" class="imageLink"><img id="TRB/dsumBarplot.png" class="imageEmbed"></a>
+                <div id="TRB/dsumBarplot.csv" class="plotlyBar"></div>
               </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="TRB/jsumBarplot.png" class="imageLink"><img id="TRB/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRB/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="TRB/vjStackBar.png" class="imageLink"><img id="TRB/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRB/vjpairHeatmap.png" class="imageLink"><img id="TRB/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="TRB/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -125,20 +112,13 @@
           <h2 class="h3">TRG</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="TRG/vsumBarplot.png" class="imageLink"><img id="TRG/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRG/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="TRG/jsumBarplot.png" class="imageLink"><img id="TRG/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRG/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="TRG/vjStackBar.png" class="imageLink"><img id="TRG/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRG/vjpairHeatmap.png" class="imageLink"><img id="TRG/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="TRG/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -148,24 +128,17 @@
           <h2 class="h3">TRD</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="TRD/vsumBarplot.png" class="imageLink"><img id="TRD/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRD/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
                 <h3 class="h5">Dgene usage</h3>
-                <a id="TRD/dsumBarplot.png" class="imageLink"><img id="TRD/dsumBarplot.png" class="imageEmbed"></a>
+                <div id="TRD/dsumBarplot.csv" class="plotlyBar"></div>
               </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="TRD/jsumBarplot.png" class="imageLink"><img id="TRD/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="TRD/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="TRD/vjStackBar.png" class="imageLink"><img id="TRD/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="TRD/vjpairHeatmap.png" class="imageLink"><img id="TRD/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="TRD/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -175,28 +148,21 @@
           <h2 class="h3">IGH</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="IGH/vsumBarplot.png" class="imageLink"><img id="IGH/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGH/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Dgene usage</h3>
-              <a id="IGH/dsumBarplot.png" class="imageLink"><img id="IGH/dsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGH/dsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="IGH/jsumBarplot.png" class="imageLink"><img id="IGH/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGH/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
               <h3 class="h5">Cgene usage</h3>
-              <a id="IGH/csumBarplot.png" class="imageLink"><img id="IGH/csumBarplot.png" class="imageEmbed"></a>
+              <div id="IGH/csumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="IGH/vjStackBar.png" class="imageLink"><img id="IGH/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="IGH/vjpairHeatmap.png" class="imageLink"><img id="IGH/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="IGH/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -206,20 +172,13 @@
           <h2 class="h3">IGL</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="IGL/vsumBarplot.png" class="imageLink"><img id="IGL/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGL/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="IGL/jsumBarplot.png" class="imageLink"><img id="IGL/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGL/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="IGL/vjStackBar.png" class="imageLink"><img id="IGL/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="IGL/vjpairHeatmap.png" class="imageLink"><img id="IGL/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="IGL/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
@@ -229,20 +188,13 @@
           <h2 class="h3">IGK</h2>
           <div class="row">
             <div class="col-6 text-center">
-              <h3 class="h5">Vgene usage</h3>
-              <a id="IGK/vsumBarplot.png" class="imageLink"><img id="IGK/vsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGK/vsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">Jgene usage</h3>
-              <a id="IGK/jsumBarplot.png" class="imageLink"><img id="IGK/jsumBarplot.png" class="imageEmbed"></a>
+              <div id="IGK/jsumBarplot.csv" class="plotlyBar"></div>
             </div>
             <div class="col-6 text-center">
-              <h3 class="h5">VJgene usage</h3>
-              <a id="IGK/vjStackBar.png" class="imageLink"><img id="IGK/vjStackBar.png" class="imageEmbed"></a>
-            </div>
-            <div class="col-6 text-center">
-              <h3 class="h5">VJ pairing usage</h3>
-              <a id="IGK/vjpairHeatmap.png" class="imageLink"><img id="IGK/vjpairHeatmap.png" class="imageEmbed"></a>
+              <div id="IGK/vjStackBar.csv" class="plotlyStackedBar"></div>
             </div>
           </div>
         </div>
