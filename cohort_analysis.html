@@ -23,7 +23,7 @@
   <script src="js/top_navbar.js"></script>
   <script src="js/plot.js"></script>
 
-  <title>Immune Repertoire</title>
+  <title>Immune Repertoire | VisualizIRR</title>
 
 </head>
 
@@ -126,10 +126,10 @@
               </div>
 
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(intracohortDiv, {format: 'png', width: 1200, height: 900, filename: 'cohort_analysis'});">Save
+                onclick="save_img('intracohortDiv', 'png', 'cohort_analysis')">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="Plotly.downloadImage(intracohortDiv, {format: 'svg', width: 1200, height: 900, filename: 'cohort_analysis'});">Save
+                onclick="save_img('intracohortDiv', 'svg', 'cohort_analysis')">Save
                 SVG</button>
 
             </div>

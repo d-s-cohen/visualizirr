@@ -72,6 +72,10 @@ function load_plotly_bar(data_path,this_id){
 
     }).fail(function() { 
 
+		console.log('#' + content_id)
+
+		$("#" + $.escapeSelector(this_id)).parent().hide();
+
 		var content_id = $(this).closest('.content_row').attr("id");
 		$(this).closest('.col-6').remove();
 		if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
@@ -144,6 +148,8 @@ function load_plotly_stacked_bar(data_path,this_id){
 		}, dataType = 'text');
     }).fail(function() { 
 
+		$("#" + $.escapeSelector(this_id)).parent().hide();
+
 		var content_id = $(this).closest('.content_row').attr("id");
 		$(this).closest('.col-6').remove();
 		if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
@@ -157,5 +163,12 @@ function load_plotly_stacked_bar(data_path,this_id){
 			}
 		}
     })
+
+}
+
+
+function save_img(div_name, file_format, file_name){
+
+	Plotly.downloadImage(div_name, {format: file_format, width: 1200, height: 900, filename: file_name});
 
 }
