@@ -64,8 +64,16 @@ Rscript immuneRepProcess.R config.R
 
 ---
 
-**config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template is included that helps to guide the user.
+**config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template with descriptions of each field is included that helps to guide the user.
 Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
+* Three fields are required (input format, input directory, output directory).
+* There are additional optional fields for the user to specify how the results are generated.
+    * Defining the prefix/suffix of the input files is recommended.
+    * cohort_list.csv (see below for more info) can automatically generated and modified
+    * Chains (TRB, TRA, TRG, TRD, IGH, IGL, IGK) to be analyzed can be defined.
+    * Different features of the output figures can be defined.
+    * Components of the report to be produced can be adjusted.
+    * Custom input format can be defined.
 
 ---
 
@@ -91,7 +99,7 @@ The leftmost column displays in bold.
 ---
 
 **cohort_list.csv** can optionally be placed in this directory in order to enable shortcuts to different cohort selections.
-The default data path is 'data/' if cohort_list.csv hasn't been implemented. If you wish to change this path for the current session, you may do so at the top of the home page.
+The default data path used for the report is 'data/' if cohort_list.csv hasn't been implemented. If you wish to change this path for the current session, you may do so at the top of the home page.
 These shortcuts appear under 'Cohort Path Selection' above. ImmuneRepProcess.R has an option to automatically update this list when running new cohorts.
 
 cohort_list.csv template:

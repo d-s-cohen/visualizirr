@@ -6,8 +6,8 @@ sample_level_run = TRUE
 cohort_level_run = TRUE
 intracohort_run = TRUE
 chains_search = c("TRB", "TRA", "TRG", "TRD", "IGH", "IGL", "IGK")
-file_prefix = ""
-file_suffix = ""
+input_prefix = ""
+input_suffix = ""
 sumMax = 10
 vjMax = 5
 clonotypeMax = 8
@@ -73,12 +73,12 @@ if (!is.null(report_dir)) {
 files <-
   list.files(
     path = input_dir,
-    pattern = paste("^",file_prefix,".*",file_suffix,"$",sep=""),
+    pattern = paste("^",input_prefix,".*",input_suffix,"$",sep=""),
     full.names = F,
     recursive = F
   )
 
-files <- gsub(paste("(",file_prefix,"|",file_suffix,"$)",sep=""),"", files)
+files <- gsub(paste("(",input_prefix,"|",input_suffix,"$)",sep=""),"", files)
 
 dir.create(output_dir, showWarnings = FALSE)
 
@@ -105,7 +105,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
     if (input_format == "TRUST4") {
       
       sample_table <-
-        read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = F)
+        read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = F)
       
       if (ncol(sample_table) == 10) {
         colnames(sample_table) <-
@@ -143,9 +143,30 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
       
+    } else if (input_format == "TRUST4_SIMPLE") {
+      
+      sample_table <-
+        read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
+      
+        colnames(sample_table) <-
+          c(
+            "read_fragment_count",
+            "read_fragment_freq",
+            "CDR3",
+            "CDR3_AA",
+            "V_gene",
+            "D_gene",            
+            "J_gene",
+            "C_gene",
+            "junction"
+          )
+      
+        # remove partials
+        sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
+      
     } else if (input_format == "MIXCR") {
       
-      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = T)
+      sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
       colnames(sample_table)[which(names(sample_table) == "allVHitsWithScore")] <- "V_gene"
       colnames(sample_table)[which(names(sample_table) == "allDHitsWithScore")] <- "D_gene"
@@ -157,7 +178,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
     } else if (input_format == "ADAPTIVE") {
       
-      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = T)
+      sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
       colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
       colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
@@ -168,7 +189,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
     } else if (input_format == "CUSTOM") {
       
-      sample_table <- read.delim(paste(input_dir,"/",file_prefix,current_sample,file_suffix, sep = ""), header = custom_header)     
+      sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = custom_header)     
       
       colnames(sample_table)[custom_cdr3] <- "CDR3"
       colnames(sample_table)[custom_v] <- "V_gene"
@@ -193,7 +214,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
       
-      if (input_format %in% c("MIXCR","TRUST4")){
+      if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
         sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
         sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
         if (!is.null(sample_table$D_gene)) {
@@ -284,6 +305,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
             names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
             chain_table <- aggregate(read_fragment_freq ~ Clonotype + cdr3length, chain_table, sum)
+            
+            chain_table <- rbind(chain_table[(chain_table$'Clonotype'=='Other'),],chain_table[!(chain_table$'Clonotype'=='Other'),])
             
             write.table(
               chain_table,
@@ -574,7 +597,7 @@ if (cohort_level_run == TRUE) {
   if (input_format == "TRUST4") {
     
     all_dfs <- lapply(files, function(x){
-      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = F)
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = F)
     })
     
     sample_table <- do.call(rbind,all_dfs)
@@ -615,10 +638,34 @@ if (cohort_level_run == TRUE) {
     
     sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
     
+  } else if (input_format == "TRUST4_SIMPLE") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    colnames(sample_table) <-
+      c(
+        "read_fragment_count",
+        "read_fragment_freq",
+        "CDR3",
+        "CDR3_AA",
+        "V_gene",
+        "D_gene",            
+        "J_gene",
+        "C_gene",
+        "junction"
+      )
+    
+    # remove partials
+    sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
+    
   } else if (input_format == "MIXCR") {
     
     all_dfs <- lapply(files, function(x){
-      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = T)
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
     })
     
     sample_table <- do.call(rbind,all_dfs)
@@ -634,7 +681,7 @@ if (cohort_level_run == TRUE) {
   } else if (input_format == "ADAPTIVE") {
     
     all_dfs <- lapply(files, function(x){
-      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = T)
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
     })
     
     sample_table <- do.call(rbind,all_dfs)
@@ -649,7 +696,7 @@ if (cohort_level_run == TRUE) {
   } else if (input_format == "CUSTOM") {
     
     all_dfs <- lapply(files, function(x){
-      read.delim(paste(input_dir,"/",file_prefix,x,file_suffix, sep = ""), header = custom_header)
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = custom_header)
     })
     
     sample_table <- do.call(rbind,all_dfs)
@@ -673,7 +720,7 @@ if (cohort_level_run == TRUE) {
   
   dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
   
-  if (input_format %in% c("MIXCR","TRUST4")){
+  if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
     sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
     sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
     if (!is.null(sample_table$D_gene)) {
@@ -763,6 +810,8 @@ if (cohort_level_run == TRUE) {
       chain_table$CDR3_AA <- factor(chain_table$CDR3_AA,levels=unique(chain_table$CDR3_AA))
       names(chain_table)[names(chain_table) == 'CDR3_AA'] <- 'Clonotype'
       chain_table <- aggregate(read_fragment_freq ~ Clonotype + cdr3length, chain_table, sum)
+      
+      chain_table <- rbind(chain_table[(chain_table$'Clonotype'=='Other'),],chain_table[!(chain_table$'Clonotype'=='Other'),])
 
       write.table(
         chain_table,
