@@ -6,9 +6,9 @@ $(function () {
 			var current_pathname = $(location).attr('pathname');
 			// For cohort_analysis, don't assign URLs in page based off of current pathname
 			if (current_pathname.split('/').pop() == "cohort_analysis.html") {
-				current_pathname = current_pathname.replace(/cohort_analysis.html$/, "info.html");
+				current_pathname = current_pathname.replace(/cohort_analysis.html$/, "cdr3_length.html");
 			} else if ($.inArray(window.location.pathname.split('/').pop(), ["index.html", ""]) >= 0) {
-				current_pathname = "info.html"
+				current_pathname = "cdr3_length.html"
 			}
 			// Prepend 'All" selection to dropdown menu
 			if ($.inArray(window.location.pathname.split('/').pop(), ["cohort_analysis.html", "index.html", ""]) == -1) {
@@ -72,6 +72,11 @@ $(function () {
 						$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
 					});
 				});
+			});
+			
+			$.get(path_val + current_sample + "/info.csv")
+			.done(function () {
+				$('#info').show();
 			});
 		}
 	}, 100);

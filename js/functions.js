@@ -72,8 +72,6 @@ function load_plotly_bar(data_path,this_id){
 
     }).fail(function() { 
 
-		console.log('#' + content_id)
-
 		$("#" + $.escapeSelector(this_id)).parent().hide();
 
 		var content_id = $(this).closest('.content_row').attr("id");
