@@ -49,7 +49,9 @@ python3 -m http.server& python3 -m webbrowser–n "http://0.0.0.0:8000"
 **Setting up Display from a Cloneset**
 
 **config.R** needs to be properly configured and then **ImmuneRepProcess.R** needs to be run using it as input. 
+
 **meta.csv** is required for intracohort analysis and is the only component of the final report that needs to be manually composed by the end-user.
+
 **info.csv** can optionally be set up to include additional meta information for each sample as well as on the cohort level.
 Read the below sections for more detailed information on each of these components.
 
@@ -66,6 +68,7 @@ Rscript immuneRepProcess.R config.R
 
 **config.R** is used to adjust the parameters of ImmuneRepProcess.R and a template with descriptions of each field is included that helps to guide the user.
 Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
+
 * Three fields are required (input format, input directory, output directory).
 * There are additional optional fields for the user to specify how the results are generated.
     * Defining the prefix/suffix of the input files is recommended.

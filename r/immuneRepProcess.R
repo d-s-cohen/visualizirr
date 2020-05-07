@@ -286,9 +286,9 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             chain_table <- chain_table_unprocessed
             
             if (nrow(chain_table)>1) {
-              chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+              chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3_AA']
             } else {
-              chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+              chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3_AA']))
             }
             
             chain_table <- aggregate(read_fragment_freq~CDR3_AA+cdr3length, chain_table, sum)
@@ -791,9 +791,9 @@ if (cohort_level_run == TRUE) {
       chain_table <- chain_table_unprocessed
       
       if (nrow(chain_table)>1) {
-        chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3']
+        chain_table[,'cdr3length'] <- apply(chain_table,2,nchar)[,'CDR3_AA']
       } else {
-        chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3']))
+        chain_table[1,'cdr3length'] <- nchar(as.character(chain_table[1,'CDR3_AA']))
       }
       
       chain_table <- aggregate(read_fragment_freq~CDR3_AA+cdr3length, chain_table, sum)
