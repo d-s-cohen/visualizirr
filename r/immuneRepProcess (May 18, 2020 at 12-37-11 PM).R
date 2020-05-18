@@ -47,7 +47,7 @@ functionNum = functionNum + length(clonotypeAbundance)
 
 intracohort_values_template <- data.frame(matrix(ncol = functionNum, nrow = 0))
 
-intracohortColNames = c("sample", "chain", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index","Unique CDR3 Count","CDR3 Length")
+intracohortColNames = c("sample", "chain", "CDR3 Length", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index","Unique CDR3 Count")
 
 if (length(clonotypeAbundance)>0) {
   colnames(intracohort_values_template) <- c(intracohortColNames,paste(clonotypeAbundance, "(Freq*1000)", sep=" "))
@@ -142,9 +142,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       sample_table <- sample_table[(sample_table$CDR3_score != 0.00), ]
       
       sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
-      
-      sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), ",") , "[", 1)
-      
       
     } else if (input_format == "TRUST4_SIMPLE") {
       
@@ -310,7 +307,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             chain_table <- aggregate(read_fragment_freq ~ Clonotype + cdr3length, chain_table, sum)
             
             chain_table <- rbind(chain_table[(chain_table$'Clonotype'=='Other'),],chain_table[!(chain_table$'Clonotype'=='Other'),])
-            chain_table[,3] <- formatC(chain_table[,3])
             
             write.table(
               chain_table,
@@ -341,7 +337,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               chain_table$V_gene <- factor(chain_table$V_gene)
               
               chain_table <- chain_table[naturalorder(chain_table$V_gene),]
-              chain_table[,2] <- formatC(chain_table[,2])
 
               write.table(
                 t(chain_table),
@@ -371,7 +366,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               
               chain_table$J_gene <- factor(chain_table$J_gene)
               chain_table <- chain_table[naturalorder(chain_table$J_gene),] 
-              chain_table[,2] <- formatC(chain_table[,2])
               
               write.table(
                 t(chain_table),
@@ -404,8 +398,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
                   
                   chain_table$C_gene <- factor(chain_table$C_gene)
                   chain_table <- chain_table[naturalorder(chain_table$C_gene),] 
-                  chain_table[,2] <- formatC(chain_table[,2])
-                  
 
                   write.table(
                     t(chain_table),
@@ -440,7 +432,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
                   
                   chain_table$D_gene <- factor(chain_table$D_gene)
                   chain_table <- chain_table[naturalorder(chain_table$D_gene),] 
-                  chain_table[,2] <- formatC(chain_table[,2])
 
                   write.table(
                     t(chain_table),
@@ -474,7 +465,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               chain_table <- chain_table[c("J_gene","V_gene","read_fragment_freq")]
               chain_table <- aggregate(read_fragment_freq ~ J_gene + V_gene, chain_table, sum)
               chain_table <- chain_table[naturalorder(chain_table$V_gene),] 
-              chain_table[,3] <- formatC(chain_table[,3])
 
               write.table(
                 chain_table,
@@ -533,21 +523,21 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             } 
             intracohort_values[1, 1] <- current_sample
             intracohort_values[1, 2] <- current_chain
-            suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
-            if (nrow(chain_table_cdr3) != 1){
-              suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
-              suppressMessages(intracohort_values[1, 5] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
-              suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
-              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
-              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "inv.simp", "read.count"),4))
-              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "chao1", "read.count")[1],4))
-            } 
-            intracohort_values[1, 10] <- length(unique(chain_table_div$CDR3.nucleotide.sequence)) 
             if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
-              intracohort_values[1, 11] <- round(cdr3_aggregate/total_count,4)
+              intracohort_values[1, 3] <- round(cdr3_aggregate/total_count,4)
             } else {
-              intracohort_values[1, 11] <- chain_table_cdr3[1, 2]
+              intracohort_values[1, 3] <- chain_table_cdr3[1, 2]
             }
+            suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
+            if (nrow(chain_table_cdr3) != 1){
+              suppressMessages(intracohort_values[1, 5] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
+              suppressMessages(intracohort_values[1, 6] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
+              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
+              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
+              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "inv.simp", "read.count"),4))
+              suppressMessages(intracohort_values[1, 10] <- round(repDiversity(chain_table_div, "chao1", "read.count")[1],4))
+            } 
+            intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.nucleotide.sequence)) 
             
             if (length(clonotypeAbundance)>0){
               for (i in c(1:length(clonotypeAbundance))){
@@ -647,8 +637,6 @@ if (cohort_level_run == TRUE) {
     sample_table <- sample_table[(sample_table$CDR3_score != 0.00), ]
     
     sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
-
-    sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), ",") , "[", 1)
     
   } else if (input_format == "TRUST4_SIMPLE") {
     
