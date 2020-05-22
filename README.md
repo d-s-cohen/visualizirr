@@ -13,7 +13,8 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 * Cohort and sample level 
     * Segment Usage
         * V gene and J gene usage
-        * Combined V and J gene usage 
+        * Combined V and J gene usage
+        * C gene usage for IGH, D gene usage for IGH/TRB/TRD
     * CDR3 Info
         * Amino acid length distribution
         * Nucleotide length distribution
@@ -21,7 +22,7 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
     * User customized meta information 
 * Intracohort Analysis
     * Diversity and clonality measures
-        * CDR3 Length, Raw Diversity, Shannon Entropy Measure, 1 / Shannon Entropy Measure, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Unique CDR3 Count
+        * Raw Diversity, Shannon Entropy Measure, 1 / Shannon Entropy Measure, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Unique CDR3 Count, CDR3 Length
         * Comparison between sub-cohort groups of these measures
 * Everything is split between different chains 
     * TRB, TRA, TRG, TRD, IGH, IGL, IGK
@@ -37,11 +38,11 @@ cd <VisualizIRR_directory>
 ```
 Python 2:
 ```
-python -m SimpleHTTPServer& python -m webbrowser-n "http://0.0.0.0:8000"
+python -m SimpleHTTPServer & python -m webbrowser -n "http://0.0.0.0:8000"
 ```
 Python 3:
 ```
-python3 -m http.server& python3 -m webbrowser–n "http://0.0.0.0:8000"
+python3 -m http.server & python3 -m webbrowser -n "http://0.0.0.0:8000"
 ```
 
 ---

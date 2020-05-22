@@ -5,10 +5,10 @@
 ### REQUIRED ###
 
 # Specify input format so that files may be parsed appropriately
-# Accepted formats: "TRUST4", "TRUST4_SIMPLE", "MIXCR", "ADAPTIVE", "CUSTOM"
+# Accepted formats: "TRUST4" (cdr3.out files), "TRUST4_SIMPLE" (report.out files), "MIXCR", "ADAPTIVE", "CUSTOM"
 input_format = "TRUST4"
 
-# Change to your directory containing input cdr3.out files
+# Change to your directory containing input files
 input_dir = "~/in"
 
 # Change to path where you wish to store output figures
