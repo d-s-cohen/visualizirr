@@ -32,7 +32,7 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 **Viewing Display on a Local Machine**
 
 For security purposes, newer browsers can have problems loading local files normally in an HTML page.
-If you can't view the the display locally by simply opening the html in a browser:
+If you can't view the the display locally by simply opening the html in a browser, you can perform the following in your terminal to set up a simple server and view the report:
 ```
 cd <VisualizIRR_directory>
 ```
@@ -44,6 +44,8 @@ Python 3:
 ```
 python3 -m http.server & python3 -m webbrowser -n "http://0.0.0.0:8000"
 ```
+
+The report is viewable at http://0.0.0.0:8000, which should pop up automatically.
 
 ---
 
@@ -83,8 +85,8 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 
 **meta.csv** should be a csv with the first column including sample names and remaining columns for different conditions. 
 There are a few ways to enter your meta information, but the preferable way is to use a numeric range and denote 
-the categorical label of those groups in the header using '|' as the seperator (as demonstrated in condition 0). 
-You can also use the labels in the metasheet and not denote them in the header (as demonstrated in condition 1).
+the categorical label of those groups in the header using '|' as the seperator (as demonstrated in condition 0 and 2). 
+You can also use the labels in the metasheet and not denote them in the header (as demonstrated in condition 1 and 3).
 
 meta.csv template:
 ```
@@ -140,7 +142,7 @@ SampleName2,IGK,32.707,3.3842,4.2796,0.2337,0.866,0.8199,5.5511,394.038,279
 ```
 
 Due to the nature of this format, you may append any column you like as an additional function for comparison in the analysis. 
-It will be processed the same as the others.
+It will be processed the same as the others in the report.
 
 ---
 
