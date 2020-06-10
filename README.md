@@ -56,11 +56,12 @@ The report is viewable at http://0.0.0.0:8000, which should pop up automatically
 **meta.csv** is required for intracohort analysis and is the only component of the final report that needs to be manually composed by the end-user.
 
 **info.csv** can optionally be set up to include additional meta information for each sample as well as on the cohort level.
+
 Read the below sections for more detailed information on each of these components.
 
 ---
 
-**ImmuneRepProcess.R** can be run to generate static figures, intracohort_data.csv, and sample_list.csv.
+**ImmuneRepProcess.R** can be run to generate figures, intracohort_data.csv, and sample_list.csv.
 
 Usage:
 ```

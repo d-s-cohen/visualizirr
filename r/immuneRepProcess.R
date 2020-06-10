@@ -183,12 +183,41 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
-      colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
-      colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
-      colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
-      colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
-      colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
-      colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+      if ("v_gene" %in% colnames(sample_table)) {
+        
+        colnames(sample_table)[which(names(sample_table) == "v_gene")] <- "V_gene"
+        colnames(sample_table)[which(names(sample_table) == "d_gene")] <- "D_gene"
+        colnames(sample_table)[which(names(sample_table) == "j_gene")] <- "J_gene"
+        colnames(sample_table)[which(names(sample_table) == "rearrangement")] <- "CDR3"
+        colnames(sample_table)[which(names(sample_table) == "amino_acid")] <- "CDR3_AA"
+        colnames(sample_table)[which(names(sample_table) == "templates")] <- "read_fragment_count"
+        
+      } else if ("vGeneName" %in% colnames(sample_table)) {
+      
+      colnames(sample_table)[which(names(sample_table) == "vGeneName")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "dGeneName")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "jGeneName")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "nucleotide")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "aminoAcid")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "count..templates.reads.")] <- "read_fragment_count"
+      
+      colnames(sample_table)[which(names(sample_table) == "vIndex")] <- "v_index"
+      colnames(sample_table)[which(names(sample_table) == "cdr3Length")] <- "cdr3_length"
+      
+      }
+      
+      sample_table[,"CDR3"] <- as.character(sample_table[,"CDR3"])
+      
+      for(i in 1:nrow(sample_table)) {
+        row <- sample_table[i,]
+        cdr3_nt <- substr(row$CDR3,row$v_index+1,row$v_index+row$cdr3_length)
+        sample_table[i,"CDR3"] <- cdr3_nt
+        
+      }
+      
+      sample_table$V_gene <- gsub('TCR', 'TR', sample_table$V_gene)      
+      sample_table$D_gene <- gsub('TCR', 'TR', sample_table$D_gene)    
+      sample_table$J_gene <- gsub('TCR', 'TR', sample_table$J_gene)    
       
     } else if (input_format == "CUSTOM") {
       
@@ -698,12 +727,44 @@ if (cohort_level_run == TRUE) {
     
     sample_table <- do.call(rbind,all_dfs)
     
-    colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
-    colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
-    colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
-    colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
-    colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
-    colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+    if ("v_gene" %in% colnames(sample_table)) {
+      
+      colnames(sample_table)[which(names(sample_table) == "v_gene")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "d_gene")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "j_gene")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "rearrangement")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "amino_acid")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "templates")] <- "read_fragment_count"
+      
+    } else if ("vGeneName" %in% colnames(sample_table)) {
+      
+      colnames(sample_table)[which(names(sample_table) == "vGeneName")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "dGeneName")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "jGeneName")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "nucleotide")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "aminoAcid")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "count..templates.reads.")] <- "read_fragment_count"
+      
+      colnames(sample_table)[which(names(sample_table) == "vIndex")] <- "v_index"
+      colnames(sample_table)[which(names(sample_table) == "cdr3Length")] <- "cdr3_length"
+      
+    }
+    
+    sample_table[,"CDR3"] <- as.character(sample_table[,"CDR3"])
+    
+    for(i in 1:nrow(sample_table)) {
+      row <- sample_table[i,]
+      cdr3_nt <- substr(row$CDR3,row$v_index+1,row$v_index+row$cdr3_length)
+      sample_table[i,"CDR3"] <- cdr3_nt
+      
+    }
+    
+
+    sample_table$V_gene <- gsub('TCR', 'TR', sample_table$V_gene)      
+    sample_table$D_gene <- gsub('TCR', 'TR', sample_table$D_gene)    
+    sample_table$J_gene <- gsub('TCR', 'TR', sample_table$J_gene)    
+    
+    
     
   } else if (input_format == "CUSTOM") {
     
