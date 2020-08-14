@@ -19,6 +19,8 @@ report_dir = NULL
 output_name = paste("Cohort", Sys.Date())
 json_out = FALSE
 
+# Command line arguments
+
 if (length(args)==0) {
   if(file.exists("config.R")){
     source("config.R")
@@ -34,6 +36,8 @@ if (length(args)==0) {
 if (!(exists("input_format") & exists("input_dir") & exists("output_dir"))) {
   stop("'Define input_format, input_dir, and output_dir in config file'", call.=FALSE)
 }
+
+# Package setup
 
 list.of.packages <- c("data.table","tcR","naturalsort","dplyr")
 
@@ -52,20 +56,6 @@ if (json_out == TRUE) {
   suppressMessages(library(rjson))
 }
 
-functionNum = 12
-functionNum = functionNum + length(clonotypeAbundance)
-
-intracohort_values_template <- data.frame(matrix(ncol = functionNum, nrow = 0))
-
-intracohortColNames = c("sample", "chain", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
-                        "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
-
-if (length(clonotypeAbundance)>0) {
-  colnames(intracohort_values_template) <- c(intracohortColNames,paste(clonotypeAbundance, "(Freq*1000)", sep=" "))
-} else {
-  colnames(intracohort_values_template) <- intracohortColNames
-}
-
 if (input_format %in% c("TRUST4","CUSTOM")){
   if (!"Biostrings" %in% installed.packages()[,"Package"]){
     if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -74,6 +64,28 @@ if (input_format %in% c("TRUST4","CUSTOM")){
   }
   suppressMessages(library(Biostrings))
 }
+
+# Intracohort analysis functions setup
+
+intracohortColNames = c("sample", "chain", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
+                        "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
+
+if (input_format == "RHTCRSEQ") {
+  intracohortColNames = intracohortColNames[-11]
+}
+
+functionNum = length(intracohortColNames)
+functionNumClonotype = functionNum + length(clonotypeAbundance)
+
+intracohort_values_template <- data.frame(matrix(ncol = functionNumClonotype, nrow = 0))
+
+if (length(clonotypeAbundance)>0) {
+  colnames(intracohort_values_template) <- c(intracohortColNames,paste(clonotypeAbundance, "(Freq*1000)", sep=" "))
+} else {
+  colnames(intracohort_values_template) <- intracohortColNames
+}
+
+# File list
 
 input_dir = sub("/$","",input_dir)
 output_dir = sub("/$","",output_dir)
@@ -112,6 +124,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
     }  
     
     print(paste(Sys.time(),"Sample",match(current_sample,files),"/",length(files),"-",current_sample))
+    
+    # TRUST4 file format
     
     if (input_format == "TRUST4") {
       
@@ -156,8 +170,11 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), ",") , "[", 1)
       
-      
-    } else if (input_format == "TRUST4_SIMPLE") {
+    }       
+    
+    # TRUST4_SIMPLE file format
+    
+    else if (input_format == "TRUST4_SIMPLE") {
       
       sample_table <-
         read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
@@ -178,7 +195,11 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         # remove partials
         sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
       
-    } else if (input_format == "MIXCR") {
+    } 
+    
+    # MIXCR file format
+    
+    else if (input_format == "MIXCR") {
       
       sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
@@ -190,7 +211,11 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       colnames(sample_table)[which(names(sample_table) == "aaSeqCDR3")] <- "CDR3_AA"
       colnames(sample_table)[which(names(sample_table) == "cloneCount")] <- "read_fragment_count"
       
-    } else if (input_format == "ADAPTIVE") {
+    } 
+    
+    # ADAPTIVE file format
+    
+    else if (input_format == "ADAPTIVE") {
       
       sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
@@ -234,9 +259,13 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       sample_table$V_gene <- gsub('TCR', 'TR', sample_table$V_gene)      
       sample_table$D_gene <- gsub('TCR', 'TR', sample_table$D_gene)    
-      sample_table$J_gene <- gsub('TCR', 'TR', sample_table$J_gene)    
+      sample_table$J_gene <- gsub('TCR', 'TR', sample_table$J_gene) 
       
-    } else if (input_format == "RHTCRSEQ") { 
+    } 
+    
+    # RHTCRSEQ file format
+    
+    else if (input_format == "RHTCRSEQ") { 
       
       sample_table_trb <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T, sep = ',')[c('v_hit','j_hit','cdr3','count_sum')] 
       input_suffix_tra <- gsub("TRB","TRA",input_suffix)
@@ -249,7 +278,11 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       colnames(sample_table)[which(names(sample_table) == "cdr3")] <- "CDR3_AA"
       colnames(sample_table)[which(names(sample_table) == "count_sum")] <- "read_fragment_count"
       
-    } else if (input_format == "CUSTOM") {
+    } 
+    
+    # CUSTOM file format
+    
+    else if (input_format == "CUSTOM") {
       
       sample_table <- read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = custom_header, sep = custom_sep)     
       
@@ -280,6 +313,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
       
+      # Clean V,D,J,C-genes
+      
       if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
         sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
         sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
@@ -290,6 +325,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
           sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), "[*]") , "[", 1)
         }
       }
+      
+      # Current chain
       
       for (current_chain in chains_search) {
         
@@ -617,6 +654,9 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             }
           }
           if (intracohort_run == TRUE) {
+            
+            # Clonality and diversity measures for intracohort analysis
+            
             intracohort_values <- intracohort_values_template
             
             chain_table_div <- chain_table_unprocessed
@@ -691,7 +731,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             
             if (input_format == "RHTCRSEQ"){
               intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.amino.acid.sequence))
-              intracohort_values[1, 12] <- length(unique(chain_table_div$CDR3.amino.acid.sequence))
             } else {
               intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.nucleotide.sequence))
               intracohort_values[1, 12] <- length(unique(chain_table_div$CDR3.amino.acid.sequence))
@@ -704,7 +743,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
                   foundClonotype = foundClonotype * 1000
                 }
                 #if (foundClonotype > 0){
-                intracohort_values[1, 12+i] <- foundClonotype
+                intracohort_values[1, functionNum+i] <- foundClonotype
                 #}
               }
             }
@@ -728,6 +767,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
   }
 }
 
+# Write intracohort_data.csv
+
 if (intracohort_run == TRUE) {
   write.table(
     intracohort_table,
@@ -738,6 +779,8 @@ if (intracohort_run == TRUE) {
     na = ""
   )
 }
+
+# Write sample_list.csv
 
 if (sample_level_run == TRUE) {
   
@@ -758,6 +801,8 @@ if (cohort_level_run == TRUE) {
   print(paste(Sys.time(),"Generating cohort-level figures. This may take a while for a larger set."))
   
   sample_table = NULL
+  
+  # TRUST4 file format
   
   if (input_format == "TRUST4") {
     
@@ -805,7 +850,11 @@ if (cohort_level_run == TRUE) {
 
     sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), ",") , "[", 1)
     
-  } else if (input_format == "TRUST4_SIMPLE") {
+  } 
+  
+  # TRUST4_SIMPLE file format
+  
+  else if (input_format == "TRUST4_SIMPLE") {
     
     all_dfs <- lapply(files, function(x){
       read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
@@ -829,7 +878,11 @@ if (cohort_level_run == TRUE) {
     # remove partials
     sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
     
-  } else if (input_format == "MIXCR") {
+  } 
+  
+  # MIXCR file format
+  
+  else if (input_format == "MIXCR") {
     
     all_dfs <- lapply(files, function(x){
       read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
@@ -845,7 +898,11 @@ if (cohort_level_run == TRUE) {
     colnames(sample_table)[which(names(sample_table) == "aaSeqCDR3")] <- "CDR3_AA"
     colnames(sample_table)[which(names(sample_table) == "cloneCount")] <- "read_fragment_count"
     
-  } else if (input_format == "ADAPTIVE") {
+  } 
+  
+  # ADAPTIVE file format
+  
+  else if (input_format == "ADAPTIVE") {
     
     sample_table_test <- read.delim(paste(input_dir,"/",input_prefix,files[1],input_suffix, sep = ""), header = T)
     
@@ -920,8 +977,11 @@ if (cohort_level_run == TRUE) {
     
     sample_table <- do.call(rbind,all_dfs)
     
-    
-  } else if (input_format == "RHTCRSEQ") { 
+  } 
+  
+  # RHTCRSEQ file format
+  
+  else if (input_format == "RHTCRSEQ") { 
     
     all_dfs <- lapply(files, function(x){
     
@@ -942,7 +1002,11 @@ if (cohort_level_run == TRUE) {
     
     sample_table <- do.call(rbind,all_dfs)
     
-  } else if (input_format == "CUSTOM") {
+  } 
+  
+  # CUSTOM file format
+  
+  else if (input_format == "CUSTOM") {
     
     all_dfs <- lapply(files, function(x){
       read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = custom_header, sep = custom_sep)
@@ -969,6 +1033,8 @@ if (cohort_level_run == TRUE) {
   
   dir.create(paste(output_dir,current_sample,sep="/"), showWarnings = FALSE)
   
+  # Clean V,D,J,C-genes
+  
   if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
     sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
     sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
@@ -981,6 +1047,8 @@ if (cohort_level_run == TRUE) {
   }
   
   sample_table <- sample_table[order(-sample_table$read_fragment_count),] 
+  
+  # Current chain
   
   for (current_chain in chains_search) {
     
@@ -1234,6 +1302,8 @@ if (cohort_level_run == TRUE) {
     }
   }
 }
+
+# Write cohort_list.csv
 
 if (!is.null(report_dir)) {
   
