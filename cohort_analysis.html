@@ -15,6 +15,7 @@
   <script src="lib/js/d3.min.js"></script>
   <script src="lib/js/plotly-latest.min.js"></script>
   <script src="lib/js/mannwhitneyu.js"></script>
+  <script src="lib/js/wilcoxon_signed_rank_test.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <link rel="stylesheet" href="css/styling.css">
   <script src="js/load_sections.js"></script>
@@ -46,8 +47,11 @@
               </ul> -->
               <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
               <ul>
-                <li class="nav-item">
+                <li class="nav-item" id="content_ica_nav">
                   <a class="nav-link nav-pad" href="#ICA" onclick="hide_others('#ICA')">Intracohort Analysis</a>
+                </li>
+                <li class="nav-item" id="content_psca_nav" style="display:none;">
+                  <a class="nav-link nav-pad" href="#PSCA" onclick="hide_others('#PSCA')">Paired Sample Cohort Analysis</a>
                 </li>
               </ul>
             </li>
@@ -62,21 +66,6 @@
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Cohort Analysis</h1>
         </div>
-
-        <!-- PCA  -->
-        <!-- <div class="content_row static" id="content_pca">
-          <h2 class="h3">Principal Component Analysis</h2>
-          <div class="row">
-            <div class="col text-center">
-              <a id = "cohortAnalysis/naive0_PCA.png" class = "imageLink"><img id = "cohortAnalysis/naive0_PCA.png" class = "imageEmbed"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
-              <a id = "cohortAnalysis/naive1_PCA.png" class = "imageLink"><img id = "cohortAnalysis/naive1_PCA.png" class = "imageEmbed"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
-              <a id = "cohortAnalysis/all_sample_PCA.png" class = "imageLink"><img id = "cohortAnalysis/all_sample_PCA.png" class = "imageEmbed"
-                  style="image-rendering:-webkit-optimize-contrast;max-width:500px;width:100%;"></a>
-            </div>
-          </div>
-        </div> -->
 
         <div class="content_row dynamic" id="content_ICA">
           <h2 class="h3">Intracohort Analysis</h2>
@@ -135,6 +124,56 @@
             </div>
           </div>
         </div>
+
+        <div class="content_row dynamic" id="content_PSCA" style="visibility: hidden">
+          <h2 class="h3">Paired Sample Cohort Analysis</h2>
+          <div class="row">
+            <div class="col text-center">
+              <div id="pscaDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+                class="d-flex justify-content-center"></div>
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChainPSCA"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select Chain
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection_psca">
+                </div>
+              </div>
+
+              <!-- <div class="btn-group-vertical">
+
+                <div class="dropdown btn-group">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Condition
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection">
+                  </div>
+                </div>
+
+              </div> -->
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionPSCA" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  Select Function
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection_psca">
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-success"
+                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis')">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis')">Save
+                SVG</button>
+
+            </div>
+          </div>
+        </div>
+
 
       </main>
     </div>

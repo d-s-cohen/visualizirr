@@ -12,6 +12,7 @@ types['#BCR'] = '#content_bcr';
 types['#PCA'] = '#content_pca';
 types['#DIV'] = '#content_diversity';
 types['#ICA'] = '#content_ICA';
+types['#PSCA'] = '#content_PSCA';
 types[''] = 'blank';
 
 // Associate location hash with content IDs

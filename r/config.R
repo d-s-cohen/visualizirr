@@ -5,7 +5,7 @@
 ### REQUIRED ###
 
 # Specify input format so that files may be parsed appropriately
-# Accepted formats: "TRUST4" (cdr3.out files), "TRUST4_SIMPLE" (report.out files), "MIXCR", "ADAPTIVE", "CUSTOM"
+# Accepted formats: "TRUST4" (cdr3.out files), "TRUST4_SIMPLE" (report.out files), "MIXCR", "ADAPTIVE", "RHTCRSEQ", "CUSTOM"
 input_format = "TRUST4"
 
 # Change to your directory containing input files
@@ -41,6 +41,9 @@ clonotypeMax = 8
 # Clonotype abundancies to include in intracohort analysis - Enter a vector of CDR3 Amino Acids (DEFAULT: NULL)
 #clonotypeAbundance = c()
 
+# Produce corresponding JSON files of report information for samples
+#json_out = FALSE
+
 # Components to run (DEFAULT: TRUE)
 sample_level_run = TRUE
 cohort_level_run = TRUE
@@ -49,7 +52,6 @@ intracohort_run = TRUE
 #####################
 # CUSTOM INPUT FORMAT
 # This applies if "CUSTOM" was selected as format
-# Must be TSV
 #####################
 # Whether or not input contains a header
 #custom_header = TRUE
@@ -65,3 +67,5 @@ intracohort_run = TRUE
 #custom_c = 5
 # Column number containing clonotype count
 #custom_count = 6
+# Custom seperator, don't change if input is TSV
+# custom_sep = ''

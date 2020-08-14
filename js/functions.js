@@ -62,7 +62,7 @@ function load_plotly_bar(data_path,this_id){
 			  Plotly.newPlot(this_id, data2,layout);
 
 			  var content_id = $("#" + $.escapeSelector(this_id)).closest('.content_row').attr("id");
-			  if ($('#' + content_id).find(".plotlyBar").length > 0) {
+			  if ($('#' + content_id).find(".plotlyBar, .plotlyStackedBar").length > 0) {
 				  $('#' + content_id + '_nav').show();
 				  if ($.inArray(types[location.hash], ['blank', '#' + content_id]) >= 0) {
 					  $('#' + content_id).show();
@@ -79,7 +79,7 @@ function load_plotly_bar(data_path,this_id){
 		if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
 			$("#" + $.escapeSelector(this_id)).closest('.col').remove();
 		}
-		if ($('#' + content_id).find(".plotlyBar").length == 0) {
+		if ($('#' + content_id).find(".plotlyBar, .plotlyStackedBar").length == 0) {
 			$('#' + content_id).remove();
 			$('#' + content_id + '_nav').remove();
 			if (types[location.hash] == '#' + content_id) {
@@ -137,7 +137,7 @@ function load_plotly_stacked_bar(data_path,this_id){
 			}
 
 			  var content_id = $("#" + $.escapeSelector(this_id)).closest('.content_row').attr("id");
-			  if ($('#' + content_id).find(".plotlyBar").length > 0) {
+			  if ($('#' + content_id).find(".plotlyBar, .plotlyStackedBar").length > 0) {
 				  $('#' + content_id + '_nav').show();
 				  if ($.inArray(types[location.hash], ['blank', '#' + content_id]) >= 0) {
 					  $('#' + content_id).show();
@@ -153,7 +153,7 @@ function load_plotly_stacked_bar(data_path,this_id){
 		if (window.location.pathname.split('/').pop() == "cohort_analysis.html") {
 			$("#" + $.escapeSelector(this_id)).closest('.col').remove();
 		}
-		if ($('#' + content_id).find(".plotlyBar").length == 0) {
+		if ($('#' + content_id).find(".plotlyBar, .plotlyStackedBar").length == 0) {
 			$('#' + content_id).remove();
 			$('#' + content_id + '_nav').remove();
 			if (types[location.hash] == '#' + content_id) {
