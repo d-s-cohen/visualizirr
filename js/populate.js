@@ -141,7 +141,6 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 	}
 	d3.text(data_path + "intracohort_data.csv").then(function (data) {
 		var parsedCSV = d3.csvParseRows(data);
-		console.log(parsedCSV)
 		var container = d3.select("#tableSpace")
 			.selectAll("tr")
 			.data(parsedCSV).enter()
