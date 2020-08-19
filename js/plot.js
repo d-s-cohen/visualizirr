@@ -45,154 +45,241 @@ if (sessionStorage.getItem('path_val') != null) {
   }, dataType = 'text');
 }
 
-d3.text(data_path + "meta.csv").then(function (data) {
 
-  var meta_rows = d3.csvParseRows(data);
-  var meta_header = meta_rows[0].slice(1);
+$.ajax({
+  url: data_path + "meta.csv",
+  type:'HEAD',
+  error: function()
+  {
+    d3.text(data_path + "intracohort_data.csv").then(function (data) {
 
-  for (let j = 1; j < meta_rows.length; j++) {
+      cond_name[0] = "no_cond_cond";
+      cond_group[0] = [];
+      cond_group[0][0] = "All Samples";
+      ica_meta[cond_name[0]] = [];
+      ica_data[cond_name[0]] = [];
+      ica_meta[cond_name[0]][cond_group[0]] = [];
+      ica_data[cond_name[0]][cond_group[0]] = [];
+    
+      var data_rows = d3.csvParseRows(data);
+      func_name = data_rows[0].slice(2);
 
-    if (j == 1) {
-      for (let j = 0; j < meta_header.length; j++) {
-        // Set up meta info and intracohort data structures
-        cond_name[j] = meta_header[j].split("|")[0];
-        ica_meta[cond_name[j]] = [];
-        ica_data[cond_name[j]] = [];
-        cond_group[j] = meta_header[j].split("|").slice(1);
-
-        if (meta_header[j].split("|").slice(1).length == 0) {
-          var group_set = [];
-          for (let k = 1; k < meta_rows.length; k++) {
-            var grouping = meta_rows[k][j + 1];
-            if (grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
-              group_set.push(grouping);
-            }
-          }
-          cond_group[j] = [...new Set(group_set)].sort();
-        }
-
-        for (let k = 0; k < cond_group[j].length; k++) {
-          ica_meta[cond_name[j]][cond_group[j][k]] = [];
-          ica_data[cond_name[j]][cond_group[j][k]] = [];
-        }
-
-        if (j == (meta_header.length - 1)) {
-          $(document).ready(function () {
-            for (let k = 0; k < cond_name.length; k++) {
-              if (cond_name[k] != 'VisGroup') {
-                // Populate condition options in html
-                $("#condition_selection").append("<a class='dropdown-item' onclick='dataMorph(" + k + ",undefined,undefined)'>" + cond_name[k] + "</a>");
-                if (cond_name.length > 1) {
-                  if (k == 0) {
-                    $("#button2nd_condition").removeAttr('style');
-                  }
-                  // Populate secondary condition options in html
-                  $("#condition2nd_selection").append("<a class='dropdown-item' onclick='condition_2nd(" + k + ")'>" + cond_name[k] + "</a>");
-                } else if (cond_name.length == 1 && k == 0) {
-                  $("#button2nd_condition").remove();
-                }
+      for (let i = 1; i < data_rows.length; i++) {
+        // Collect information on which chains are included for cond_group
+        in_chain[data_rows[i][1]] = in_chain[data_rows[i][1]] || [];
+        in_chain[data_rows[i][1]].push(data_rows[i][0]);
+        // Loop through available conditions
+        for (let k = 0; k < cond_name.length; k++) {
+          // Loop through condition groups
+          for (let l = 0; l < cond_group[k].length; l++) {
+              // Populate if chain is undefined
+              ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
+              // Loop through functions and append values for sample/chain
+              for (let m = 0; m < func_name.length; m++) {
+                ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [];
+                ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
               }
-            }
-          });
-        }
-      }
-    }
-    // Populate available conditions
-    for (let i = 0; i < meta_header.length; i++) {
-      var grouping = meta_rows[j][i + 1];
-      if (typeof grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
-        if (meta_header[i].split("|").slice(1).length == 0) {
-          ica_meta[cond_name[i]][grouping].push(meta_rows[j][0]);
-        } else {
-          ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
-        }
-      }
-    }
-    // On last meta table row...
-    if (j == (meta_rows.length - 1)) {
-
-      d3.text(data_path + "intracohort_data.csv").then(function (data) {
-
-        var data_rows = d3.csvParseRows(data);
-        func_name = data_rows[0].slice(2);
-
-        for (let i = 1; i < data_rows.length; i++) {
-          // Collect information on which chains are included for cond_group
-          in_chain[data_rows[i][1]] = in_chain[data_rows[i][1]] || [];
-          in_chain[data_rows[i][1]].push(data_rows[i][0]);
-          // Loop through available conditions
-          for (let k = 0; k < cond_name.length; k++) {
-            // Loop through condition groups
-            for (let l = 0; l < cond_group[k].length; l++) {
-              // if sample is in condition group...
-              if (ica_meta[cond_name[k]][cond_group[k][l]].includes(data_rows[i][0])) {
-                // Populate if chain is undefined
-                ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
-                // Loop through functions and append values for sample/chain
-                for (let m = 0; m < func_name.length; m++) {
-                  if (cond_name[k] == 'VisGroup'){
-                    ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [null,null];
-                    if (ica_meta["Timepoint"]["Pre"].includes(data_rows[i][0])) {
-                    ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][0] = data_rows[i][m + 2]
-                    } else if (ica_meta["Timepoint"]["Post"].includes(data_rows[i][0])){
-                      ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][1] = data_rows[i][m + 2]                      
-                    }
-                  } else {
-                  ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [];
-                  ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
-                  }
-
-                }
-              }
-            }
-            // On last data table row draw plot
-            if (i == (data_rows.length - 1)) {
-              $(document).ready(function () {
-                curr_func = func_name[0];
-                curr_chain = Object.keys(in_chain)[0];
-                curr_cond = cond_name[0];
-                curr_func_psca = func_name[0];
-                curr_chain_psca = Object.keys(in_chain)[0];
-                curr_group = cond_group[0];
-                $("#dropdownChain").text(curr_chain);
-                $("#dropdownFunction").text(curr_func);
-                $("#dropdownCondition").text(curr_cond);
-                $("#dropdownChainPSCA").text(curr_chain_psca);
-                $("#dropdownFunctionPSCA").text(curr_func_psca);
-                // Hide secondary condition option which is the current primary condition
-                $("#condition2nd_selection").children().filter(function () {
-                  return $(this).text() === curr_cond;
-                }).css("display", "none");
-                dataMorph();
-                if (cond_name.includes('VisGroup')){
-                  $('#content_PSCA').removeAttr('style');
-                  $('#content_psca_nav').removeAttr('style');
-                  pscaDraw();
-                }
-              });
-            }
           }
+          // On last data table row draw plot
           if (i == (data_rows.length - 1)) {
             $(document).ready(function () {
-              // Populate function options in html
-              for (let n = 0; n < func_name.length; n++) {
-                $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
-                $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined," + n + ")'>" + func_name[n] + "</a>");
-              }
-              $("#dropdownFondition").text(func_name[curr_func]);
-              // Populate chain options in html
-              var available_chains = Object.keys(in_chain).sort();
-              for (let n = 0; n < available_chains.length; n++) {
-                $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
-                $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+              curr_func = func_name[0];
+              curr_chain = Object.keys(in_chain)[0];
+              curr_cond = cond_name[0];
+              curr_func_psca = func_name[0];
+              curr_chain_psca = Object.keys(in_chain)[0];
+              curr_group = cond_group[0];
+              $("#dropdownChain").text(curr_chain);
+              $("#dropdownFunction").text(curr_func);
+              $("#dropdownCondition").text(curr_cond);
+              $("#dropdownChainPSCA").text(curr_chain_psca);
+              $("#dropdownFunctionPSCA").text(curr_func_psca);
+              // Hide secondary condition option which is the current primary condition
+              $("#condition2nd_selection").children().filter(function () {
+                return $(this).text() === curr_cond;
+              }).css("display", "none");
+              dataMorph();
+              if (cond_name.includes('VisGroup')){
+                $('#content_PSCA').removeAttr('style');
+                $('#content_psca_nav').removeAttr('style');
+                pscaDraw();
               }
             });
           }
         }
-      })
-    }
+        if (i == (data_rows.length - 1)) {
+          $(document).ready(function () {
+            // Populate function options in html
+            for (let n = 0; n < func_name.length; n++) {
+              $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
+              $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined," + n + ")'>" + func_name[n] + "</a>");
+            }
+            $("#dropdownFondition").text(func_name[curr_func]);
+            // Populate chain options in html
+            var available_chains = Object.keys(in_chain).sort();
+            for (let n = 0; n < available_chains.length; n++) {
+              $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+              $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+            }
+          });
+        }
+      }
+    })
+  },
+  success: function()
+  {
+    d3.text(data_path + "meta.csv").then(function (data) {
+
+      var meta_rows = d3.csvParseRows(data);
+      var meta_header = meta_rows[0].slice(1);
+    
+      for (let j = 1; j < meta_rows.length; j++) {
+    
+        if (j == 1) {
+          for (let j = 0; j < meta_header.length; j++) {
+            // Set up meta info and intracohort data structures
+            cond_name[j] = meta_header[j].split("|")[0];
+            ica_meta[cond_name[j]] = [];
+            ica_data[cond_name[j]] = [];
+            cond_group[j] = meta_header[j].split("|").slice(1);
+    
+            if (meta_header[j].split("|").slice(1).length == 0) {
+              var group_set = [];
+              for (let k = 1; k < meta_rows.length; k++) {
+                var grouping = meta_rows[k][j + 1];
+                if (grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
+                  group_set.push(grouping);
+                }
+              }
+              cond_group[j] = [...new Set(group_set)].sort();
+            }
+    
+            for (let k = 0; k < cond_group[j].length; k++) {
+              ica_meta[cond_name[j]][cond_group[j][k]] = [];
+              ica_data[cond_name[j]][cond_group[j][k]] = [];
+            }
+    
+            if (j == (meta_header.length - 1)) {
+              $(document).ready(function () {
+                for (let k = 0; k < cond_name.length; k++) {
+                  if (cond_name[k] != 'VisGroup') {
+                    // Populate condition options in html
+                    $("#condition_selection").append("<a class='dropdown-item' onclick='dataMorph(" + k + ",undefined,undefined)'>" + cond_name[k] + "</a>");
+                    if (cond_name.length > 1) {
+                      if (k == 0) {
+                        $("#button2nd_condition").removeAttr('style');
+                      }
+                      // Populate secondary condition options in html
+                      $("#condition2nd_selection").append("<a class='dropdown-item' onclick='condition_2nd(" + k + ")'>" + cond_name[k] + "</a>");
+                    } else if (cond_name.length == 1 && k == 0) {
+                      $("#button2nd_condition").remove();
+                    }
+                  }
+                }
+              });
+            }
+          }
+        }
+        // Populate available conditions
+        for (let i = 0; i < meta_header.length; i++) {
+          var grouping = meta_rows[j][i + 1];
+          if (typeof grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
+            if (meta_header[i].split("|").slice(1).length == 0) {
+              ica_meta[cond_name[i]][grouping].push(meta_rows[j][0]);
+            } else {
+              ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
+            }
+          }
+        }
+        // On last meta table row...
+        if (j == (meta_rows.length - 1)) {
+    
+          d3.text(data_path + "intracohort_data.csv").then(function (data) {
+    
+            var data_rows = d3.csvParseRows(data);
+            func_name = data_rows[0].slice(2);
+    
+            for (let i = 1; i < data_rows.length; i++) {
+              // Collect information on which chains are included for cond_group
+              in_chain[data_rows[i][1]] = in_chain[data_rows[i][1]] || [];
+              in_chain[data_rows[i][1]].push(data_rows[i][0]);
+              // Loop through available conditions
+              for (let k = 0; k < cond_name.length; k++) {
+                // Loop through condition groups
+                for (let l = 0; l < cond_group[k].length; l++) {
+                  // if sample is in condition group...
+                  if (ica_meta[cond_name[k]][cond_group[k][l]].includes(data_rows[i][0])) {
+                    // Populate if chain is undefined
+                    ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
+                    // Loop through functions and append values for sample/chain
+                    for (let m = 0; m < func_name.length; m++) {
+                      if (cond_name[k] == 'VisGroup'){
+                        ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [null,null];
+                        if (ica_meta["Timepoint"]["Pre"].includes(data_rows[i][0])) {
+                        ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][0] = data_rows[i][m + 2]
+                        } else if (ica_meta["Timepoint"]["Post"].includes(data_rows[i][0])){
+                          ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][1] = data_rows[i][m + 2]                      
+                        }
+                      } else {
+                      ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [];
+                      ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
+                      }
+    
+                    }
+                  }
+                }
+                // On last data table row draw plot
+                if (i == (data_rows.length - 1)) {
+                  $(document).ready(function () {
+                    curr_func = func_name[0];
+                    curr_chain = Object.keys(in_chain)[0];
+                    curr_cond = cond_name[0];
+                    curr_func_psca = func_name[0];
+                    curr_chain_psca = Object.keys(in_chain)[0];
+                    curr_group = cond_group[0];
+                    $("#dropdownChain").text(curr_chain);
+                    $("#dropdownFunction").text(curr_func);
+                    $("#dropdownCondition").text(curr_cond);
+                    $("#dropdownChainPSCA").text(curr_chain_psca);
+                    $("#dropdownFunctionPSCA").text(curr_func_psca);
+                    $('#cond_buttons').removeAttr('style');
+                    // Hide secondary condition option which is the current primary condition
+                    $("#condition2nd_selection").children().filter(function () {
+                      return $(this).text() === curr_cond;
+                    }).css("display", "none");
+                    dataMorph();
+                    if (cond_name.includes('VisGroup')){
+                      $('#content_PSCA').removeAttr('style');
+                      $('#content_psca_nav').removeAttr('style');
+                      pscaDraw();
+                    }
+                  });
+                }
+              }
+              if (i == (data_rows.length - 1)) {
+                $(document).ready(function () {
+                  // Populate function options in html
+                  for (let n = 0; n < func_name.length; n++) {
+                    $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
+                    $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined," + n + ")'>" + func_name[n] + "</a>");
+                  }
+                  $("#dropdownFondition").text(func_name[curr_func]);
+                  // Populate chain options in html
+                  var available_chains = Object.keys(in_chain).sort();
+                  for (let n = 0; n < available_chains.length; n++) {
+                    $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+                    $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+                  }
+                });
+              }
+            }
+          })
+        }
+      }
+    })
+    
   }
-})
+});
 
 $(document).ready(function () {
   // URL location hash show/hide support

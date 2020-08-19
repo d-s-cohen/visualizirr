@@ -54,6 +54,7 @@
                   <a class="nav-link nav-pad" href="#PSCA" onclick="hide_others('#PSCA')">Paired Sample Cohort Analysis</a>
                 </li>
               </ul>
+              <a class="nav-link" href="#TAB" onclick="show_class('.table_dv')" style="font-size: 1rem">Clonality and Diversity Information</a>
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
           </ul>
@@ -83,7 +84,7 @@
                 </div>
               </div>
 
-              <div class="btn-group-vertical">
+              <div class="btn-group-vertical" id="cond_buttons" style="display:none;">
 
                 <div class="dropdown btn-group">
                   <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
@@ -174,7 +175,7 @@
           </div>
         </div>
 
-        <div class="content_row dynamic" id="content_dv"> <!-- style="visibility: hidden">  -->
+        <div class="content_row table_dv" id="content_dv"> <!-- style="visibility: hidden">  -->
           <h2 class="h3">Clonality and Diversity Information</h2>
           <div class="card">
             <div class="card-header border-0">
