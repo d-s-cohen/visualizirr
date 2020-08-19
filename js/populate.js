@@ -122,3 +122,34 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 		});
 	});
 }
+
+// Populate information table from info.csv
+if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html']) >= 0) {
+	$(document).ready(function () {
+	});
+	var data_path = 'data/'
+	if (sessionStorage.getItem('path_val') != null) {
+		data_path = sessionStorage.getItem('path_val')
+	} else {
+		jQuery.get("cohort_list.csv", function (data) {
+			var path_val = data.split("\n")[0].split(",")[0]
+			path_val = path_val.replace(/\/?$/, '/');
+			sessionStorage.setItem('path_val', path_val);
+			data_path = sessionStorage.getItem('path_val');
+			location.reload();
+		}, dataType = 'text');
+	}
+	d3.text(data_path + "intracohort_data.csv").then(function (data) {
+		var parsedCSV = d3.csvParseRows(data);
+		console.log(parsedCSV)
+		var container = d3.select("#tableSpace")
+			.selectAll("tr")
+			.data(parsedCSV).enter()
+			.append("tr")
+
+			.selectAll("td")
+			.data(function (d) { return d; }).enter()
+			.append("td")
+			.text(function (d) { return d; });
+	});
+}

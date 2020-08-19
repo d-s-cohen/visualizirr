@@ -170,3 +170,28 @@ function save_img(div_name, file_format, file_name){
 	Plotly.downloadImage(div_name, {format: file_format, width: 1200, height: 900, filename: file_name});
 
 }
+
+
+function tableSearchFunction() {
+	// Declare variables
+	var input, filter, table, tr, td, i, txtValue;
+	input = document.getElementById("tableSearchInput");
+	filter = input.value.toUpperCase();
+	table = document.getElementById("tableSpace");
+	tr = table.getElementsByTagName("tr");
+  
+	// Loop through all table rows, and hide those who don't match the search query
+	for (i = 1; i < tr.length; i++) {
+	  td0 = tr[i].getElementsByTagName("td")[0];
+	  td1 = tr[i].getElementsByTagName("td")[1];
+
+	  if (td0 || td1) {
+		txtValue = (td0.textContent || td0.innerText) + '\t' + (td1.textContent || td1.innerText);
+		if (txtValue.toUpperCase().indexOf(filter) > -1) {
+		  tr[i].style.display = "";
+		} else {
+		  tr[i].style.display = "none";
+		}
+	  }
+	}
+  }
