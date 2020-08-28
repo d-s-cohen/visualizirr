@@ -8,6 +8,7 @@
   <!-- CSS and JS libraries-->
   <link rel="stylesheet" href="lib/css/bootstrap.min.css">
   <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
+  <link rel="stylesheet" href="lib/css/tabulator.min.css">
   <script src="lib/js/popper.min.js"></script>
   <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
   <script src="lib/js/bootstrap.min.js"></script>
@@ -16,6 +17,8 @@
   <script src="lib/js/plotly-latest.min.js"></script>
   <script src="lib/js/mannwhitneyu.js"></script>
   <script src="lib/js/wilcoxon_signed_rank_test.js"></script>
+  <script src="lib/js/tabulator.min.js"></script>
+  <script src="lib/js/papaparse.min.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <link rel="stylesheet" href="css/styling.css">
   <script src="js/load_sections.js"></script>
@@ -23,6 +26,7 @@
   <script src="js/functions.js"></script>
   <script src="js/top_navbar.js"></script>
   <script src="js/plot.js"></script>
+  <script src="js/overlap.js"></script>
 
   <title>Immune Repertoire | VisualizIRR</title>
 
@@ -53,8 +57,11 @@
                 <li class="nav-item" id="content_psca_nav" style="display:none;">
                   <a class="nav-link nav-pad" href="#PSCA" onclick="hide_others('#PSCA')">Paired Sample Cohort Analysis</a>
                 </li>
+                <li class="nav-item" id="content_ol_nav" style="display:none;">
+                  <a class="nav-link nav-pad" href="#OL" onclick="hide_others('#OL')">Overlap Analysis</a>
+                </li>
               </ul>
-              <a class="nav-link" href="#TAB" onclick="show_class('.table_dv')" style="font-size: 1rem">Clonality and Diversity Information</a>
+              <a class="nav-link" href="#TAB" onclick="show_class('.table_dv')" style="font-size: 1rem">Cohort Information Table</a>
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
           </ul>
@@ -67,6 +74,8 @@
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Cohort Analysis</h1>
         </div>
+
+        <div id="example-table"></div>
 
         <div class="content_row dynamic" id="content_ICA">
           <h2 class="h3">Intracohort Analysis</h2>
@@ -175,22 +184,78 @@
           </div>
         </div>
 
-        <div class="content_row table_dv" id="content_dv"> <!-- style="visibility: hidden">  -->
-          <h2 class="h3">Clonality and Diversity Information</h2>
-          <div class="card">
+        <div class="content_row dynamic" id="content_ol" style="visibility: hidden">
+          <h2 class="h3">Overlap Analysis</h2>
+          <div class="row">
+            <div class="col text-center">
+              <div id="overlapDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+                class="d-flex justify-content-center"></div>
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChainOverlap"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select Chain
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection_overlap">
+                </div>
+              </div>
+
+              <div class="btn-group-vertical" id="cond_buttons_overlap" style="display:none;">
+
+                <div class="dropdown btn-group">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownConditionOverlap"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Condition
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection_overlap">
+                  </div>
+                </div>
+
+                <div class="dropdown btn-group" id="button2nd_condition_overlap" style="display:none;">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdown2ndConditionOverlap"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Secondary Condition
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition2nd_selection_overlap">
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionOverlap" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  Select Function
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection_overlap">
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-success"
+                onclick="save_img('overlapDiv', 'png', 'overlap_analysis')">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="save_img('overlapDiv', 'svg', 'overlap_analysis')">Save
+                SVG</button>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="content_row table_dv" id="content_dv">
+          <h2 class="h3">Cohort Information Table</h2>
+          <!-- <div class="card">
             <div class="card-header border-0">
               <a class="btn btn-primary" data-toggle="collapse" href="#collapseTable" role="button" aria-expanded="false" aria-controls="collapseTable">
                 Show/Hide Table
               </a>
             </div>
             <div class="collapse" id="collapseTable">
-              <div class="card-body">
-                <input type="text" class="form-control" id="tableSearchInput" onkeyup="tableSearchFunction()" placeholder="Filter by Chain or Sample Name...">
-                <br>
-                <table class="table" style="font-size: 15px" id="tableSpace"></table>
-              </div>
-            </div>
-          </div>
+              <div class="card-body"> -->
+                <div id="data-table"></div>
+              <!-- </div>
+            </div> -->
+          <!-- </div> -->
         </div>
 
       </main>

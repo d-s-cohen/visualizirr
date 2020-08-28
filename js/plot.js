@@ -721,3 +721,15 @@ function dataMorphPSCA(chain, func) {
   pscaDraw();
 
 }
+
+
+$(document).ready(function () {
+
+
+  $('.imageEmbed').attr("src", function () { return data_path + $(this).attr("id") });
+  $(".imageEmbed").on("load", function () {
+    $('.static').removeAttr('style');
+  });
+});
+
+

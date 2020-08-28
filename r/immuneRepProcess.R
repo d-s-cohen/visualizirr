@@ -25,12 +25,12 @@ if (length(args)==0) {
   if(file.exists("config.R")){
     source("config.R")
   } else {
-    stop("'Usage: Rscript static_figures.R config.R'", call.=FALSE)
+    stop("'Usage: Rscript immuneRepProcess.R config.R'", call.=FALSE)
   }
 } else if (length(args)==1) {
   source(args[1])
 } else {
-  stop("'Usage: Rscript static_figures.R config.R'", call.=FALSE)
+  stop("'Usage: Rscript immuneRepProcess.R config.R'", call.=FALSE)
 }
 
 if (!(exists("input_format") & exists("input_dir") & exists("output_dir"))) {
@@ -39,7 +39,7 @@ if (!(exists("input_format") & exists("input_dir") & exists("output_dir"))) {
 
 # Package setup
 
-list.of.packages <- c("data.table","tcR","naturalsort","dplyr")
+list.of.packages <- c("data.table","immunarch","naturalsort","dplyr")
 
 if (json_out == TRUE) {
   list.of.packages <- append(list.of.packages,"rjson")
@@ -49,7 +49,7 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
 
 suppressMessages(library(data.table))
-suppressMessages(library(tcR))
+suppressMessages(library(immunarch))
 suppressMessages(library(naturalsort))
 suppressMessages(library(dplyr))
 if (json_out == TRUE) {
@@ -67,7 +67,7 @@ if (input_format %in% c("TRUST4","CUSTOM")){
 
 # Intracohort analysis functions setup
 
-intracohortColNames = c("sample", "chain", "Raw Diversity", "Shannon Entropy Measure","1 / Shannon Entropy Measure", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
+intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy","1/Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
                         "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
 
 if (input_format == "RHTCRSEQ") {
@@ -160,6 +160,22 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             "CDR3",
             "CDR3_score",
             "read_fragment_count"
+          )
+      } else if (ncol(sample_table) == 12) {
+        colnames(sample_table) <-
+          c(
+            "consensus_id",
+            "index_within_consensus",
+            "V_gene",
+            "D_gene",
+            "J_gene",
+            "C_gene",
+            "CDR1",
+            "CDR2",
+            "CDR3",
+            "CDR3_score",
+            "read_fragment_count",
+            "CDR3_germline_similarity"
           )
       }
       
@@ -338,9 +354,9 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         
         if (input_format != "RHTCRSEQ"){
           chain_table_unprocessed_allframe <- chain_table_unprocessed
+          chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
+                                                                         chr = apply(chain_table_unprocessed, 2, nchar))$chr.CDR3 %% 3 == 0), ]
         }
-        chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
-                                                                       chr = apply(chain_table_unprocessed, 2, nchar))$chr.CDR3 %% 3 == 0), ]
         
         count_sum = sum(chain_table_unprocessed$read_fragment_count)
         chain_table_unprocessed$read_fragment_freq <- sapply(chain_table_unprocessed$read_fragment_count/count_sum , "[", 1)
@@ -679,11 +695,11 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
               chain_table_cdr3$CDR3 <- nchar(as.character(chain_table_cdr3$CDR3))
             }
             
-            names(chain_table_div)[names(chain_table_div) == 'read_fragment_count'] <- 'Read.count'
-            names(chain_table_div)[names(chain_table_div) == 'CDR3'] <- 'CDR3.nucleotide.sequence'
-            names(chain_table_div)[names(chain_table_div) == 'CDR3_AA'] <- 'CDR3.amino.acid.sequence'
-            names(chain_table_div)[names(chain_table_div) == 'V_gene'] <- 'J.gene'
-            names(chain_table_div)[names(chain_table_div) == 'J_gene'] <- 'V.gene'
+            names(chain_table_div)[names(chain_table_div) == 'read_fragment_count'] <- 'Clones'
+            names(chain_table_div)[names(chain_table_div) == 'CDR3'] <- 'CDR3.nt'
+            names(chain_table_div)[names(chain_table_div) == 'CDR3_AA'] <- 'CDR3.aa'
+            names(chain_table_div)[names(chain_table_div) == 'V_gene'] <- 'J.name'
+            names(chain_table_div)[names(chain_table_div) == 'J_gene'] <- 'V.name'
             
             if (length(unique(chain_table_cdr3$CDR3)) != 1) {
               if (nrow(chain_table_cdr3) != 1){
@@ -709,14 +725,19 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             intracohort_values[1, 1] <- current_sample
             intracohort_values[1, 2] <- current_chain
             
-            suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", "read.count"),4))
+            process_col <- "nt"
+            if (input_format == "RHTCRSEQ"){
+              process_col <- "aa"
+            }
+            
+            suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", process_col),4))
             if (nrow(chain_table_cdr3) != 1){
-              suppressMessages(intracohort_values[1, 4] <- round(repDiversity(chain_table_div, "entropy", "read.count"),4))
-              suppressMessages(intracohort_values[1, 5] <- round(1/(repDiversity(chain_table_div, "entropy", "read.count")),4))
-              suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "gini", "read.count"),4))
-              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini.simp", "read.count"),4))
-              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "inv.simp", "read.count"),4))
-              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "chao1", "read.count")[1],4))
+              suppressMessages(intracohort_values[1, 4] <- round(entropy(chain_table_div$Clones),4))
+              suppressMessages(intracohort_values[1, 5] <- round(1/entropy(chain_table_div$Clones),4))
+              suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "gini", process_col),4))
+              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini.simp", process_col),4))
+              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "inv.simp", process_col),4))
+              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "chao1", process_col)[1],4))
             } 
             
             if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
@@ -730,10 +751,10 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             }
             
             if (input_format == "RHTCRSEQ"){
-              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.amino.acid.sequence))
+              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.aa))
             } else {
-              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.nucleotide.sequence))
-              intracohort_values[1, 12] <- length(unique(chain_table_div$CDR3.amino.acid.sequence))
+              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.aa))
+              intracohort_values[1, 12] <- length(unique(chain_table_div$CDR3.nt))
             }
             
             if (length(clonotypeAbundance)>0){
@@ -840,6 +861,22 @@ if (cohort_level_run == TRUE) {
           "CDR3",
           "CDR3_score",
           "read_fragment_count"
+        )
+    } else if (ncol(sample_table) == 12) {
+      colnames(sample_table) <-
+        c(
+          "consensus_id",
+          "index_within_consensus",
+          "V_gene",
+          "D_gene",
+          "J_gene",
+          "C_gene",
+          "CDR1",
+          "CDR2",
+          "CDR3",
+          "CDR3_score",
+          "read_fragment_count",
+          "CDR3_germline_similarity"
         )
     }
     

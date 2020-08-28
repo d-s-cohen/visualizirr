@@ -13,6 +13,7 @@ types['#PCA'] = '#content_pca';
 types['#DIV'] = '#content_diversity';
 types['#ICA'] = '#content_ICA';
 types['#PSCA'] = '#content_PSCA';
+types['#OL'] = '#content_ol';
 types[''] = 'blank';
 
 // Associate location hash with content IDs
@@ -139,16 +140,49 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 			location.reload();
 		}, dataType = 'text');
 	}
-	d3.text(data_path + "intracohort_data.csv").then(function (data) {
-		var parsedCSV = d3.csvParseRows(data);
-		var container = d3.select("#tableSpace")
-			.selectAll("tr")
-			.data(parsedCSV).enter()
-			.append("tr")
 
-			.selectAll("td")
-			.data(function (d) { return d; }).enter()
-			.append("td")
-			.text(function (d) { return d; });
-	});
+	function jsonToTable(data_json) {
+		columns_array = [
+			{title:"Sample", field:"sample",headerFilter: true},
+			{title:"Chain", field:"chain",headerFilter: true},
+		]
+		json_columns = Object.keys(data_json[0]);
+
+		for (i = 2; i < json_columns.length; i++) { 
+			console.log(json_columns[i])
+			columns_array.push({title:json_columns[i].split(' ').join('<br>'), field:json_columns[i], sorter:"number"},)
+			if (i == json_columns.length - 1){
+				var table = new Tabulator("#data-table", {
+					data:data_json,           //load row data from array
+					layout:"fitColumns",      //fit columns to width of table
+					responsiveLayout:"hide",  //hide columns that dont fit on the table
+					tooltips:true,            //show tool tips on cells
+					addRowPos:"top",          //when adding a new row, add it to the top of the table
+					history:true,             //allow undo and redo actions on the table
+					pagination:"local",       //paginate the data
+					paginationSize:25,         //allow 7 rows per page of data
+					//movableColumns:true,      //allow column order to be changed
+					resizableRows:true,       //allow row order to be changed
+					initialSort:[             //set the initial sort order of the data
+						{column:"sample", dir:"asc"},
+					],
+					columns:columns_array,
+				});
+			}
+		}
+	}
+	
+	function parseData(url, callBack) {
+		Papa.parse(url, {
+			download: true,
+			dynamicTyping: true,
+			header: true,
+			skipEmptyLines: true,
+			complete: function(results) {
+				callBack(results.data);
+			}
+		});
+	}
+	
+	parseData(data_path + "intracohort_data.csv", jsonToTable);
 }

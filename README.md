@@ -29,7 +29,7 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 
 ---
 
-**Viewing Display on a Local Machine**
+**Viewing Report on a Local Machine**
 
 For security purposes, newer browsers can have problems loading local files normally in an HTML page.
 If you can't view the the display locally by simply opening the html in a browser, you can perform the following in your terminal to set up a simple server and view the report:
