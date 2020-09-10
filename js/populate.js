@@ -149,8 +149,9 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 		json_columns = Object.keys(data_json[0]);
 
 		for (i = 2; i < json_columns.length; i++) { 
-			console.log(json_columns[i])
-			columns_array.push({title:json_columns[i].split(' ').join('<br>'), field:json_columns[i], sorter:"number"},)
+			columns_array.push({title:json_columns[i].split(' ').join('<br>'), field:json_columns[i], sorter:"number",formatter:function(cell, formatterParams, onRendered){
+				return Number.parseFloat(cell.getValue()).toPrecision(3).replace(/\.0+$/,""); //return the contents of the cell;
+			}},)
 			if (i == json_columns.length - 1){
 				var table = new Tabulator("#data-table", {
 					data:data_json,           //load row data from array

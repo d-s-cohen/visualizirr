@@ -214,11 +214,12 @@ $.ajax({
                     // Loop through functions and append values for sample/chain
                     for (let m = 0; m < func_name.length; m++) {
                       if (cond_name[k] == 'VisGroup'){
-                        ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [null,null];
-                        if (ica_meta["Timepoint"]["Pre"].includes(data_rows[i][0])) {
-                        ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][0] = data_rows[i][m + 2]
-                        } else if (ica_meta["Timepoint"]["Post"].includes(data_rows[i][0])){
-                          ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][1] = data_rows[i][m + 2]                      
+                        pair_groups = Object.keys(ica_meta["Timepoint"])
+                        ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || Array.from(Array(pair_groups.length), () => null);;
+                        for (let n = 0; n < pair_groups.length; n++) {
+                          if (ica_meta["Timepoint"][pair_groups[n]].includes(data_rows[i][0])) {
+                              ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][n] = data_rows[i][m + 2]
+                            }
                         }
                       } else {
                       ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [];
@@ -416,7 +417,8 @@ function condition_2nd(cond_2nd_idx) {
   }
   Plotly.relayout('intracohortDiv', update)
 
-  $("#dropdown2ndCondition").text(curr_cond_2nd);
+  $("#dropdown2ndCondition").text("x: "+curr_cond_2nd);
+  $("#dropdownCondition").text("hue: "+curr_cond);
   // Show primary conditions that aren't the same as secondary condition 
   $("#condition_selection").children().filter(function () {
     return $(this).text() === curr_cond_2nd;
@@ -438,6 +440,7 @@ function clear_2nd() {
 
   activated_cond_2nd = false;
   // Refresh secondary condition selection
+  $("#dropdownCondition").text(curr_cond);
   $("#dropdown2ndCondition").text("Select Secondary Condition");
   $("#cancel_2nd").remove();
   $("#swap_2nd").remove();
@@ -557,117 +560,106 @@ function pscaDraw() {
 
   var data = [];
 
-  var pre = [];
-  var post = [];
-
   timepoint_group = cond_group[cond_name.indexOf("Timepoint")]
   pair_group = cond_group[cond_name.indexOf("VisGroup")]
 
+  median_arrays = Array.from(Array(timepoint_group.length), () => []);
+  pval_paired_arrays = Array.from(Array(timepoint_group.length-1), () => [[],[]]);
+
   for (let k = 0; k < pair_group.length; k++) {
-    // Populate trace data (Just primary condition data)
 
-    // var filtered = ica_data['VisGroup'][pair_group[k]][curr_chain_psca].filter(function (el) {
-    //   return el != null;
-    // });
-    
+    if (typeof ica_data['VisGroup'][pair_group[k]][curr_chain_psca] !== 'undefined') {
 
-    if (typeof ica_data['VisGroup'][pair_group[k]][curr_chain_psca] !== 'undefined' && 
-    ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca].length == 2 &&
-    !ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca].includes(null)) {
+      for (let l = 0; l < (timepoint_group.length - 1); l++) {
 
-      var median_color = '' 
+        if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null)) {
 
-      if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][0]) > Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][1])){
-        median_color = 'royalblue'
-      } else if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][0]) < Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][1])){
-        median_color = 'crimson'
-      } else {
-        median_color = 'grey'
-      }
+          var median_color = ''
 
+          if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) > Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+            median_color = 'royalblue'
+          } else if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) < Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+            median_color = 'crimson'
+          } else {
+            median_color = 'grey'
+          }
 
-      var trace = {
-        mode: 'lines+markers',
-        type: 'scatter',
-        x: [(0+k/200-pair_group.length/400),1+k/200-pair_group.length/400],
-        y: ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca],
-        name: pair_group[k],
-        visible: true,
-        marker: {
-          color: median_color,
-          size: 5
-        },
-        line: {
-          color: median_color,
-          width: 1,
-          //dash: 'dash'
-        },
-        hoverinfo: 'none'
-      };
-      data.push(trace);
-
-      pre.push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][0]));
-      post.push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][1]));
-
-      if (k == pair_group.length-1){
-
-        // var median_color = '' 
-
-        // if (Number(median(pre)) > Number(median(post))){
-        //   median_color = 'royalblue'
-        // } else if (Number(median(pre)) < Number(median(post))){
-        //   median_color = 'crimson'
-        // } else {
-        //   median_color = 'grey'
-        // }
-
-        for (let i = -.007; i < .014; i=i+.007) {
           var trace = {
-            mode: 'markers',
+            mode: 'lines+markers',
             type: 'scatter',
-            x: [0+i,1+i],
-            y: [median(pre),median(post)],
-            name: "Median",
+            x: [
+              (l + k / 2000 - pair_group.length / 4000),
+              ((l + 1) + k / 2000 - pair_group.length / 4000)
+            ],
+            y: [ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]],
+            name: pair_group[k],
             visible: true,
             marker: {
-              color: 'white',
-              size: 50,
-              symbol: 'line-ew',
-              line: {
-                color: 'white',
-                width: 10
-              }
+              color: 'grey',
+              size: 7
+            },
+            line: {
+              color: median_color,
+              width: 1
             },
             hoverinfo: 'none'
           };
-          data.push(trace);
-        }
 
-        var trace = {
-          mode: 'markers',
-          type: 'scatter',
-          x: [0,1],
-          y: [median(pre),median(post)],
-          name: "Median",
-          visible: true,
-          marker: {
-            color: 'black',
-            // color: median_color,
-            size: 50,
-            symbol: 'line-ew',
-            line: {
-              color: 'black',
-              // color: median_color,
-              width: 4
-            }
-          },
-          // line: {
-          //   color: 'royalblue',
-          //   width: 2
-          // }
-        };
-        data.push(trace);
+          data.push(trace);
+
+          median_arrays[l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]);
+          median_arrays[l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]);
+
+          pval_paired_arrays[l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]));
+          pval_paired_arrays[l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]));
+
+        }
       }
+
+          if (k == pair_group.length - 1) {
+
+            var trace = {
+              mode: 'markers',
+              type: 'scatter',
+              x: Array.from(Array(timepoint_group.length).keys()),
+              y: median_arrays.map(x => median(Object.values(x))),
+              name: "Median",
+              visible: true,
+              marker: {
+                color: 'black',
+                size: 50,
+                symbol: 'line-ew',
+                line: {
+                  color: 'black',
+                  width: 4
+                }
+              }
+            };
+            data.unshift(trace);
+
+            pval_anno = []
+
+            for (let m = 0; m < (timepoint_group.length - 1); m++) {
+
+              pval_anno.push({
+                showarrow: false,
+                text: "p-value:<br>" + wilcoxon(pval_paired_arrays[m][0],pval_paired_arrays[m][1])['P'].toFixed(5),
+                x: m+.5,
+                xref: 'x',
+                y: -.175,
+                yref: 'paper',
+                font: {
+                  size: 12,
+                  color: 'black'
+                },
+              });
+
+
+            }
+
+          }
+
+
 
     }
 
@@ -686,20 +678,7 @@ function pscaDraw() {
       zeroline: false
     },
     showlegend: false,
-    annotations: [
-      {
-        showarrow: false,
-        text: "p-value:<br>" + wilcoxon(pre,post)['P'].toFixed(5),
-        x: .5,
-        xref: 'x',
-        y: -.175,
-        yref: 'paper',
-        font: {
-          size: 12,
-          color: 'black'
-        },
-      }
-    ]
+    annotations: pval_anno
   };
   // Render plot
   Plotly.newPlot("pscaDiv", data, layout);
