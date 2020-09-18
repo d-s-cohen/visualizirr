@@ -24,6 +24,15 @@ var pair_group = [];
 
 var curr_chain_psca = "";
 var curr_func_psca = "";
+var curr_split_psca = "psca_allsamples";
+
+var curr_x_scatter = "";
+var curr_y_scatter = "";
+var curr_chain_scatter = "";
+
+var sample_list = [];
+
+let checker = (arr, target) => target.every(v => arr.includes(v));
 
 
 const median = arr => {
@@ -112,14 +121,17 @@ $.ajax({
             // Populate function options in html
             for (let n = 0; n < func_name.length; n++) {
               $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
-              $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined," + n + ")'>" + func_name[n] + "</a>");
+              $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
+              $("#x_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined," + n + ",undefined)'>" + func_name[n] + "</a>");
+              $("#y_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
             }
             $("#dropdownFondition").text(func_name[curr_func]);
             // Populate chain options in html
             var available_chains = Object.keys(in_chain).sort();
             for (let n = 0; n < available_chains.length; n++) {
               $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
-              $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+              $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined,&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+              $("#chain_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + available_chains[n] + "</a>");
             }
           });
         }
@@ -165,6 +177,9 @@ $.ajax({
                   if (cond_name[k] != 'VisGroup') {
                     // Populate condition options in html
                     $("#condition_selection").append("<a class='dropdown-item' onclick='dataMorph(" + k + ",undefined,undefined)'>" + cond_name[k] + "</a>");
+                    if (cond_name[k] != 'Timepoint') {
+                      $("#split_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined,"+k+",undefined)'>" + cond_name[k] + "</a>");
+                    }
                     if (cond_name.length > 1) {
                       if (k == 0) {
                         $("#button2nd_condition").removeAttr('style');
@@ -174,6 +189,9 @@ $.ajax({
                     } else if (cond_name.length == 1 && k == 0) {
                       $("#button2nd_condition").remove();
                     }
+                  } else {
+                    ica_meta["psca_allsamples"] = [];
+                    ica_meta["psca_allsamples"][" "] = meta_rows.slice(1).map(function(x) {return x[0];});
                   }
                 }
               });
@@ -198,11 +216,20 @@ $.ajax({
     
             var data_rows = d3.csvParseRows(data);
             func_name = data_rows[0].slice(2);
+            all_data = [];
     
             for (let i = 1; i < data_rows.length; i++) {
               // Collect information on which chains are included for cond_group
               in_chain[data_rows[i][1]] = in_chain[data_rows[i][1]] || [];
               in_chain[data_rows[i][1]].push(data_rows[i][0]);
+
+              all_data[data_rows[i][1]] = all_data[data_rows[i][1]] || [];
+              for (let m = 0; m < func_name.length; m++) {
+              all_data[data_rows[i][1]][func_name[m]] = all_data[data_rows[i][1]][func_name[m]] || [];
+              all_data[data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
+              }
+
+
               // Loop through available conditions
               for (let k = 0; k < cond_name.length; k++) {
                 // Loop through condition groups
@@ -211,6 +238,7 @@ $.ajax({
                   if (ica_meta[cond_name[k]][cond_group[k][l]].includes(data_rows[i][0])) {
                     // Populate if chain is undefined
                     ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
+
                     // Loop through functions and append values for sample/chain
                     for (let m = 0; m < func_name.length; m++) {
                       if (cond_name[k] == 'VisGroup'){
@@ -224,6 +252,8 @@ $.ajax({
                       } else {
                       ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || [];
                       ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
+
+
                       }
     
                     }
@@ -238,11 +268,17 @@ $.ajax({
                     curr_func_psca = func_name[0];
                     curr_chain_psca = Object.keys(in_chain)[0];
                     curr_group = cond_group[0];
+                    curr_chain_scatter = Object.keys(in_chain)[0];
+                    curr_x_scatter = func_name[0];
+                    curr_y_scatter = func_name[0];
                     $("#dropdownChain").text(curr_chain);
                     $("#dropdownFunction").text(curr_func);
                     $("#dropdownCondition").text(curr_cond);
                     $("#dropdownChainPSCA").text(curr_chain_psca);
                     $("#dropdownFunctionPSCA").text(curr_func_psca);
+                    $("#dropdownChainScatter").text(curr_chain_scatter);
+                    $("#dropdownXScatter").text("x: "+curr_x_scatter);
+                    $("#dropdownYScatter").text("y: "+curr_y_scatter);
                     $('#cond_buttons').removeAttr('style');
                     // Hide secondary condition option which is the current primary condition
                     $("#condition2nd_selection").children().filter(function () {
@@ -254,6 +290,7 @@ $.ajax({
                       $('#content_psca_nav').removeAttr('style');
                       pscaDraw();
                     }
+                    scatterDraw();
                   });
                 }
               }
@@ -262,14 +299,17 @@ $.ajax({
                   // Populate function options in html
                   for (let n = 0; n < func_name.length; n++) {
                     $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
-                    $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined," + n + ")'>" + func_name[n] + "</a>");
+                    $("#function_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
+                    $("#x_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined," + n + ",undefined)'>" + func_name[n] + "</a>");
+                    $("#y_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
                   }
                   $("#dropdownFondition").text(func_name[curr_func]);
                   // Populate chain options in html
                   var available_chains = Object.keys(in_chain).sort();
                   for (let n = 0; n < available_chains.length; n++) {
                     $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
-                    $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
+                    $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + available_chains[n] + "</a>");
+                    $("#chain_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + available_chains[n] + "</a>");
                   }
                 });
               }
@@ -386,7 +426,7 @@ function condition_2nd(cond_2nd_idx) {
   if (curr_group.length == 2) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
       if (typeof pval_arrays[0][k] !== 'undefined' && typeof pval_arrays[1][k] !== 'undefined') {
-        x_text.push(curr_group_2nd[k] + "<br>p-value: " + mannwhitneyu.test(pval_arrays[0][k], pval_arrays[1][k], alternative = 'two-sided')["p"].toFixed(5));
+        x_text.push(curr_group_2nd[k] + "<br>pval: " + mannwhitneyu.test(pval_arrays[0][k], pval_arrays[1][k], alternative = 'two-sided')["p"].toFixed(3));
       } else { x_text.push(curr_group_2nd[k]); }
     }
   } else { x_text = curr_group_2nd };
@@ -480,7 +520,7 @@ function draw_traces() {
     if (k < curr_group.length - 1) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+          var the_pval = "pval:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(3);
         }
       } else { var the_pval = ""; }
       var anno = {
@@ -488,7 +528,7 @@ function draw_traces() {
         text: the_pval,
         x: k + .5,
         xref: 'x',
-        y: -.175,
+        y: 0,
         yref: 'paper',
         font: {
           size: 12,
@@ -524,14 +564,14 @@ function draw_traces() {
       for (let k = 0; k < pval_vis.length - 1; k++) {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-            var the_pval = "p-value:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(5);
+            var the_pval = "pval:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func], ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func], alternative = 'two-sided')["p"].toFixed(3);
           } else { var the_pval = ""; }
           var anno = {
             showarrow: false,
             text: the_pval,
             x: k + .5,
             xref: 'x',
-            y: -.175,
+            y: 0,
             yref: 'paper',
             font: {
               size: 12,
@@ -562,15 +602,28 @@ function pscaDraw() {
 
   timepoint_group = cond_group[cond_name.indexOf("Timepoint")]
   pair_group = cond_group[cond_name.indexOf("VisGroup")]
+  if (curr_split_psca== "psca_allsamples"){
+    split_group = [" "]
+  } else {
+    split_group = cond_group[cond_name.indexOf(curr_split_psca)]
+  }
 
-  median_arrays = Array.from(Array(timepoint_group.length), () => []);
-  pval_paired_arrays = Array.from(Array(timepoint_group.length-1), () => [[],[]]);
+  median_arrays = Array.from(Array((timepoint_group.length+10)*(split_group.length+1)), () => []);
+  pval_paired_arrays = Array.from(Array((timepoint_group.length+10)*(split_group.length+1)), () => [[],[]]);
 
   for (let k = 0; k < pair_group.length; k++) {
 
     if (typeof ica_data['VisGroup'][pair_group[k]][curr_chain_psca] !== 'undefined') {
 
       for (let l = 0; l < (timepoint_group.length - 1); l++) {
+
+        for (let z = 0; z < split_group.length; z++){
+
+          if (checker(ica_meta[curr_split_psca][split_group[z]],ica_meta['VisGroup'][pair_group[k]])) {
+            subplot_num = (timepoint_group.length*z);
+            break
+          }
+        }
 
         if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null)) {
 
@@ -588,8 +641,8 @@ function pscaDraw() {
             mode: 'lines+markers',
             type: 'scatter',
             x: [
-              (l + k / 2000 - pair_group.length / 4000),
-              ((l + 1) + k / 2000 - pair_group.length / 4000)
+              (subplot_num+l + k / 2000 - pair_group.length / 4000),
+              ((subplot_num+l + 1) + k / 2000 - pair_group.length / 4000)
             ],
             y: [ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]],
             name: pair_group[k],
@@ -607,13 +660,15 @@ function pscaDraw() {
 
           data.push(trace);
 
-          median_arrays[l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]);
-          median_arrays[l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]);
+          median_arrays[subplot_num+l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]);
+          median_arrays[subplot_num+l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]);
 
-          pval_paired_arrays[l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]));
-          pval_paired_arrays[l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]));
+          pval_paired_arrays[subplot_num+l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]));
+          pval_paired_arrays[subplot_num+l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]));
 
         }
+
+      }
       }
 
           if (k == pair_group.length - 1) {
@@ -621,13 +676,13 @@ function pscaDraw() {
             var trace = {
               mode: 'markers',
               type: 'scatter',
-              x: Array.from(Array(timepoint_group.length).keys()),
+              x: Array.from(Array(timepoint_group.length*split_group.length).keys()),
               y: median_arrays.map(x => median(Object.values(x))),
               name: "Median",
               visible: true,
               marker: {
                 color: 'black',
-                size: 50,
+                size: 25,
                 symbol: 'line-ew',
                 line: {
                   color: 'black',
@@ -639,31 +694,51 @@ function pscaDraw() {
 
             pval_anno = []
 
-            for (let m = 0; m < (timepoint_group.length - 1); m++) {
+            for (let m = 0; m < (pval_paired_arrays.length); m++) {
+
+              if (pval_paired_arrays[m][0].length>0){
 
               pval_anno.push({
                 showarrow: false,
-                text: "p-value:<br>" + wilcoxon(pval_paired_arrays[m][0],pval_paired_arrays[m][1])['P'].toFixed(5),
+                text: "pval:<br>" + wilcoxon(pval_paired_arrays[m][0],pval_paired_arrays[m][1])['P'].toFixed(3),
                 x: m+.5,
                 xref: 'x',
-                y: -.175,
+                y: 0,
                 yref: 'paper',
                 font: {
                   size: 12,
                   color: 'black'
                 },
               });
-
+            }
 
             }
 
-          }
 
 
 
     }
 
   }
+
+  for (let k = 0; k < split_group.length; k++) {
+
+    pval_anno.push({
+      showarrow: false,
+      text: split_group[k],
+      x: (k*timepoint_group.length)+((timepoint_group.length-1)*.5),
+      xref: 'x',
+      y: 1,
+      yref: 'paper',
+      yanchor: 'top',
+      font: {
+        size: 12,
+        color: 'black'
+      },
+    });
+  };
+
+  x_lab = [].concat(... new Array(split_group.length).fill(timepoint_group))
 
   // Plot layout
   var layout = {
@@ -673,8 +748,8 @@ function pscaDraw() {
       zeroline: false
     },
     xaxis: {
-      tickvals: Object.keys(timepoint_group),
-      ticktext: timepoint_group,
+      tickvals: Array.from(Array(x_lab.length).keys()),
+      ticktext: x_lab,
       zeroline: false
     },
     showlegend: false,
@@ -684,13 +759,150 @@ function pscaDraw() {
   Plotly.newPlot("pscaDiv", data, layout);
 }
 
+// function pscaDrawNoSplit() {
 
-function dataMorphPSCA(chain, func) {
+//   var data = [];
+
+//   timepoint_group = cond_group[cond_name.indexOf("Timepoint")]
+//   pair_group = cond_group[cond_name.indexOf("VisGroup")]
+
+//   median_arrays = Array.from(Array(timepoint_group.length), () => []);
+//   pval_paired_arrays = Array.from(Array(timepoint_group.length-1), () => [[],[]]);
+
+//   for (let k = 0; k < pair_group.length; k++) {
+
+//     if (typeof ica_data['VisGroup'][pair_group[k]][curr_chain_psca] !== 'undefined') {
+
+//       for (let l = 0; l < (timepoint_group.length - 1); l++) {
+
+//         if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null)) {
+
+//           var median_color = ''
+
+//           if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) > Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+//             median_color = 'royalblue'
+//           } else if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) < Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+//             median_color = 'crimson'
+//           } else {
+//             median_color = 'grey'
+//           }
+
+//           var trace = {
+//             mode: 'lines+markers',
+//             type: 'scatter',
+//             x: [
+//               (l + k / 2000 - pair_group.length / 4000),
+//               ((l + 1) + k / 2000 - pair_group.length / 4000)
+//             ],
+//             y: [ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]],
+//             name: pair_group[k],
+//             visible: true,
+//             marker: {
+//               color: 'grey',
+//               size: 7
+//             },
+//             line: {
+//               color: median_color,
+//               width: 1
+//             },
+//             hoverinfo: 'none'
+//           };
+
+//           data.push(trace);
+
+//           median_arrays[l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]);
+//           median_arrays[l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]);
+
+//           pval_paired_arrays[l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]));
+//           pval_paired_arrays[l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]));
+
+//         }
+//       }
+
+//           if (k == pair_group.length - 1) {
+
+//             var trace = {
+//               mode: 'markers',
+//               type: 'scatter',
+//               x: Array.from(Array(timepoint_group.length).keys()),
+//               y: median_arrays.map(x => median(Object.values(x))),
+//               name: "Median",
+//               visible: true,
+//               marker: {
+//                 color: 'black',
+//                 size: 50,
+//                 symbol: 'line-ew',
+//                 line: {
+//                   color: 'black',
+//                   width: 4
+//                 }
+//               }
+//             };
+//             data.unshift(trace);
+
+//             pval_anno = []
+
+//             for (let m = 0; m < (timepoint_group.length - 1); m++) {
+
+//               pval_anno.push({
+//                 showarrow: false,
+//                 text: "p-value:<br>" + wilcoxon(pval_paired_arrays[m][0],pval_paired_arrays[m][1])['P'].toFixed(5),
+//                 x: m+.5,
+//                 xref: 'x',
+//                 y: -.175,
+//                 yref: 'paper',
+//                 font: {
+//                   size: 12,
+//                   color: 'black'
+//                 },
+//               });
+
+
+//             }
+
+//           }
+
+
+
+//     }
+
+//   }
+
+//   // Plot layout
+//   var layout = {
+//     title: 'Paired Sample Cohort Analysis',
+//     yaxis: {
+//       title: curr_func_psca,
+//       zeroline: false
+//     },
+//     xaxis: {
+//       tickvals: Object.keys(timepoint_group),
+//       ticktext: timepoint_group,
+//       zeroline: false
+//     },
+//     showlegend: false,
+//     annotations: pval_anno
+//   };
+//   // Render plot
+//   Plotly.newPlot("pscaDiv", data, layout);
+// }
+
+function dataMorphPSCA(chain, split, func) {
   // Chain change
   if (typeof chain != "undefined") {
     curr_chain_psca = chain;
     $("#dropdownChainPSCA").text(curr_chain_psca);
   }
+  // Function change
+  if (typeof split != "undefined") {
+    if (split =="none"){
+      curr_split_psca = 'psca_allsamples'
+      $("#dropdownSplitPSCA").text("No Split");
+    } else {
+      curr_split_psca = cond_name[split];
+      $("#dropdownSplitPSCA").text(curr_split_psca);
+    }
+  }  
   // Function change
   if (typeof func != "undefined") {
     curr_func_psca = func_name[func];
@@ -698,6 +910,49 @@ function dataMorphPSCA(chain, func) {
   }
 
   pscaDraw();
+
+}
+
+
+function scatterDraw() {
+
+  var trace1 = {
+    x: all_data[curr_chain_scatter][curr_x_scatter],
+    y: all_data[curr_chain_scatter][curr_y_scatter],
+    mode: 'markers',
+    type: 'scatter'
+  };
+  
+  var data = [trace1];
+
+  var layout = {
+    title: 'Cohort Scatterplot',
+    xaxis: { title: curr_x_scatter },
+    yaxis: { title: curr_y_scatter }
+  };
+  
+  Plotly.newPlot('scatterDiv', data,layout);
+
+}
+
+function dataMorphScatter(chain,x,y) {
+  // Chain change
+  if (typeof chain != "undefined") {
+    curr_chain_scatter = chain;
+    $("#dropdownChainScatter").text(curr_chain_scatter);
+  }
+  // Function change
+  if (typeof x != "undefined") {
+      curr_x_scatter = func_name[x];
+      $("#dropdownXScatter").text("x: "+curr_x_scatter);
+  }  
+  // Function change
+  if (typeof y != "undefined") {
+    curr_y_scatter = func_name[y];
+    $("#dropdownYScatter").text("y: "+curr_y_scatter);
+  }
+
+  scatterDraw();
 
 }
 

@@ -49,19 +49,27 @@
                   <a class="nav-link nav-pad" href="#PCA" onclick="hide_others('#PCA')">PCA</a>
                 </li>
               </ul> -->
-              <a class="nav-link" href="#DYN" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
+              <a class="nav-link" href="#" onclick="show_class('.dynamic')" style="font-size: 1rem">Dynamic Plots</a>
               <ul>
                 <li class="nav-item" id="content_ica_nav">
-                  <a class="nav-link nav-pad" href="#ICA" onclick="hide_others('#ICA')">Intracohort Analysis</a>
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#ICA')">Intracohort Analysis</a>
                 </li>
                 <li class="nav-item" id="content_psca_nav" style="display:none;">
-                  <a class="nav-link nav-pad" href="#PSCA" onclick="hide_others('#PSCA')">Paired Sample Cohort Analysis</a>
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#PSCA')">Paired Sample Cohort Analysis</a>
                 </li>
                 <li class="nav-item" id="content_ol_nav" style="display:none;">
-                  <a class="nav-link nav-pad" href="#OL" onclick="hide_others('#OL')">Overlap Analysis</a>
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#OL')">Overlap Analysis</a>
                 </li>
               </ul>
-              <a class="nav-link" href="#TAB" onclick="show_class('.table_dv')" style="font-size: 1rem">Cohort Information Table</a>
+              <a class="nav-link" href="#" onclick="show_class('.cohort_overview')" style="font-size: 1rem">Cohort Overview</a>
+              <ul>
+                <li class="nav-item">
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#CIT')">Cohort Information Table</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#CS')">Cohort Scatterplot</a>
+              </li>
+              </ul>
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
           </ul>
@@ -75,13 +83,11 @@
           <h1 class="h2">Cohort Analysis</h1>
         </div>
 
-        <div id="example-table"></div>
-
         <div class="content_row dynamic" id="content_ICA">
           <h2 class="h3">Intracohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="intracohortDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+              <div id="intracohortDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
               <div class="dropdown btn-group">
@@ -139,7 +145,7 @@
           <h2 class="h3">Paired Sample Cohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="pscaDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+              <div id="pscaDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
               <div class="dropdown btn-group">
@@ -151,18 +157,19 @@
                 </div>
               </div>
 
-              <!-- <div class="btn-group-vertical">
+              <div class="btn-group-vertical">
 
                 <div class="dropdown btn-group">
-                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCondition"
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownSplitPSCA"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Select Condition
+                    No Split
                   </button>
-                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection">
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="split_selection_psca">
+                    <a class="dropdown-item" onclick="dataMorphPSCA(undefined,'none',undefined)">No Split</a>
                   </div>
                 </div>
 
-              </div> -->
+              </div>
 
               <div class="dropdown btn-group">
                 <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionPSCA" data-toggle="dropdown"
@@ -188,7 +195,7 @@
           <h2 class="h3">Overlap Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="overlapDiv" style="max-width: 900px;max-height: 600px;margin-left: auto;margin-right: auto;"
+              <div id="overlapDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
               <div class="dropdown btn-group">
@@ -242,7 +249,7 @@
           </div>
         </div>
 
-        <div class="content_row table_dv" id="content_dv">
+        <div class="content_row cohort_overview" id="content_cit">
           <h2 class="h3">Cohort Information Table</h2>
           <!-- <div class="card">
             <div class="card-header border-0">
@@ -256,6 +263,52 @@
               <!-- </div>
             </div> -->
           <!-- </div> -->
+        </div>
+
+        <div class="content_row cohort_overview" id="content_cs">
+          <h2 class="h3">Cohort Scatterplot</h2>
+          <div class="row">
+            <div class="col text-center">
+              <div id="scatterDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
+                class="d-flex justify-content-center"></div>
+
+                <div class="dropdown btn-group">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChainScatter"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Chain
+                  </button>
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection_scatter">
+                  </div>
+                </div>
+  
+                  <div class="dropdown btn-group">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownXScatter"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Select X Data
+                    </button>
+                    <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="x_selection_scatter">
+                    </div>
+                  </div>
+  
+                  <div class="dropdown btn-group">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownYScatter"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Select Y Data
+                    </button>
+                    <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="y_selection_scatter">
+                    </div>
+                  </div>
+
+                <button type="button" class="btn btn-success"
+                onclick="save_img('scatterDiv', 'png', 'scatterplot')">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="save_img('scatterDiv', 'svg', 'scatterplot')">Save
+                SVG</button>
+
+
+            </div>
+          </div>
         </div>
 
       </main>

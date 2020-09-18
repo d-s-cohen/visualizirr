@@ -14,6 +14,8 @@ types['#DIV'] = '#content_diversity';
 types['#ICA'] = '#content_ICA';
 types['#PSCA'] = '#content_PSCA';
 types['#OL'] = '#content_ol';
+types['#CIT'] = '#content_cit';
+types['#CS'] = '#content_cs';
 types[''] = 'blank';
 
 // Associate location hash with content IDs
@@ -143,7 +145,9 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 
 	function jsonToTable(data_json) {
 		columns_array = [
-			{title:"Sample", field:"sample",headerFilter: true},
+			{title:"Sample", field:"sample",headerFilter: true, formatter:function(cell, formatterParams, onRendered){
+				return '<B>'+cell.getValue()+'</B>'; //return the contents of the cell;
+			}},
 			{title:"Chain", field:"chain",headerFilter: true},
 		]
 		json_columns = Object.keys(data_json[0]);
