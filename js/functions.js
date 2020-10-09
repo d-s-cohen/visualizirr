@@ -195,3 +195,92 @@ function tableSearchFunction() {
 	  }
 	}
   }
+
+function parseData(url, callBack) {
+	Papa.parse(url, {
+		download: true,
+		dynamicTyping: true,
+		header: true,
+		skipEmptyLines: true,
+		complete: function(results) {
+			$('#cohort_select').hide();
+			$('#cohort_table').show();
+			callBack(results.data);
+		}
+	});
+}
+
+function jsonToCohortTable(data_json) {
+	columns_array = [
+		{title:"Select", field:"path", headerSort:false, width:80, formatter:function(cell, formatterParams, onRendered){
+			if (cell.getValue().replace(/\/?$/, '/') == sessionStorage.getItem('path_val')){
+				return '<button type="button" class="btn btn-success btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>'; //return the contents of the cell;
+			} else {
+				return '<button type="button" class="btn btn-secondary disabled btn-sm" onclick="change_path_val(&quot;'+cell.getValue()+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
+			}
+		}},
+		//{title:"Chain", field:"name",headerFilter: true},
+	]
+	json_columns = Object.keys(data_json[0]);
+
+	for (i = 2; i < json_columns.length; i++) { 
+		if (json_columns[i].startsWith("#")){
+			columns_array.push({title:json_columns[i].substr(1), field:json_columns[i], sorter:"number",headerFilter: true})
+		} else {
+			columns_array.push({title:json_columns[i], field:json_columns[i],headerFilter: true})
+		}
+		if (i == json_columns.length - 1){
+			var table = new Tabulator("#cohort-select-table", {
+				data:data_json,           //load row data from array
+				//layout:"fitDataFill",
+				layout:"fitColumns",      //fit columns to width of table
+				responsiveLayout:"hide",  //hide columns that dont fit on the table
+				tooltips:true,            //show tool tips on cells
+				addRowPos:"top",          //when adding a new row, add it to the top of the table
+				history:true,             //allow undo and redo actions on the table
+				pagination:"local",       //paginate the data
+				paginationSize:25,         //allow 7 rows per page of data
+				//movableColumns:true,      //allow column order to be changed
+				resizableRows:true,       //allow row order to be changed
+				initialSort:[             //set the initial sort order of the data
+					{column:"Author", dir:"asc"},
+				],
+				columns:columns_array
+			});
+		}
+	}
+}
+
+function jsonToTable(data_json) {
+	columns_array = [
+		{title:"Sample", field:"sample",headerFilter: true, formatter:function(cell, formatterParams, onRendered){
+			return '<B>'+cell.getValue()+'</B>'; //return the contents of the cell;
+		}},
+		{title:"Chain", field:"chain",headerFilter: true},
+	]
+	json_columns = Object.keys(data_json[0]);
+
+	for (i = 2; i < json_columns.length; i++) { 
+		columns_array.push({title:json_columns[i].split(' ').join('<br>'), field:json_columns[i], sorter:"number",formatter:function(cell, formatterParams, onRendered){
+			return Number.parseFloat(cell.getValue()).toPrecision(3).replace(/\.0+$/,""); //return the contents of the cell;
+		}},)
+		if (i == json_columns.length - 1){
+			var table = new Tabulator("#data-table", {
+				data:data_json,           //load row data from array
+				layout:"fitColumns",      //fit columns to width of table
+				responsiveLayout:"hide",  //hide columns that dont fit on the table
+				tooltips:true,            //show tool tips on cells
+				addRowPos:"top",          //when adding a new row, add it to the top of the table
+				history:true,             //allow undo and redo actions on the table
+				pagination:"local",       //paginate the data
+				paginationSize:25,         //allow 7 rows per page of data
+				//movableColumns:true,      //allow column order to be changed
+				resizableRows:true,       //allow row order to be changed
+				initialSort:[             //set the initial sort order of the data
+					{column:"sample", dir:"asc"},
+				],
+				columns:columns_array,
+			});
+		}
+	}
+}

@@ -18,6 +18,7 @@ custom_sep = ""
 report_dir = NULL
 output_name = paste("Cohort", Sys.Date())
 json_out = FALSE
+process_col = "aa"
 
 # Command line arguments
 
@@ -67,11 +68,12 @@ if (input_format %in% c("TRUST4","CUSTOM")){
 
 # Intracohort analysis functions setup
 
-intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy","1/Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
+intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy", "1/Entropy", "Normalized Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
+                        "Clonal Proportion (Top 10)", "Clonal Proportion (Top 100)", "Clonal Proportion (Top 1000)", "Cumulative Proportion Clonotypes (Top 10%)", "Cumulative Proportion Clonotypes (Top 50%)",
                         "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
 
 if (input_format == "RHTCRSEQ") {
-  intracohortColNames = intracohortColNames[-11]
+  intracohortColNames = intracohortColNames[-17]
 }
 
 functionNum = length(intracohortColNames)
@@ -195,18 +197,13 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       sample_table <-
         read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
       
-        colnames(sample_table) <-
-          c(
-            "read_fragment_count",
-            "read_fragment_freq",
-            "CDR3",
-            "CDR3_AA",
-            "V_gene",
-            "D_gene",            
-            "J_gene",
-            "C_gene",
-            "junction"
-          )
+      colnames(sample_table)[which(names(sample_table) == "V")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "D")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "J")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "C")] <- "C_gene"
+      colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "X.count")] <- "read_fragment_count"
       
         # remove partials
         sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
@@ -248,14 +245,19 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         
       } else if ("vGeneName" %in% colnames(sample_table)) {
         
-        sample_table <- sample_table[c("vGeneName","dGeneName","jGeneName","nucleotide","aminoAcid","count..templates.reads.","vIndex","cdr3Length")]
+        if ("count..templates.reads." %in% colnames(sample_table)) {
+          colnames(sample_table)[which(names(sample_table) == "count..templates.reads.")] <- "read_fragment_count"
+        } else if ("count..templates." %in% colnames(sample_table)) {
+          colnames(sample_table)[which(names(sample_table) == "count..templates.")] <- "read_fragment_count"
+        }
+        
+        sample_table <- sample_table[c("vGeneName","dGeneName","jGeneName","nucleotide","aminoAcid","read_fragment_count","vIndex","cdr3Length")]
       
         colnames(sample_table)[which(names(sample_table) == "vGeneName")] <- "V_gene"
         colnames(sample_table)[which(names(sample_table) == "dGeneName")] <- "D_gene"
         colnames(sample_table)[which(names(sample_table) == "jGeneName")] <- "J_gene"
         colnames(sample_table)[which(names(sample_table) == "nucleotide")] <- "CDR3"
         colnames(sample_table)[which(names(sample_table) == "aminoAcid")] <- "CDR3_AA"
-        colnames(sample_table)[which(names(sample_table) == "count..templates.reads.")] <- "read_fragment_count"
         
         colnames(sample_table)[which(names(sample_table) == "vIndex")] <- "v_index"
         colnames(sample_table)[which(names(sample_table) == "cdr3Length")] <- "cdr3_length"
@@ -696,6 +698,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             }
             
             names(chain_table_div)[names(chain_table_div) == 'read_fragment_count'] <- 'Clones'
+            names(chain_table_div)[names(chain_table_div) == 'read_fragment_freq'] <- 'Proportion'
             names(chain_table_div)[names(chain_table_div) == 'CDR3'] <- 'CDR3.nt'
             names(chain_table_div)[names(chain_table_div) == 'CDR3_AA'] <- 'CDR3.aa'
             names(chain_table_div)[names(chain_table_div) == 'V_gene'] <- 'J.name'
@@ -725,36 +728,39 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             intracohort_values[1, 1] <- current_sample
             intracohort_values[1, 2] <- current_chain
             
-            process_col <- "nt"
-            if (input_format == "RHTCRSEQ"){
-              process_col <- "aa"
-            }
-            
             suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", process_col),4))
             if (nrow(chain_table_cdr3) != 1){
               suppressMessages(intracohort_values[1, 4] <- round(entropy(chain_table_div$Clones),4))
               suppressMessages(intracohort_values[1, 5] <- round(1/entropy(chain_table_div$Clones),4))
-              suppressMessages(intracohort_values[1, 6] <- round(repDiversity(chain_table_div, "gini", process_col),4))
-              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini.simp", process_col),4))
-              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "inv.simp", process_col),4))
-              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "chao1", process_col)[1],4))
+              suppressMessages(intracohort_values[1, 6] <- round(entropy(chain_table_div$Clones,.norm=TRUE),4))
+              suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", process_col),4))
+              suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", process_col),4))
+              suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "inv.simp", process_col),4))
+              suppressMessages(intracohort_values[1, 10] <- round(repDiversity(chain_table_div, "chao1", process_col)[1],4))
             } 
             
+            clonality_top <- repClonality(chain_table_div, "top")
+            suppressMessages(intracohort_values[1, 11] <- round(clonality_top[1],4))
+            suppressMessages(intracohort_values[1, 12] <- round(clonality_top[2],4))
+            suppressMessages(intracohort_values[1, 13] <- round(clonality_top[3],4))
+            suppressMessages(intracohort_values[1, 14] <- round(repClonality(chain_table_div, "clonal.prop",.perc=10)[1],4))
+            suppressMessages(intracohort_values[1, 15] <- round(repClonality(chain_table_div, "clonal.prop",.perc=50)[1],4))
+            
             if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
-              intracohort_values[1, 10] <- round(cdr3_aggregate/total_count,4)
+              intracohort_values[1, 16] <- round(cdr3_aggregate/total_count,4)
             } else {
-              intracohort_values[1, 10] <- chain_table_cdr3[1, 2]
+              intracohort_values[1, 16] <- chain_table_cdr3[1, 2]
             }
             
             if (input_format == "RHTCRSEQ"){
-              intracohort_values[1, 10] <- intracohort_values[1, 10]*3
+              intracohort_values[1, 16] <- intracohort_values[1, 16]*3
             }
             
             if (input_format == "RHTCRSEQ"){
-              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.aa))
+              intracohort_values[1, 17] <- length(unique(chain_table_div$CDR3.aa))
             } else {
-              intracohort_values[1, 11] <- length(unique(chain_table_div$CDR3.aa))
-              intracohort_values[1, 12] <- length(unique(chain_table_div$CDR3.nt))
+              intracohort_values[1, 17] <- length(unique(chain_table_div$CDR3.nt))
+              intracohort_values[1, 18] <- length(unique(chain_table_div$CDR3.aa))
             }
             
             if (length(clonotypeAbundance)>0){
@@ -899,18 +905,13 @@ if (cohort_level_run == TRUE) {
     
     sample_table <- do.call(rbind,all_dfs)
     
-    colnames(sample_table) <-
-      c(
-        "read_fragment_count",
-        "read_fragment_freq",
-        "CDR3",
-        "CDR3_AA",
-        "V_gene",
-        "D_gene",            
-        "J_gene",
-        "C_gene",
-        "junction"
-      )
+    colnames(sample_table)[which(names(sample_table) == "V")] <- "V_gene"
+    colnames(sample_table)[which(names(sample_table) == "D")] <- "D_gene"
+    colnames(sample_table)[which(names(sample_table) == "J")] <- "J_gene"
+    colnames(sample_table)[which(names(sample_table) == "C")] <- "C_gene"
+    colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
+    colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+    colnames(sample_table)[which(names(sample_table) == "X.count")] <- "read_fragment_count"
     
     # remove partials
     sample_table <- sample_table[(sample_table$CDR3_AA != "partial"), ]
@@ -977,16 +978,23 @@ if (cohort_level_run == TRUE) {
       
       } else if ("vGeneName" %in% colnames(sample_table_test)) {
         
+        if ("count..templates.reads." %in% colnames(sample_table_test)) {
+          count_name <- "count..templates.reads."
+        } else if ("count..templates." %in% colnames(sample_table_test)) {
+          count_name <- "count..templates."
+        }
+        
         rm(sample_table_test)
         all_dfs <- lapply(files, function(x){
-          sample_table_pt <- read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)[c("vGeneName","dGeneName","jGeneName","nucleotide","aminoAcid","count..templates.reads.","vIndex","cdr3Length")]
+          sample_table_pt <- read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)[c("vGeneName","dGeneName","jGeneName","nucleotide","aminoAcid",count_name,"vIndex","cdr3Length")]
           
           colnames(sample_table_pt)[which(names(sample_table_pt) == "vGeneName")] <- "V_gene"
           colnames(sample_table_pt)[which(names(sample_table_pt) == "dGeneName")] <- "D_gene"
           colnames(sample_table_pt)[which(names(sample_table_pt) == "jGeneName")] <- "J_gene"
           colnames(sample_table_pt)[which(names(sample_table_pt) == "nucleotide")] <- "CDR3"
           colnames(sample_table_pt)[which(names(sample_table_pt) == "aminoAcid")] <- "CDR3_AA"
-          colnames(sample_table_pt)[which(names(sample_table_pt) == "count..templates.reads.")] <- "read_fragment_count"
+          
+          colnames(sample_table_pt)[which(names(sample_table_pt) == count_name)] <- "read_fragment_count"
           
           colnames(sample_table_pt)[which(names(sample_table_pt) == "vIndex")] <- "v_index"
           colnames(sample_table_pt)[which(names(sample_table_pt) == "cdr3Length")] <- "cdr3_length"
