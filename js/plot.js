@@ -36,6 +36,14 @@ var ica_meta_ordered = [];
 
 let checker = (arr, target) => target.every(v => arr.includes(v));
 
+function toExp(x) {
+  if (x < .01) {
+    x = x.toExponential(2)
+  } else {
+    x = x.toFixed(2)
+  }
+  return x;
+}
 
 const median = arr => {
   const mid = Math.floor(arr.length / 2),
@@ -383,7 +391,25 @@ function dataMorph(cond, chain, func) {
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
     condition_2nd();
-  }
+  } /* else {
+    for (var i = 0; i < Object.keys(ica_data[curr_cond]).length - 1; i++) {
+      // This is where you'll capture that last value
+      for (var j = i + 1; j < Object.keys(ica_data[curr_cond]).length; j++) {
+    
+        console.log(
+          curr_group[i] , ',' , curr_group[j] , ': ' ,
+          toExp(
+            mannwhitneyu.test(
+              ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number), 
+              ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
+              )["p"]
+              )
+            )
+    
+      }
+    }
+  } */
+
 
 }
 
@@ -441,7 +467,7 @@ function condition_2nd(cond_2nd_idx) {
   if (curr_group.length == 2) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
       if (typeof pval_arrays[0][k] !== 'undefined' && typeof pval_arrays[1][k] !== 'undefined') {
-        x_text.push(curr_group_2nd[k] + "<br>pval: " + mannwhitneyu.test(pval_arrays[0][k].map(Number), pval_arrays[1][k].map(Number))["p"].toFixed(3));
+        x_text.push(curr_group_2nd[k] + "<br>pval: " + toExp(mannwhitneyu.test(pval_arrays[0][k].map(Number), pval_arrays[1][k].map(Number))["p"]));
       } else { x_text.push(curr_group_2nd[k]); }
     }
   } else { x_text = curr_group_2nd };
@@ -449,14 +475,14 @@ function condition_2nd(cond_2nd_idx) {
   k_count = 0;
   // Populate available traces
   for (let k = 0; k < condition_2nd_x.length; k++) {
-    if (condition_2nd_x[k].length > 0) {
+    //if (condition_2nd_x[k].length > 0) {
       var update = {
         x: [condition_2nd_x[k]],
         y: [curr_y[k]]
       }
       Plotly.restyle('intracohortDiv', update, k_count);
       k_count = k_count + 1;
-    }
+    //}
   }
   // Delete extra remaining traces
   for (let k = k_count; k < intracohortDiv.data.length; k++) {  
@@ -535,7 +561,7 @@ function draw_traces() {
     if (k < curr_group.length - 1) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var the_pval = "pval:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"].toFixed(3);
+          var the_pval = "pval:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
         }
       } else { var the_pval = ""; }
       var anno = {
@@ -579,7 +605,7 @@ function draw_traces() {
       for (let k = 0; k < pval_vis.length - 1; k++) {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-            var the_pval = "pval:<br>" + mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"].toFixed(3);
+            var the_pval = "pval:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
           } else { var the_pval = ""; }
           var anno = {
             showarrow: false,
@@ -632,12 +658,19 @@ function pscaDraw() {
 
       for (let l = 0; l < (timepoint_group.length - 1); l++) {
 
+        found_it = false
+
         for (let z = 0; z < split_group.length; z++){
 
           if (checker(ica_meta[curr_split_psca][split_group[z]],ica_meta['VisGroup'][pair_group[k]])) {
             subplot_num = (timepoint_group.length*z);
+            found_it = true
             break
           }
+        }
+
+        if (found_it == false){
+          break
         }
 
         if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null)) {
@@ -715,7 +748,7 @@ function pscaDraw() {
 
               pval_anno.push({
                 showarrow: false,
-                text: "pval:<br>" + wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P'].toFixed(3),
+                text: "pval:<br>" + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
                 x: m+.5,
                 xref: 'x',
                 y: 0,
