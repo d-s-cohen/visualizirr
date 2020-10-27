@@ -258,8 +258,9 @@ $.ajax({
 
                     ica_meta_ordered[cond_name[k]] = ica_meta_ordered[cond_name[k]] || [];
                     ica_meta_ordered[cond_name[k]][cond_group[k][l]] = ica_meta_ordered[cond_name[k]][cond_group[k][l]] || [];
+                    ica_meta_ordered[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_meta_ordered[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
 
-                    ica_meta_ordered[cond_name[k]][cond_group[k][l]].push(data_rows[i][0])
+                    ica_meta_ordered[cond_name[k]][cond_group[k][l]][data_rows[i][1]].push(data_rows[i][0])
                     // Populate if chain is undefined
                     ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]] || [];
 
@@ -391,24 +392,35 @@ function dataMorph(cond, chain, func) {
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
     condition_2nd();
-  } /* else {
+  } else {
+
+    pval_text = ""
+
     for (var i = 0; i < Object.keys(ica_data[curr_cond]).length - 1; i++) {
       // This is where you'll capture that last value
       for (var j = i + 1; j < Object.keys(ica_data[curr_cond]).length; j++) {
+
+        if (typeof ica_data[curr_cond][curr_group[i]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain][curr_func] !== 'undefined') {
     
-        console.log(
-          curr_group[i] , ',' , curr_group[j] , ': ' ,
-          toExp(
-            mannwhitneyu.test(
-              ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number), 
-              ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
-              )["p"]
+          pval_text = pval_text.concat(
+            curr_group[i] , ', ' , curr_group[j] , ': ' ,
+            toExp(
+              mannwhitneyu.test(
+                ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number), 
+                ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
+                )["p"]
+                ),
+                '<br/>'
               )
-            )
+
+        }
     
       }
     }
-  } */
+
+    $("#test1").html(pval_text);
+
+  }
 
 
 }
@@ -426,39 +438,35 @@ function condition_2nd(cond_2nd_idx) {
   var curr_sample = [];
   curr_y = [];
 
-  if (curr_group.length == 2) {
-    pval_arrays = [[], []];
-  }
+  // if (curr_group.length == 2) {
+  //   pval_arrays = [[], []];
+  // }
+
+  pval_arrays = Array.from(Array(curr_group.length), () => []);
+
   // Loop through groups in current condition and push data for them
   for (let i = 0; i < curr_group.length; i++) {
-    curr_sample.push(ica_meta_ordered[curr_cond][curr_group[i]]);
+    curr_sample.push(ica_meta_ordered[curr_cond][curr_group[i]][curr_chain]);
     curr_y.push([]);
     condition_2nd_x.push([]);
   }
 
   for (let i = 0; i < curr_sample.length; i++) {
-    var skip = 0;
     for (let j = 0; j < curr_sample[i].length; j++) {
       var sample = curr_sample[i][j];
-      var chain_included = in_chain[curr_chain].includes(sample);
-      // If not included in chain, don't count
-      if (chain_included == false) {
-        skip = skip + 1;
-      } else {
         // Loop through secondary condition groups
         for (let k = 0; k < curr_group_2nd.length; k++) {
           // If primary condition group includes sample...
-          if (ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]].includes(sample)) {
+          if (ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]][curr_chain].includes(sample)) {
             // Push corresponding x (secondary condition grouping) and y (primary condition value)
             condition_2nd_x[i].push(k);
-            curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j - skip]);
-            if (curr_group.length == 2) {
+            curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
+            //if (curr_group.length == 2) {
               pval_arrays[i][k] = pval_arrays[i][k] || [];
-              pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j - skip]);
-            }
+              pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
+            //}
           }
         }
-      }
     }
   }
 
@@ -467,7 +475,14 @@ function condition_2nd(cond_2nd_idx) {
   if (curr_group.length == 2) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
       if (typeof pval_arrays[0][k] !== 'undefined' && typeof pval_arrays[1][k] !== 'undefined') {
-        x_text.push(curr_group_2nd[k] + "<br>pval: " + toExp(mannwhitneyu.test(pval_arrays[0][k].map(Number), pval_arrays[1][k].map(Number))["p"]));
+
+        if (pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0 && pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0) {
+      
+        x_text.push(curr_group_2nd[k] + "<br>pval: " + toExp(mannwhitneyu.test(
+          pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
+          pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"])
+          );
+        } else { x_text.push(curr_group_2nd[k]); }
       } else { x_text.push(curr_group_2nd[k]); }
     }
   } else { x_text = curr_group_2nd };
@@ -498,6 +513,50 @@ function condition_2nd(cond_2nd_idx) {
   }
   Plotly.relayout('intracohortDiv', update)
 
+  pval_text = "";
+
+  for (let k = 0; k < Object.keys(curr_group_2nd).length; k++){
+
+    pval_text = pval_text.concat('<b>', curr_group_2nd[k], ":</b><br/>");
+
+    pval_populated = false;
+
+    for (var i = 0; i < Object.keys(ica_data[curr_cond]).length - 1; i++) {
+      // This is where you'll capture that last value
+      for (var j = i + 1; j < Object.keys(ica_data[curr_cond]).length; j++) {
+
+        if (typeof pval_arrays[i][k] !== 'undefined' && typeof pval_arrays[j][k] !== 'undefined') {
+          if (pval_arrays[i][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0 && pval_arrays[j][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0) {
+
+          pval_populated = true;
+
+          pval_text = pval_text.concat(
+            curr_group[i] , ', ' , curr_group[j] , ': ' ,
+            toExp(
+              mannwhitneyu.test(
+                pval_arrays[i][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
+                pval_arrays[j][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number)
+                )["p"]
+                ),
+                '<br/>'
+              );
+              }
+      }
+
+        if (i == Object.keys(ica_data[curr_cond]).length - 2 &&
+          j == Object.keys(ica_data[curr_cond]).length - 1 &&
+          pval_populated == false) {
+          pval_text = pval_text.concat('None<br/>')
+        }
+
+    }
+
+  }
+
+  }
+
+  $("#test1").html(pval_text);
+
   $("#dropdown2ndCondition").text("x: "+curr_cond_2nd);
   $("#dropdownCondition").text("hue: "+curr_cond);
   // Show primary conditions that aren't the same as secondary condition 
@@ -517,9 +576,8 @@ function condition_2nd(cond_2nd_idx) {
 
 function clear_2nd() {
 
-  draw_traces();
-
   activated_cond_2nd = false;
+  dataMorph();
   // Refresh secondary condition selection
   $("#dropdownCondition").text(curr_cond);
   $("#dropdown2ndCondition").text("Select Secondary Condition");

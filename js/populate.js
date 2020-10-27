@@ -20,13 +20,13 @@ types[''] = 'blank';
 
 // Associate location hash with content IDs
 var plot_labels = {};
-plot_labels['cdr3aaLength'] = ['CDR3 amino acid length distribution','CDR3 Length, AA','Frequency','Clonotype'];
-plot_labels['cdr3ntLength'] = ['CDR3 nucleotide length distribution','CDR3 Length, bp','Count'];
-plot_labels['vsumBarplot'] = ['V Gene Usage','V Gene','Frequency'];
-plot_labels['dsumBarplot'] = ['D Gene Usage','D Gene','Frequency'];
-plot_labels['jsumBarplot'] = ['J Gene Usage','J Gene','Frequency'];
-plot_labels['csumBarplot'] = ['C Gene Usage','C Gene','Frequency'];
-plot_labels['vjStackBar'] = ['V-J Gene Usage','V Gene','Frequency','J Gene'];
+plot_labels['cdr3aaLength'] = ['CDR3 amino acid length distribution', 'CDR3 Length, AA', 'Frequency', 'Clonotype'];
+plot_labels['cdr3ntLength'] = ['CDR3 nucleotide length distribution', 'CDR3 Length, bp', 'Count'];
+plot_labels['vsumBarplot'] = ['V Gene Usage', 'V Gene', 'Frequency'];
+plot_labels['dsumBarplot'] = ['D Gene Usage', 'D Gene', 'Frequency'];
+plot_labels['jsumBarplot'] = ['J Gene Usage', 'J Gene', 'Frequency'];
+plot_labels['csumBarplot'] = ['C Gene Usage', 'C Gene', 'Frequency'];
+plot_labels['vjStackBar'] = ['V-J Gene Usage', 'V Gene', 'Frequency', 'J Gene'];
 
 // Get current sample value from URL
 var current_sample = $(location).attr('search').split('=').pop();
@@ -48,8 +48,8 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['segment_usage.html', 
 				location.reload();
 			}, dataType = 'text');
 		}
-		$('.plotlyBar').each(function () { load_plotly_bar(data_path,$(this).attr("id")); });
-		$('.plotlyStackedBar').each(function () { load_plotly_stacked_bar(data_path,$(this).attr("id")); });
+		$('.plotlyBar').each(function () { load_plotly_bar(data_path, $(this).attr("id")); });
+		$('.plotlyStackedBar').each(function () { load_plotly_stacked_bar(data_path, $(this).attr("id")); });
 	});
 }
 // Populate information table from info.csv
@@ -146,8 +146,10 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 		}, dataType = 'text');
 	}
 
-	parseData(data_path + "intracohort_data.csv", jsonToTable);
+	var i = setInterval(function () {
+		if (sessionStorage.length) {
+			clearInterval(i);
+			parseData(data_path + "intracohort_data.csv", jsonToTable);
+		}
+	}, 100);
 }
-
-
-

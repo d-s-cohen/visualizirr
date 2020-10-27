@@ -78,6 +78,13 @@ $(function () {
 			.done(function () {
 				$('#info').show();
 			});
+
+			// Show cohort name
+			$(document).ready(function () {
+				if (sessionStorage.getItem('path_val') != "data/") {
+					$("#header_desc").text(sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2] + " Immune Repertoire");
+				}
+			});
 		}
 	}, 100);
 });
