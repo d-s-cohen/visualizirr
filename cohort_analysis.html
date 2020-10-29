@@ -90,6 +90,26 @@
               <div id="intracohortDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
+                <div id="accordion">
+                <div class="card">
+                  <div class="card-header" id="headingTwo">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        P-value expanded
+                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                    <div class="card-body align-items-center d-flex justify-content-center">
+                      <p id="pval_table_space"></p>
+                    </div>
+                    <p>Blue: Row < Col, Red: Col < Row, Bold: p < .05</p>
+                  </div>
+                </div>
+              </div>
+
+              <br>
+
               <div class="dropdown btn-group">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChain"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -136,25 +156,6 @@
               <button type="button" class="btn btn-success"
                 onclick="save_img('intracohortDiv', 'svg', 'cohort_analysis')">Save
                 SVG</button>
-
-                <br> <br>
-
-                <div id="accordion">
-                <div class="card">
-                  <div class="card-header" id="headingTwo">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        P-value expanded
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                    <div class="card-body">
-                      <p id="test1"></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
             </div>
           </div>

@@ -18,6 +18,8 @@ var activated_cond_2nd = false;
 var curr_y = [];
 var pval_arrays = [];
 
+var pair_split = ""
+
 
 var timepoint_group = [];
 var pair_group = [];
@@ -38,9 +40,9 @@ let checker = (arr, target) => target.every(v => arr.includes(v));
 
 function toExp(x) {
   if (x < .01) {
-    x = x.toExponential(2)
+    x = x.toExponential(3)
   } else {
-    x = x.toFixed(2)
+    x = x.toFixed(3)
   }
   return x;
 }
@@ -199,13 +201,13 @@ $.ajax({
                     if (cond_name[k] != 'Timepoint') {
                       $("#split_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(undefined,"+k+",undefined)'>" + cond_name[k] + "</a>");
                     }
-                    if (cond_name.length > 1) {
+                    if (cond_name.filter(e => e !== 'VisGroup').length > 1) {
                       if (k == 0) {
                         $("#button2nd_condition").removeAttr('style');
                       }
                       // Populate secondary condition options in html
                       $("#condition2nd_selection").append("<a class='dropdown-item' onclick='condition_2nd(" + k + ")'>" + cond_name[k] + "</a>");
-                    } else if (cond_name.length == 1 && k == 0) {
+                    } else if (cond_name.filter(e => e !== 'VisGroup').length == 1 && k == 0) {
                       $("#button2nd_condition").remove();
                     }
                   } else {
@@ -267,10 +269,15 @@ $.ajax({
                     // Loop through functions and append values for sample/chain
                     for (let m = 0; m < func_name.length; m++) {
                       if (cond_name[k] == 'VisGroup'){
-                        pair_groups = Object.keys(ica_meta["Timepoint"])
+                        if (Object.keys(ica_meta).includes("Timepoint")){
+                        pair_split = "Timepoint";
+                        } else {
+                          pair_split = Object.keys(ica_meta)[0]
+                        }
+                        pair_groups = Object.keys(ica_meta[pair_split])
                         ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || Array.from(Array(pair_groups.length), () => null);;
                         for (let n = 0; n < pair_groups.length; n++) {
-                          if (ica_meta["Timepoint"][pair_groups[n]].includes(data_rows[i][0])) {
+                          if (ica_meta[pair_split][pair_groups[n]].includes(data_rows[i][0])) {
                               ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]][n] = data_rows[i][m + 2]
                             }
                         }
@@ -394,34 +401,76 @@ function dataMorph(cond, chain, func) {
     condition_2nd();
   } else {
 
-    pval_text = ""
+    $("#pval_table_space").html("");
 
-    for (var i = 0; i < Object.keys(ica_data[curr_cond]).length - 1; i++) {
-      // This is where you'll capture that last value
-      for (var j = i + 1; j < Object.keys(ica_data[curr_cond]).length; j++) {
+    var myTableDiv = document.getElementById("pval_table_space")
+    var table = document.createElement('TABLE')
+    var tableBody = document.createElement('TBODY')
 
-        if (typeof ica_data[curr_cond][curr_group[i]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain][curr_func] !== 'undefined') {
+    //table.border = '1'
+    table.classList.add('table-sm');
+    table.classList.add('table-bordered');
     
-          pval_text = pval_text.concat(
-            curr_group[i] , ', ' , curr_group[j] , ': ' ,
-            toExp(
-              mannwhitneyu.test(
-                ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number), 
-                ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
-                )["p"]
-                ),
-                '<br/>'
-              )
+    table.appendChild(tableBody);
+    heading = [...curr_group];
+    heading.unshift("");
 
-        }
-    
-      }
+    //TABLE COLUMNS
+    var tr = document.createElement('TR');
+    tableBody.appendChild(tr);
+    for (i = 0; i < heading.length; i++) {
+        var th = document.createElement('TH')
+        th.width = '75';
+        th.appendChild(document.createTextNode(heading[i]));
+        tr.appendChild(th);
     }
 
-    $("#test1").html(pval_text);
+    //TABLE ROWS
+    for (i = 0; i < Object.keys(ica_data[curr_cond]).length; i++) {
 
+        var tr = document.createElement('TR');
+        var td = document.createElement('TD');
+        td.style.fontWeight = 'bold';
+
+        td.appendChild(document.createTextNode(Object.keys(ica_data[curr_cond])[i]));
+        tr.appendChild(td)
+
+        for (j = 0; j < Object.keys(ica_data[curr_cond]).length; j++) {
+            var td = document.createElement('TD')
+            if (curr_group[i] == curr_group[j]){
+              td.appendChild(document.createTextNode(""));
+              tr.appendChild(td);
+            } else {
+              if (typeof ica_data[curr_cond][curr_group[i]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain][curr_func] !== 'undefined') {
+            td.appendChild(document.createTextNode(
+              toExp(
+                mannwhitneyu.test(
+                    ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
+                    ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
+                )["p"]
+              )
+            ));
+            if (toExp(
+              mannwhitneyu.test(
+                  ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
+                  ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
+              )["p"]
+            ) < .05) {td.style.fontWeight = 'bold';} 
+            if (median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))){
+              td.style.backgroundColor = '#ffcccb';
+            } else if (median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))){
+              td.style.backgroundColor = '#c3e4e8';
+            }
+                } else {
+                  td.appendChild(document.createTextNode(""));
+                }
+            tr.appendChild(td);
+                }
+        }
+        tableBody.appendChild(tr);
+    }  
+    myTableDiv.appendChild(table);
   }
-
 
 }
 
@@ -513,49 +562,102 @@ function condition_2nd(cond_2nd_idx) {
   }
   Plotly.relayout('intracohortDiv', update)
 
-  pval_text = "";
+  $("#pval_table_space").html("");
 
-  for (let k = 0; k < Object.keys(curr_group_2nd).length; k++){
-
-    pval_text = pval_text.concat('<b>', curr_group_2nd[k], ":</b><br/>");
-
-    pval_populated = false;
-
-    for (var i = 0; i < Object.keys(ica_data[curr_cond]).length - 1; i++) {
-      // This is where you'll capture that last value
-      for (var j = i + 1; j < Object.keys(ica_data[curr_cond]).length; j++) {
-
-        if (typeof pval_arrays[i][k] !== 'undefined' && typeof pval_arrays[j][k] !== 'undefined') {
-          if (pval_arrays[i][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0 && pval_arrays[j][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0) {
-
-          pval_populated = true;
-
-          pval_text = pval_text.concat(
-            curr_group[i] , ', ' , curr_group[j] , ': ' ,
-            toExp(
-              mannwhitneyu.test(
-                pval_arrays[i][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
-                pval_arrays[j][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number)
-                )["p"]
-                ),
-                '<br/>'
-              );
-              }
+  for (let k = 0; k < Object.keys(curr_group_2nd).length; k++) {
+  
+      pval_populated = false;
+  
+      var myTableDiv = document.getElementById("pval_table_space")
+  
+      var t = document.createElement("b");
+      t.innerHTML = (curr_group_2nd[k].concat(":"));
+      //t.style.fontWeight = 'bold';
+      myTableDiv.appendChild(t);
+  
+      var table = document.createElement('TABLE')
+      var tableBody = document.createElement('TBODY')
+  
+      table.classList.add('table-sm');
+      table.classList.add('table-bordered');
+      table.appendChild(tableBody);
+  
+      heading = [...curr_group];
+      heading.unshift("");
+  
+      //TABLE COLUMNS
+      var tr = document.createElement('TR');
+      tableBody.appendChild(tr);
+      for (i = 0; i < heading.length; i++) {
+          var th = document.createElement('TH')
+          th.width = '75';
+          th.appendChild(document.createTextNode(heading[i]));
+          tr.appendChild(th);
       }
-
-        if (i == Object.keys(ica_data[curr_cond]).length - 2 &&
-          j == Object.keys(ica_data[curr_cond]).length - 1 &&
-          pval_populated == false) {
-          pval_text = pval_text.concat('None<br/>')
-        }
-
-    }
-
+  
+      //TABLE ROWS
+      for (i = 0; i < Object.keys(ica_data[curr_cond]).length; i++) {
+  
+          var tr = document.createElement('TR');
+          var td = document.createElement('TD');
+          td.style.fontWeight = 'bold';
+  
+          td.appendChild(document.createTextNode(Object.keys(ica_data[curr_cond])[i]));
+          tr.appendChild(td)
+  
+          for (j = 0; j < Object.keys(ica_data[curr_cond]).length; j++) {
+              var td = document.createElement('TD')
+              if (curr_group[i] == curr_group[j]) {
+                  td.appendChild(document.createTextNode(""));
+                  tr.appendChild(td);
+              } else {
+                  if (typeof pval_arrays[i][k] !== 'undefined' && typeof pval_arrays[j][k] !== 'undefined') {
+                      if (pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).length !== 0 && pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).length !== 0) {
+                          pval_populated = true;
+                          td.appendChild(document.createTextNode(
+                              toExp(
+                                  mannwhitneyu.test(
+                                      pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number),
+                                      pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)
+                                  )["p"]
+                              )
+                          ));
+                          if (toExp(
+                            mannwhitneyu.test(
+                                pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number),
+                                pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)
+                            )["p"]
+                        ) < .05) {td.style.fontWeight = 'bold';} 
+                          if (median(pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)) > median(pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))) {
+                              td.style.backgroundColor = '#ffcccb';
+                          } else if (median(pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)) > median(pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))) {
+                              td.style.backgroundColor = '#c3e4e8';
+                          }
+                      }
+                  } else {
+                      td.appendChild(document.createTextNode(""));
+                  }
+                  tr.appendChild(td);
+              }
+          }
+          tableBody.appendChild(tr);
+      }
+      if (pval_populated == false) {
+        var br = document.createElement("br");
+        myTableDiv.appendChild(br);
+        var tn = document.createTextNode('None');
+        myTableDiv.appendChild(tn);
+        var br = document.createElement("br");
+        myTableDiv.appendChild(br);
+      } else {
+        myTableDiv.appendChild(table);
+      }
+      if (k != Object.keys(curr_group_2nd).length-1){
+        var br = document.createElement("br");
+        myTableDiv.appendChild(br);
+      }
   }
-
-  }
-
-  $("#test1").html(pval_text);
+  
 
   $("#dropdown2ndCondition").text("x: "+curr_cond_2nd);
   $("#dropdownCondition").text("hue: "+curr_cond);
@@ -699,7 +801,7 @@ function pscaDraw() {
 
   var data = [];
 
-  timepoint_group = cond_group[cond_name.indexOf("Timepoint")]
+  timepoint_group = cond_group[cond_name.indexOf(pair_split)]
   pair_group = cond_group[cond_name.indexOf("VisGroup")]
   if (curr_split_psca== "psca_allsamples"){
     split_group = [" "]
