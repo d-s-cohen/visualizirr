@@ -39,11 +39,11 @@ var ica_meta_ordered = [];
 let checker = (arr, target) => target.every(v => arr.includes(v));
 
 function toExp(x) {
-  if (x < .01) {
-    x = x.toExponential(3)
-  } else {
-    x = x.toFixed(3)
-  }
+  //if (x < .01) {
+    x = x.toExponential(1)
+  //} else {
+  //  x = x.toFixed(3)
+  //}
   return x;
 }
 
@@ -558,7 +558,8 @@ function condition_2nd(cond_2nd_idx) {
       tickvals: Object.keys(curr_group_2nd),
       ticktext: x_text
     },
-    annotations: []
+    annotations: [],
+    boxmode: 'group'
   }
   Plotly.relayout('intracohortDiv', update)
 
@@ -710,6 +711,7 @@ function draw_traces() {
       var trace = {
         type: 'box',
         boxpoints: 'all',
+        pointpos: 0,
         y: ica_data[curr_cond][curr_group[k]][curr_chain][curr_func],
         x: Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k),
         name: curr_group[k],
@@ -746,7 +748,7 @@ function draw_traces() {
       title: curr_func,
       zeroline: false
     },
-    boxmode: 'group',
+    //boxmode: 'group',
     xaxis: {
       tickvals: Object.keys(curr_group),
       ticktext: curr_group
