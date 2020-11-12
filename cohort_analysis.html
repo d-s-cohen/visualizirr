@@ -87,7 +87,7 @@
           <h2 class="h3">Intracohort Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="intracohortDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
+              <div id="intracohortDiv" style="max-width: 800px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
                 <div id="accordion">
@@ -95,7 +95,7 @@
                   <div class="card-header" id="headingTwo">
                     <h5 class="mb-0">
                       <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        P-value expanded
+                        P-value Tables
                       </button>
                     </h5>
                   </div>
@@ -201,10 +201,10 @@
               </div>
 
               <button type="button" class="btn btn-success"
-                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis')">Save
+                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis',1200,800)">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis')">Save
+                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis',1200,800)">Save
                 SVG</button>
 
             </div>
@@ -215,7 +215,7 @@
           <h2 class="h3">Overlap Analysis</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="overlapDiv" style="max-width: 1200px;max-height: 800px;margin-left: auto;margin-right: auto;"
+              <div id="overlapDiv" style="max-width: 800px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
               <div class="dropdown btn-group">
@@ -289,7 +289,7 @@
           <h2 class="h3">Cohort Scatterplot</h2>
           <div class="row">
             <div class="col text-center">
-              <div id="scatterDiv" style="max-width: 800px;max-height: 800px;margin-left: auto;margin-right: auto;"
+              <div id="scatterDiv" style="max-width: 600px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
                 <div class="dropdown btn-group">
@@ -320,10 +320,10 @@
                   </div>
 
                 <button type="button" class="btn btn-success"
-                onclick="save_img('scatterDiv', 'png', 'scatterplot')">Save
+                onclick="save_img('scatterDiv', 'png', 'scatterplot', 600, 600)">Save
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="save_img('scatterDiv', 'svg', 'scatterplot')">Save
+                onclick="save_img('scatterDiv', 'svg', 'scatterplot', 600, 600)">Save
                 SVG</button>
 
 

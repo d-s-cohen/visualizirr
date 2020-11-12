@@ -165,9 +165,16 @@ function load_plotly_stacked_bar(data_path,this_id){
 }
 
 
-function save_img(div_name, file_format, file_name){
+function save_img(div_name, file_format, file_name, save_x, save_y){
 
-	Plotly.downloadImage(div_name, {format: file_format, width: 1200, height: 900, filename: file_name});
+	if (!save_x){
+		save_x = 800;
+	}
+	if (!save_y){
+		save_y = 600;
+	}
+
+	Plotly.downloadImage(div_name, {format: file_format, width: save_x, height: save_y, filename: file_name});
 
 }
 
@@ -216,7 +223,7 @@ function jsonToCohortTable(data_json) {
 			if (cell.getValue().replace(/\/?$/, '/') == sessionStorage.getItem('path_val')){
 				return '<button type="button" class="btn btn-success btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>'; //return the contents of the cell;
 			} else {
-				return '<button type="button" class="btn btn-secondary disabled btn-sm" onclick="change_path_val(&quot;'+cell.getValue()+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
+				return '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="change_path_val(&quot;'+cell.getValue()+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
 			}
 		}},
 		//{title:"Chain", field:"name",headerFilter: true},
@@ -239,7 +246,7 @@ function jsonToCohortTable(data_json) {
 				addRowPos:"top",          //when adding a new row, add it to the top of the table
 				history:true,             //allow undo and redo actions on the table
 				pagination:"local",       //paginate the data
-				paginationSize:25,         //allow 7 rows per page of data
+				paginationSize:10,         //allow 7 rows per page of data
 				//movableColumns:true,      //allow column order to be changed
 				resizableRows:true,       //allow row order to be changed
 				initialSort:[             //set the initial sort order of the data

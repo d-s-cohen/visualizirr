@@ -520,6 +520,7 @@ function condition_2nd(cond_2nd_idx) {
   }
 
   var x_text = [];
+  var x_pvals = [];
 
   if (curr_group.length == 2) {
     for (let k = 0; k < curr_group_2nd.length; k++) {
@@ -527,9 +528,22 @@ function condition_2nd(cond_2nd_idx) {
 
         if (pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0 && pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0) {
       
-        x_text.push(curr_group_2nd[k] + "<br>pval: " + toExp(mannwhitneyu.test(
+        x_text.push(curr_group_2nd[k]);
+        x_pvals.push( 
+          {
+          showarrow: false,
+          text: "p: " + toExp(mannwhitneyu.test(
           pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
-          pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"])
+          pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"]),
+          x: k,
+          xref: 'x',
+          y: 0,
+          yref: 'paper',
+          font: {
+            size: 12,
+            color: 'black'
+          },
+          }
           );
         } else { x_text.push(curr_group_2nd[k]); }
       } else { x_text.push(curr_group_2nd[k]); }
@@ -554,11 +568,13 @@ function condition_2nd(cond_2nd_idx) {
   }
 
   var update = {
-    xaxis: {
+    xaxis: { automargin: true,
       tickvals: Object.keys(curr_group_2nd),
-      ticktext: x_text
+      ticktext: x_text,
+      zeroline: false,
+      showline: true
     },
-    annotations: [],
+    annotations: x_pvals,
     boxmode: 'group'
   }
   Plotly.relayout('intracohortDiv', update)
@@ -720,10 +736,10 @@ function draw_traces() {
       data.push(trace);
     }
     // p-value annotation
-    if (k < curr_group.length - 1) {
+    if (k < curr_group.length - 1 && curr_group.length == 2) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var the_pval = "pval:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+          var the_pval = "p:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
         }
       } else { var the_pval = ""; }
       var anno = {
@@ -746,18 +762,22 @@ function draw_traces() {
     title: 'Intracohort Analysis',
     yaxis: {
       title: curr_func,
-      zeroline: false
+      zeroline: false,
+      showline: true
     },
     //boxmode: 'group',
-    xaxis: {
+    xaxis: { automargin: true,
       tickvals: Object.keys(curr_group),
-      ticktext: curr_group
+      ticktext: curr_group,
+      zeroline: false,
+      showline: true
     },
     annotations: pvals,
     showlegend: true
+
   };
   // Render plot
-  Plotly.newPlot("intracohortDiv", data, layout);
+  Plotly.newPlot("intracohortDiv", data, layout, {modeBarButtonsToRemove: ['toImage']});
   // Hide p-vals of hidden traces
   var pval_vis = Array(curr_group.length).fill(true);
   $('.legendtoggle').on('click', function () {
@@ -767,7 +787,7 @@ function draw_traces() {
       for (let k = 0; k < pval_vis.length - 1; k++) {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-            var the_pval = "pval:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+            var the_pval = "p:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
           } else { var the_pval = ""; }
           var anno = {
             showarrow: false,
@@ -910,7 +930,7 @@ function pscaDraw() {
 
               pval_anno.push({
                 showarrow: false,
-                text: "pval:<br>" + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
+                text: "p:<br>" + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
                 x: m+.5,
                 xref: 'x',
                 y: 0,
@@ -955,18 +975,20 @@ function pscaDraw() {
     title: 'Paired Sample Cohort Analysis',
     yaxis: {
       title: curr_func_psca,
-      zeroline: false
+      zeroline: false,
+      showline: true
     },
-    xaxis: {
+    xaxis: { automargin: true,
       tickvals: Array.from(Array(x_lab.length).keys()),
       ticktext: x_lab,
-      zeroline: false
+      zeroline: false,
+      showline: true
     },
     showlegend: false,
     annotations: pval_anno
   };
   // Render plot
-  Plotly.newPlot("pscaDiv", data, layout);
+  Plotly.newPlot("pscaDiv", data, layout, {modeBarButtonsToRemove: ['toImage']});
 }
 
 function dataMorphPSCA(chain, split, func) {
@@ -1009,11 +1031,18 @@ function scatterDraw() {
 
   var layout = {
     title: 'Cohort Scatterplot',
-    xaxis: { title: curr_x_scatter },
-    yaxis: { title: curr_y_scatter }
+    xaxis: { 
+      automargin: true, 
+      title: curr_x_scatter,
+      zeroline: false,
+      showline: true },
+    yaxis: { 
+      title: curr_y_scatter,
+      zeroline: false,
+      showline: true }
   };
   
-  Plotly.newPlot('scatterDiv', data,layout);
+  Plotly.newPlot('scatterDiv', data,layout,{modeBarButtonsToRemove: ['toImage']});
 
 }
 
