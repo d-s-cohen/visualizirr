@@ -57,23 +57,21 @@ if (json_out == TRUE) {
   suppressMessages(library(rjson))
 }
 
-if (input_format %in% c("TRUST4","CUSTOM")){
-  if (!"Biostrings" %in% installed.packages()[,"Package"]){
-    if (!requireNamespace("BiocManager", quietly = TRUE))
-      install.packages("BiocManager")
-    BiocManager::install("Biostrings")
-  }
-  suppressMessages(library(Biostrings))
+if (!"Biostrings" %in% installed.packages()[,"Package"]){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager", repos = "http://cran.us.r-project.org")
+  BiocManager::install("Biostrings")
 }
+suppressMessages(library(Biostrings))
 
 # Intracohort analysis functions setup
 
 intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy", "1/Entropy", "Normalized Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
-                        "Clonal Proportion (Top 10)", "Clonal Proportion (Top 100)", "Clonal Proportion (Top 1000)", "Cumulative Proportion Clonotypes (Top 10%)", "Cumulative Proportion Clonotypes (Top 50%)",
+                        "Clonal Proportion (Top 10)", "Clonal Proportion (Top 100)", "Clonal Proportion (Top 1000)", "Cumulative Proportion Clonotypes (Top 10%)", "Cumulative Proportion Clonotypes (Top 50%)", "Clonality",
                         "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
 
 if (input_format == "RHTCRSEQ") {
-  intracohortColNames = intracohortColNames[-17]
+  intracohortColNames = intracohortColNames[-18]
 }
 
 functionNum = length(intracohortColNames)
@@ -234,14 +232,18 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       if ("v_gene" %in% colnames(sample_table)) {
         
-        sample_table <- sample_table[c("v_gene","d_gene","j_gene","rearrangement","amino_acid","templates","v_index","cdr3_length")]
+        adaptive_counts = "templates"
+        
+        if (all(is.na(sample_table$template))) {adaptive_counts <- "seq_reads"}
+        
+        sample_table <- sample_table[c("v_gene","d_gene","j_gene","rearrangement","amino_acid",adaptive_counts,"v_index","cdr3_length")]
         
         colnames(sample_table)[which(names(sample_table) == "v_gene")] <- "V_gene"
         colnames(sample_table)[which(names(sample_table) == "d_gene")] <- "D_gene"
         colnames(sample_table)[which(names(sample_table) == "j_gene")] <- "J_gene"
         colnames(sample_table)[which(names(sample_table) == "rearrangement")] <- "CDR3"
         colnames(sample_table)[which(names(sample_table) == "amino_acid")] <- "CDR3_AA"
-        colnames(sample_table)[which(names(sample_table) == "templates")] <- "read_fragment_count"
+        colnames(sample_table)[which(names(sample_table) == adaptive_counts)] <- "read_fragment_count"
         
       } else if ("vGeneName" %in% colnames(sample_table)) {
         
@@ -354,6 +356,10 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
         
         chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
         
+        if (current_chain == "IGH" && input_format == "ADAPTIVE") {
+          chain_table_unprocessed$CDR3_AA <- as.character(translate(DNAStringSet(chain_table_unprocessed$CDR3),if.fuzzy.codon="X"))
+        }
+        
         if (input_format != "RHTCRSEQ"){
           chain_table_unprocessed_allframe <- chain_table_unprocessed
           chain_table_unprocessed <- chain_table_unprocessed[(data.frame(names = chain_table_unprocessed$CDR3,
@@ -424,7 +430,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
             
             chain_table$CDR3_AA <- as.character(chain_table$CDR3_AA)
-            x <- as.character(chain_table$CDR3_AA) %in% c('*','')
+            x <- as.character(chain_table$CDR3_AA) %in% c('*','','unresolved')
             chain_table <- rbind(chain_table[!x,], chain_table[x,])
             if (nrow(chain_table) > clonotypeMax){
               chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
@@ -467,7 +473,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             
             chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
             
-            x <- as.character(chain_table$V_gene) %in% c('*','')
+            x <- as.character(chain_table$V_gene) %in% c('*','','unresolved')
             chain_table <- chain_table[!x,]
             if (nrow(chain_table) > 0){
               sumV <- subset(unique(chain_table$V_gene)[c(1:sumMax)], (!is.na(unique(chain_table$V_gene)[c(1:sumMax)])))
@@ -510,7 +516,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             
             chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
             
-            x <- as.character(chain_table$J_gene) %in% c('*','')
+            x <- as.character(chain_table$J_gene) %in% c('*','','unresolved')
             chain_table <- chain_table[!x,]
             if (nrow(chain_table) > 0){
               sumJ <- subset(unique(chain_table$J_gene)[c(1:sumMax)], (!is.na(unique(chain_table$J_gene)[c(1:sumMax)])))
@@ -556,7 +562,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
                 
                 chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
                 
-                x <- as.character(chain_table$C_gene) %in% c('*','')
+                x <- as.character(chain_table$C_gene) %in% c('*','','unresolved')
                 chain_table <- chain_table[!x,]
                 if (nrow(chain_table) > 0){
                   sumC <- subset(unique(chain_table$C_gene)[c(1:sumMax)], (!is.na(unique(chain_table$C_gene)[c(1:sumMax)])))
@@ -632,10 +638,10 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             
             chain_table <- chain_table_unprocessed
             
-            x <- as.character(chain_table$J_gene) %in% c('*','')
+            x <- as.character(chain_table$J_gene) %in% c('*','','unresolved')
             chain_table <- chain_table[!x,]
             
-            x <- as.character(chain_table$V_gene) %in% c('*','')
+            x <- as.character(chain_table$V_gene) %in% c('*','','unresolved')
             chain_table <- chain_table[!x,]
             
             if (nrow(chain_table) > 0){
@@ -730,9 +736,12 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             
             suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", process_col),4))
             if (nrow(chain_table_cdr3) != 1){
-              suppressMessages(intracohort_values[1, 4] <- round(entropy(chain_table_div$Clones),4))
-              suppressMessages(intracohort_values[1, 5] <- round(1/entropy(chain_table_div$Clones),4))
-              suppressMessages(intracohort_values[1, 6] <- round(entropy(chain_table_div$Clones,.norm=TRUE),4))
+              
+              ent_range <- aggregate(. ~ CDR3.aa, data=chain_table_div[c('Clones','CDR3.aa')], FUN=sum)[['Clones']]
+                
+              suppressMessages(intracohort_values[1, 4] <- round(entropy(ent_range),4))
+              suppressMessages(intracohort_values[1, 5] <- round(1/entropy(ent_range),4))
+              suppressMessages(intracohort_values[1, 6] <- round(entropy(ent_range,.norm=TRUE),4))
               suppressMessages(intracohort_values[1, 7] <- round(repDiversity(chain_table_div, "gini", process_col),4))
               suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", process_col),4))
               suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "inv.simp", process_col),4))
@@ -746,21 +755,25 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
             suppressMessages(intracohort_values[1, 14] <- round(repClonality(chain_table_div, "clonal.prop",.perc=10)[1],4))
             suppressMessages(intracohort_values[1, 15] <- round(repClonality(chain_table_div, "clonal.prop",.perc=50)[1],4))
             
+            if (nrow(chain_table_cdr3) != 1){
+              suppressMessages(intracohort_values[1, 16] <- round(1-(entropy(ent_range)/log2(length(ent_range))),4))
+            }
+            
             if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
-              intracohort_values[1, 16] <- round(cdr3_aggregate/total_count,4)
+              intracohort_values[1, 17] <- round(cdr3_aggregate/total_count,4)
             } else {
-              intracohort_values[1, 16] <- chain_table_cdr3[1, 2]
+              intracohort_values[1, 17] <- chain_table_cdr3[1, 2]
             }
             
             if (input_format == "RHTCRSEQ"){
-              intracohort_values[1, 16] <- intracohort_values[1, 16]*3
+              intracohort_values[1, 17] <- intracohort_values[1, 16]*3
             }
             
             if (input_format == "RHTCRSEQ"){
-              intracohort_values[1, 17] <- length(unique(chain_table_div$CDR3.aa))
-            } else {
-              intracohort_values[1, 17] <- length(unique(chain_table_div$CDR3.nt))
               intracohort_values[1, 18] <- length(unique(chain_table_div$CDR3.aa))
+            } else {
+              intracohort_values[1, 18] <- length(unique(chain_table_div$CDR3.nt))
+              intracohort_values[1, 19] <- length(unique(chain_table_div$CDR3.aa))
             }
             
             if (length(clonotypeAbundance)>0){
@@ -946,16 +959,20 @@ if (cohort_level_run == TRUE) {
     
     if ("v_gene" %in% colnames(sample_table_test)) {
       
+      adaptive_counts = "templates"
+      
+      if (all(is.na(sample_table_test$template))) {adaptive_counts <- "seq_reads"}
+      
       rm(sample_table_test)
       all_dfs <- lapply(files, function(x){
-        sample_table_pt <- read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)[c("v_gene","d_gene","j_gene","rearrangement","amino_acid","templates","v_index","cdr3_length")]
+        sample_table_pt <- read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)[c("v_gene","d_gene","j_gene","rearrangement","amino_acid",adaptive_counts,"v_index","cdr3_length")]
         
         colnames(sample_table_pt)[which(names(sample_table_pt) == "v_gene")] <- "V_gene"
         colnames(sample_table_pt)[which(names(sample_table_pt) == "d_gene")] <- "D_gene"
         colnames(sample_table_pt)[which(names(sample_table_pt) == "j_gene")] <- "J_gene"
         colnames(sample_table_pt)[which(names(sample_table_pt) == "rearrangement")] <- "CDR3"
         colnames(sample_table_pt)[which(names(sample_table_pt) == "amino_acid")] <- "CDR3_AA"
-        colnames(sample_table_pt)[which(names(sample_table_pt) == "templates")] <- "read_fragment_count"
+        colnames(sample_table_pt)[which(names(sample_table_pt) == adaptive_counts)] <- "read_fragment_count"
         
         sample_table_pt[,"CDR3"] <- as.character(sample_table_pt[,"CDR3"])
         
@@ -1103,6 +1120,10 @@ if (cohort_level_run == TRUE) {
 
     chain_table_unprocessed <- sample_table[as.logical(rowSums(which_chain)),]
     
+    if (current_chain == "IGH" && input_format == "ADAPTIVE") {
+      chain_table_unprocessed$CDR3_AA <- as.character(translate(DNAStringSet(chain_table_unprocessed$CDR3),if.fuzzy.codon="X"))
+    }
+    
     # in-frame only
     
     if (input_format != "RHTCRSEQ") {
@@ -1162,7 +1183,7 @@ if (cohort_level_run == TRUE) {
       chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
       
       chain_table$CDR3_AA <- as.character(chain_table$CDR3_AA)
-      x <- as.character(chain_table$CDR3_AA) %in% c('*','')
+      x <- as.character(chain_table$CDR3_AA) %in% c('*','','unresolved')
       chain_table <- rbind(chain_table[!x,], chain_table[x,])
       if (nrow(chain_table) > clonotypeMax){
         chain_table[c((clonotypeMax+1):length(chain_table$CDR3_AA)),'CDR3_AA'] <- "Other"
@@ -1192,7 +1213,7 @@ if (cohort_level_run == TRUE) {
       
       chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
       
-      x <- as.character(chain_table$V_gene) %in% c('*','')
+      x <- as.character(chain_table$V_gene) %in% c('*','','unresolved')
       chain_table <- chain_table[!x,]
       if (nrow(chain_table) > 0){
         
@@ -1222,7 +1243,7 @@ if (cohort_level_run == TRUE) {
       
       chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
       
-      x <- as.character(chain_table$J_gene) %in% c('*','')
+      x <- as.character(chain_table$J_gene) %in% c('*','','unresolved')
       chain_table <- chain_table[!x,]
       if (nrow(chain_table) > 0){
         sumJ <- subset(unique(chain_table$J_gene)[c(1:sumMax)], (!is.na(unique(chain_table$J_gene)[c(1:sumMax)])))
@@ -1255,7 +1276,7 @@ if (cohort_level_run == TRUE) {
           
           chain_table <- chain_table[order(-chain_table$read_fragment_freq),] 
           
-          x <- as.character(chain_table$C_gene) %in% c('*','')
+          x <- as.character(chain_table$C_gene) %in% c('*','','unresolved')
           chain_table <- chain_table[!x,]
           if (nrow(chain_table) > 0){
             sumC <- subset(unique(chain_table$C_gene)[c(1:sumMax)], (!is.na(unique(chain_table$C_gene)[c(1:sumMax)])))
@@ -1318,10 +1339,10 @@ if (cohort_level_run == TRUE) {
       
       chain_table <- chain_table_unprocessed
       
-      x <- as.character(chain_table$J_gene) %in% c('*','')
+      x <- as.character(chain_table$J_gene) %in% c('*','','unresolved')
       chain_table <- chain_table[!x,]
       
-      x <- as.character(chain_table$V_gene) %in% c('*','')
+      x <- as.character(chain_table$V_gene) %in% c('*','','unresolved')
       chain_table <- chain_table[!x,]
       
       if (nrow(chain_table) > 0){

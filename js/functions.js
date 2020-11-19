@@ -252,7 +252,12 @@ function jsonToCohortTable(data_json) {
 				initialSort:[             //set the initial sort order of the data
 					{column:"Author", dir:"asc"},
 				],
-				columns:columns_array
+				columns:columns_array,
+				persistence: {
+						filter: true, //persist filter sorting}
+						page: true,
+						sort: true, //persist column sorting
+				}
 			});
 		}
 	}

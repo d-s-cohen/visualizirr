@@ -441,27 +441,29 @@ function dataMorph(cond, chain, func) {
               td.appendChild(document.createTextNode(""));
               tr.appendChild(td);
             } else {
-              if (typeof ica_data[curr_cond][curr_group[i]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain][curr_func] !== 'undefined') {
-            td.appendChild(document.createTextNode(
-              toExp(
+              if (typeof ica_data[curr_cond][curr_group[i]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain] !== 'undefined') {
+                if (typeof ica_data[curr_cond][curr_group[i]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[j]][curr_chain][curr_func] !== 'undefined') {
+              td.appendChild(document.createTextNode(
+                toExp(
+                  mannwhitneyu.test(
+                      ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
+                      ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
+                  )["p"]
+                )
+              ));
+              if (toExp(
                 mannwhitneyu.test(
                     ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
                     ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
                 )["p"]
-              )
-            ));
-            if (toExp(
-              mannwhitneyu.test(
-                  ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
-                  ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
-              )["p"]
-            ) < .05) {td.style.fontWeight = 'bold';} 
-            if (median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))){
-              td.style.backgroundColor = '#ffcccb';
-            } else if (median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))){
-              td.style.backgroundColor = '#c3e4e8';
-            }
-                } else {
+              ) < .05) {td.style.fontWeight = 'bold';} 
+              if (median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))){
+                td.style.backgroundColor = '#ffcccb';
+              } else if (median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))>median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))){
+                td.style.backgroundColor = '#c3e4e8';
+              }
+                }
+              } else {
                   td.appendChild(document.createTextNode(""));
                 }
             tr.appendChild(td);
@@ -540,7 +542,7 @@ function condition_2nd(cond_2nd_idx) {
           y: 0,
           yref: 'paper',
           font: {
-            size: 12,
+            size: 14,
             color: 'black'
           },
           }
@@ -739,7 +741,7 @@ function draw_traces() {
     if (k < curr_group.length - 1 && curr_group.length == 2) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var the_pval = "p:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+          var the_pval = "p: " + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
         }
       } else { var the_pval = ""; }
       var anno = {
@@ -750,7 +752,7 @@ function draw_traces() {
         y: 0,
         yref: 'paper',
         font: {
-          size: 12,
+          size: 14,
           color: 'black'
         },
       }
@@ -766,6 +768,7 @@ function draw_traces() {
       showline: true
     },
     //boxmode: 'group',
+    font: {size: 14},
     xaxis: { automargin: true,
       tickvals: Object.keys(curr_group),
       ticktext: curr_group,
@@ -797,7 +800,7 @@ function draw_traces() {
             y: 0,
             yref: 'paper',
             font: {
-              size: 12,
+              size: 14,
               color: 'black'
             },
           }
@@ -936,7 +939,7 @@ function pscaDraw() {
                 y: 0,
                 yref: 'paper',
                 font: {
-                  size: 12,
+                  size: 14,
                   color: 'black'
                 },
               });
@@ -962,7 +965,7 @@ function pscaDraw() {
       yref: 'paper',
       yanchor: 'top',
       font: {
-        size: 12,
+        size: 14,
         color: 'black'
       },
     });
@@ -973,6 +976,7 @@ function pscaDraw() {
   // Plot layout
   var layout = {
     title: 'Paired Sample Cohort Analysis',
+    font: {size: 14},
     yaxis: {
       title: curr_func_psca,
       zeroline: false,
@@ -1031,6 +1035,7 @@ function scatterDraw() {
 
   var layout = {
     title: 'Cohort Scatterplot',
+    font: {size: 14},
     xaxis: { 
       automargin: true, 
       title: curr_x_scatter,
