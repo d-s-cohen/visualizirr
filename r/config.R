@@ -5,7 +5,7 @@
 ### REQUIRED ###
 
 # Specify input format so that files may be parsed appropriately
-# Accepted formats: "TRUST4" (cdr3.out files), "TRUST4_SIMPLE" (report.out files), "MIXCR", "ADAPTIVE", "RHTCRSEQ", "CUSTOM"
+# Accepted formats: "TRUST4" (cdr3.out files), "TRUST4_SIMPLE" (report.out files), "VDJTOOLS", "MIXCR", "ADAPTIVE", "RHTCRSEQ", "CUSTOM"
 input_format = "TRUST4"
 
 # Change to your directory containing input files

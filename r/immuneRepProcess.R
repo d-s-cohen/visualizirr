@@ -208,6 +208,23 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
     } 
     
+    # VDJTOOLS file format
+    
+    else if (input_format == "VDJTOOLS") {
+      
+      sample_table <-
+        read.delim(paste(input_dir,"/",input_prefix,current_sample,input_suffix, sep = ""), header = T)
+      
+      colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
+      colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
+      colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
+      colnames(sample_table)[which(names(sample_table) == "c")] <- "C_gene"
+      colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+      
+    } 
+    
     # MIXCR file format
     
     else if (input_format == "MIXCR") {
@@ -335,7 +352,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       
       # Clean V,D,J,C-genes
       
-      if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
+      if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE","VDJTOOLS")){
         sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
         sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
         if (!is.null(sample_table$D_gene)) {
@@ -931,6 +948,26 @@ if (cohort_level_run == TRUE) {
     
   } 
   
+  # VDJTOOLS file format
+  
+  else if (input_format == "VDJTOOLS") {
+    
+    all_dfs <- lapply(files, function(x){
+      read.delim(paste(input_dir,"/",input_prefix,x,input_suffix, sep = ""), header = T)
+    })
+    
+    sample_table <- do.call(rbind,all_dfs)
+    
+    colnames(sample_table)[which(names(sample_table) == "v")] <- "V_gene"
+    colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
+    colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
+    colnames(sample_table)[which(names(sample_table) == "c")] <- "C_gene"
+    colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
+    colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+    colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
+    
+  } 
+  
   # MIXCR file format
   
   else if (input_format == "MIXCR") {
@@ -1097,7 +1134,7 @@ if (cohort_level_run == TRUE) {
   
   # Clean V,D,J,C-genes
   
-  if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE")){
+  if (input_format %in% c("MIXCR","TRUST4","TRUST4_SIMPLE","VDJTOOLS")){
     sample_table$V_gene <- sapply(strsplit(as.character(sample_table$V_gene), "[*]") , "[", 1)
     sample_table$J_gene <- sapply(strsplit(as.character(sample_table$J_gene), "[*]") , "[", 1)
     if (!is.null(sample_table$D_gene)) {
