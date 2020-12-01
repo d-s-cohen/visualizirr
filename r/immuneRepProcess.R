@@ -219,8 +219,8 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
       colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
       colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
       colnames(sample_table)[which(names(sample_table) == "c")] <- "C_gene"
-      colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
-      colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+      colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
+      colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
       colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
       
     } 
@@ -962,8 +962,8 @@ if (cohort_level_run == TRUE) {
     colnames(sample_table)[which(names(sample_table) == "d")] <- "D_gene"
     colnames(sample_table)[which(names(sample_table) == "j")] <- "J_gene"
     colnames(sample_table)[which(names(sample_table) == "c")] <- "C_gene"
-    colnames(sample_table)[which(names(sample_table) == "CDR3nt")] <- "CDR3"
-    colnames(sample_table)[which(names(sample_table) == "CDR3aa")] <- "CDR3_AA"
+    colnames(sample_table)[which(names(sample_table) == "cdr3nt")] <- "CDR3"
+    colnames(sample_table)[which(names(sample_table) == "cdr3aa")] <- "CDR3_AA"
     colnames(sample_table)[which(names(sample_table) == "count")] <- "read_fragment_count"
     
   } 
