@@ -119,7 +119,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			}
 		}, dataType = 'text');
 
-		d3.text("README.md").then(function (data) {
+		d3.text("home.md").then(function (data) {
 			var md = window.markdownit();
 			$('#markdown').html(md.render(data));
 		});

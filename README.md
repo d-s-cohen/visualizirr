@@ -4,7 +4,7 @@ An in-browser immune repertoire report, incorporating popular web development li
 These reports are structured to dynamically display the results of whatever cohort you run TCR/BCR analysis on.
 All you need to do is run an R script on a directory of clonesets and prepare your meta information according to specifications detailed by the documentation.
 An included config file template walks the user through the process and helps them customize their report.
-Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
+Support is included for TRUST4, MiXCR, VDJtools, Adaptive, and custom clonesets.
 
 ---
 
@@ -20,11 +20,11 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
         * Nucleotide length distribution
         * Top clonotypes
     * User customized meta information 
-* Intracohort Analysis
-    * Diversity and clonality measures
-        * Raw Diversity, Shannon Entropy Measure, 1 / Shannon Entropy Measure, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Unique CDR3 Count, CDR3 Length
-        * Comparison between sub-cohort groups of these measures
-* Everything is split between different chains 
+* Cohort Analysis
+    * Intracohort Analysis, Sample Cohort Analysis, Cohort Information Table, Cohort Scatterplot
+    * Raw Diversity, Entropy, 1/Entropy, Normalized Entropy, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Clonal Proportion, Cumulative Proportion Clonotypes, Clonality, Average CDR3 Length (Nt), Unique CDR3 Count (Nt), Unique CDR3 Count (AA)
+    * Comparison between sub-cohort groups of these measures
+* Everything is split between different available chains 
     * TRB, TRA, TRG, TRD, IGH, IGL, IGK
 
 ---

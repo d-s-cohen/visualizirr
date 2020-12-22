@@ -337,10 +337,18 @@ $.ajax({
                   $("#dropdownFondition").text(func_name[curr_func]);
                   // Populate chain options in html
                   var available_chains = Object.keys(in_chain).sort();
+                  var reference_chain_array = ['IGH','IGHA1','IGHA2','IGHD','IGHE','IGHG1','IGHG2','IGHG3','IGHG4','IGHM','IGK+IGL','IGK','IGL','TRA','TRB','TRD','TRG'];
+                  var sub_chain_array = ['IGHA1','IGHA2','IGHD','IGHE','IGHG1','IGHG2','IGHG3','IGHG4','IGHM'];
+                  if (available_chains.includes('IGK+IGL')){sub_chain_array = sub_chain_array.concat(['IGK','IGL'])}
+                  available_chains.sort(function(a, b) {
+                    return reference_chain_array.indexOf(a) - reference_chain_array.indexOf(b);
+                  });
                   for (let n = 0; n < available_chains.length; n++) {
-                    $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + available_chains[n] + "</a>");
-                    $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + available_chains[n] + "</a>");
-                    $("#chain_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + available_chains[n] + "</a>");
+                    var indent = ''
+                    if ((sub_chain_array.includes(available_chains[n]))) {indent = '&emsp;'}
+                    $("#chain_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined, &quot;" + available_chains[n] + "&quot;,undefined)'>" + indent + available_chains[n] + "</a>");
+                    $("#chain_selection_psca").append("<a class='dropdown-item' onclick='dataMorphPSCA(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + indent + available_chains[n] + "</a>");
+                    $("#chain_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(&quot;" + available_chains[n] + "&quot;,undefined,undefined)'>" + indent + available_chains[n] + "</a>");
                   }
                 });
               }
@@ -927,13 +935,16 @@ function pscaDraw() {
 
             pval_anno = []
 
+            x_length = Array.from(Array(timepoint_group.length*split_group.length).keys()).length
+            if (x_length > 12){p_prefix = "p:<br>"} else {p_prefix = "p: "}
+
             for (let m = 0; m < (pval_paired_arrays.length); m++) {
 
               if (pval_paired_arrays[m][0].length>0){
 
               pval_anno.push({
                 showarrow: false,
-                text: "p:<br>" + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
+                text: p_prefix + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
                 x: m+.5,
                 xref: 'x',
                 y: 0,

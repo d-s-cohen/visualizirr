@@ -61,14 +61,15 @@
                   <a class="nav-link nav-pad" href="#" onclick="hide_others('#OL')">Overlap Analysis</a>
                 </li>
               </ul>
-              <a class="nav-link" href="#" onclick="show_class('.cohort_overview')" style="font-size: 1rem">Cohort Overview</a>
+              <a class="nav-link" href="#" onclick="show_class('.cohort_overview')" style="font-size: 1rem">Cohort
+                Overview</a>
               <ul>
                 <li class="nav-item">
                   <a class="nav-link nav-pad" href="#" onclick="hide_others('#CIT')">Cohort Information Table</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link nav-pad" href="#" onclick="hide_others('#CS')">Cohort Scatterplot</a>
-              </li>
+                </li>
               </ul>
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
@@ -90,11 +91,12 @@
               <div id="intracohortDiv" style="max-width: 800px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
-                <div id="accordion">
+              <div id="accordion">
                 <div class="card">
                   <div class="card-header" id="headingTwo">
                     <h5 class="mb-0">
-                      <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                        aria-expanded="false" aria-controls="collapseTwo">
                         P-value Tables
                       </button>
                     </h5>
@@ -192,8 +194,8 @@
               </div>
 
               <div class="dropdown btn-group">
-                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionPSCA" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionPSCA"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Function
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection_psca">
@@ -201,10 +203,17 @@
               </div>
 
               <button type="button" class="btn btn-success"
-                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis',1200,800)">Save
+                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis',1200,800)">Save Large
                 PNG</button>
               <button type="button" class="btn btn-success"
-                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis',1200,800)">Save
+                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis',1200,800)">Save Large
+                SVG</button>
+
+              <button type="button" class="btn btn-success"
+                onclick="save_img('pscaDiv', 'png', 'paired_sample_cohort_analysis',550,550)">Save
+                PNG</button>
+              <button type="button" class="btn btn-success"
+                onclick="save_img('pscaDiv', 'svg', 'paired_sample_cohort_analysis',550,550)">Save
                 SVG</button>
 
             </div>
@@ -234,7 +243,8 @@
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Select Condition
                   </button>
-                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition_selection_overlap">
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;"
+                    id="condition_selection_overlap">
                   </div>
                 </div>
 
@@ -243,15 +253,16 @@
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Select Secondary Condition
                   </button>
-                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="condition2nd_selection_overlap">
+                  <div class="dropdown-menu" style="position: relative; z-index: 10000;"
+                    id="condition2nd_selection_overlap">
                   </div>
                 </div>
 
               </div>
 
               <div class="dropdown btn-group">
-                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionOverlap" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownFunctionOverlap"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Select Function
                 </button>
                 <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="function_selection_overlap">
@@ -279,8 +290,8 @@
             </div>
             <div class="collapse" id="collapseTable">
               <div class="card-body"> -->
-                <div id="data-table"></div>
-              <!-- </div>
+          <div id="data-table"></div>
+          <!-- </div>
             </div> -->
           <!-- </div> -->
         </div>
@@ -292,34 +303,34 @@
               <div id="scatterDiv" style="max-width: 600px;max-height: 600px;margin-left: auto;margin-right: auto;"
                 class="d-flex justify-content-center"></div>
 
-                <div class="dropdown btn-group">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChainScatter"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Select Chain
-                  </button>
-                  <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection_scatter">
-                  </div>
+              <div class="dropdown btn-group">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownChainScatter"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select Chain
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="chain_selection_scatter">
                 </div>
-  
-                  <div class="dropdown btn-group">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownXScatter"
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Select X Data
-                    </button>
-                    <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="x_selection_scatter">
-                    </div>
-                  </div>
-  
-                  <div class="dropdown btn-group">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownYScatter"
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Select Y Data
-                    </button>
-                    <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="y_selection_scatter">
-                    </div>
-                  </div>
+              </div>
 
-                <button type="button" class="btn btn-success"
+              <div class="dropdown btn-group">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownXScatter"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select X Data
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="x_selection_scatter">
+                </div>
+              </div>
+
+              <div class="dropdown btn-group">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownYScatter"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select Y Data
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="y_selection_scatter">
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-success"
                 onclick="save_img('scatterDiv', 'png', 'scatterplot', 600, 600)">Save
                 PNG</button>
               <button type="button" class="btn btn-success"

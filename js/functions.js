@@ -43,11 +43,16 @@ function load_plotly_bar(data_path,this_id){
 			var plot_type = this_id.split('/')[1].split('.')[0]
 			var lines = data.split("\n");
 			var layout = {
+				font: {size: 14},
 				autosize: true,
 				xaxis: {
+					zeroline: false,
+					showline: true,
 					title: plot_labels[plot_type][1]
 				  },
 				  yaxis: {
+					zeroline: false,
+					showline: true,
 					title: plot_labels[plot_type][2]
 				  },
 				  title: plot_labels[plot_type][0]
@@ -99,12 +104,17 @@ function load_plotly_stacked_bar(data_path,this_id){
 			var lines = data.split("\n");
 			var data2 = [];
 			var layout = {
+				font: {size: 14},
 				barmode: 'stack',
 				autosize: true,
 				xaxis: {
+					zeroline: false,
+					showline: true,
 					title: plot_labels[plot_type][1]
 				  },
 				  yaxis: {
+					zeroline: false,
+					showline: true,
 					title: plot_labels[plot_type][2]
 				  },
 				  title: plot_labels[plot_type][0],
@@ -168,10 +178,10 @@ function load_plotly_stacked_bar(data_path,this_id){
 function save_img(div_name, file_format, file_name, save_x, save_y){
 
 	if (!save_x){
-		save_x = 800;
+		save_x = 700;
 	}
 	if (!save_y){
-		save_y = 600;
+		save_y = 450;
 	}
 
 	Plotly.downloadImage(div_name, {format: file_format, width: save_x, height: save_y, filename: file_name});
@@ -218,10 +228,13 @@ function parseData(url, callBack) {
 }
 
 function jsonToCohortTable(data_json) {
+	$(document).ready(function () {
 	columns_array = [
-		{title:"Select", field:"path", headerSort:false, width:80, formatter:function(cell, formatterParams, onRendered){
+		{title:"Select", field:"path", headerSort:false, width:80, formatter:function(cell, formatterParams, onRendered) {
 			if (cell.getValue().replace(/\/?$/, '/') == sessionStorage.getItem('path_val')){
 				return '<button type="button" class="btn btn-success btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>'; //return the contents of the cell;
+			} else if (cell.getValue()=='TCGA') {
+				return '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="location.href=&apos;tcga&apos;;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
 			} else {
 				return '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="change_path_val(&quot;'+cell.getValue()+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
 			}
@@ -250,7 +263,7 @@ function jsonToCohortTable(data_json) {
 				//movableColumns:true,      //allow column order to be changed
 				resizableRows:true,       //allow row order to be changed
 				initialSort:[             //set the initial sort order of the data
-					{column:"Author", dir:"asc"},
+					{column:"#Sample Count", dir:"desc"},
 				],
 				columns:columns_array,
 				persistence: {
@@ -261,6 +274,7 @@ function jsonToCohortTable(data_json) {
 			});
 		}
 	}
+});
 }
 
 function jsonToTable(data_json) {
