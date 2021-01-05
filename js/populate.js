@@ -15,7 +15,7 @@ types['#ICA'] = '#content_ICA';
 types['#PSCA'] = '#content_PSCA';
 types['#OL'] = '#content_ol';
 types['#CIT'] = '#content_cit';
-types['#CS'] = '#content_cs';
+types['#CT'] = '#content_ct';
 types[''] = 'blank';
 
 // Associate location hash with content IDs
@@ -132,7 +132,6 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 // Populate information table from info.csv
 if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html']) >= 0) {
 	$(document).ready(function () {
-	});
 	var data_path = 'data/'
 	if (sessionStorage.getItem('path_val') != null) {
 		data_path = sessionStorage.getItem('path_val')
@@ -150,6 +149,18 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 		if (sessionStorage.length) {
 			clearInterval(i);
 			parseData(data_path + "intracohort_data.csv", jsonToTable);
+			$("#statsCSV").attr('href', data_path + "intracohort_data.csv");
+			$.ajax({
+				url: data_path + "meta.csv",
+				type:'HEAD',
+				success: function()
+				{
+					$('#cohortMetaTable').attr('style','');
+					parseData(data_path + "meta.csv", jsonToMetaTable);
+					$("#metaCSV").attr('href', data_path + "meta.csv");
+				}
+			});
 		}
 	}, 100);
+});
 }

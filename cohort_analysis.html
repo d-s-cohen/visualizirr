@@ -65,7 +65,7 @@
                 Overview</a>
               <ul>
                 <li class="nav-item">
-                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#CIT')">Cohort Information Table</a>
+                  <a class="nav-link nav-pad" href="#" onclick="hide_others('#CT')">Cohort Tables</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link nav-pad" href="#" onclick="hide_others('#CS')">Cohort Scatterplot</a>
@@ -97,7 +97,7 @@
                     <h5 class="mb-0">
                       <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
                         aria-expanded="false" aria-controls="collapseTwo">
-                        P-value Tables
+                        P-value Tables &#9660;
                       </button>
                     </h5>
                   </div>
@@ -280,21 +280,54 @@
           </div>
         </div>
 
-        <div class="content_row cohort_overview" id="content_cit">
-          <h2 class="h3">Cohort Information Table</h2>
-          <!-- <div class="card">
-            <div class="card-header border-0">
-              <a class="btn btn-primary" data-toggle="collapse" href="#collapseTable" role="button" aria-expanded="false" aria-controls="collapseTable">
-                Show/Hide Table
-              </a>
+
+
+        <div class="content_row cohort_overview" id="content_ct">
+          <h2 class="h3">Cohort Tables</h2>
+
+          <div id="accordionCst">
+            <div class="card">
+              <div class="card-header" id="headingCst">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseCst"
+                    aria-expanded="false" aria-controls="collapseCst">
+                    Cohort Statistics Table &#9660;
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseCst" class="collapse" aria-labelledby="headingCst" data-parent="#accordionCst">
+
+                  <div id="data-table"></div>
+                  <a id="statsCSV" href="" download>Download CSV</a>
+
+              </div>
             </div>
-            <div class="collapse" id="collapseTable">
-              <div class="card-body"> -->
-          <div id="data-table"></div>
-          <!-- </div>
-            </div> -->
-          <!-- </div> -->
+          </div>
+
+          <p></p>
+
+          <div id="cohortMetaTable" style="visibility: hidden">
+            <div id="accordionCmt">
+              <div class="card">
+                <div class="card-header" id="headingCmt">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseCmt"
+                      aria-expanded="false" aria-controls="collapseCmt">
+                      Cohort Meta-information Table &#9660;
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseCmt" class="collapse" aria-labelledby="headingCmt" data-parent="#accordionCmt">
+
+                  <div id="meta-table"></div>
+                  <a id="metaCSV" href="" download>Download CSV</a>
+
+                </div>
+              </div>
+            </div>
         </div>
+
+        </div>        
 
         <div class="content_row cohort_overview" id="content_cs">
           <h2 class="h3">Cohort Scatterplot</h2>

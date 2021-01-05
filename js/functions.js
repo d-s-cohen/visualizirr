@@ -310,3 +310,34 @@ function jsonToTable(data_json) {
 		}
 	}
 }
+
+function jsonToMetaTable(data_json) {
+	columns_array = [
+		{title:"Sample", field:"sample",headerFilter: true, formatter:function(cell, formatterParams, onRendered){
+			return '<B>'+cell.getValue()+'</B>'; //return the contents of the cell;
+		}},
+	]
+	json_columns = Object.keys(data_json[0]);
+
+	for (i = 1; i < json_columns.length; i++) { 
+		columns_array.push({title:json_columns[i], field:json_columns[i],headerFilter: true})
+		if (i == json_columns.length - 1){
+			var table = new Tabulator("#meta-table", {
+				data:data_json,           //load row data from array
+				layout:"fitColumns",      //fit columns to width of table
+				responsiveLayout:"hide",  //hide columns that dont fit on the table
+				tooltips:true,            //show tool tips on cells
+				addRowPos:"top",          //when adding a new row, add it to the top of the table
+				history:true,             //allow undo and redo actions on the table
+				pagination:"local",       //paginate the data
+				paginationSize:25,         //allow 7 rows per page of data
+				//movableColumns:true,      //allow column order to be changed
+				resizableRows:true,       //allow row order to be changed
+				initialSort:[             //set the initial sort order of the data
+					{column:"sample", dir:"asc"},
+				],
+				columns:columns_array,
+			});
+		}
+	}
+}
