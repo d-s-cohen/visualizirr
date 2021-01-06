@@ -228,54 +228,39 @@ function parseData(url, callBack) {
 }
 
 function jsonToCohortTable(data_json) {
-	$(document).ready(function () {
-	columns_array = [
-		{title:"Select", field:"path", headerSort:false, width:80, formatter:function(cell, formatterParams, onRendered) {
-			if (cell.getValue().replace(/\/?$/, '/') == sessionStorage.getItem('path_val')){
-				return '<button type="button" class="btn btn-success btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>'; //return the contents of the cell;
-			} else if (cell.getValue()=='TCGA') {
-				return '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="location.href=&apos;tcga&apos;;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
-			} else {
-				return '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="change_path_val(&quot;'+cell.getValue()+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
-			}
-		}},
-		//{title:"Chain", field:"name",headerFilter: true},
-	]
-	json_columns = Object.keys(data_json[0]);
 
-	for (i = 2; i < json_columns.length; i++) { 
-		if (json_columns[i].startsWith("#")){
-			columns_array.push({title:json_columns[i].substr(1), field:json_columns[i], sorter:"number",headerFilter: true})
-		} else {
-			columns_array.push({title:json_columns[i], field:json_columns[i],headerFilter: true})
+	var table_columns = [];
+	Object.keys(data_json[0]).forEach((key, i) => table_columns[i] = {"title":key});
+	table_data = data_json.flatMap((item) => [Object.values(item)]);
+	
+		for (i = 0; i < table_data.length; i++) { 
+	
+		if (table_data[i][0].replace(/\/?$/, '/') == sessionStorage.getItem('path_val')){
+			table_data[i][0] = '<button type="button" class="btn btn-success btn-sm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></button>'; //return the contents of the cell;
+			} else if (table_data[i][0]=='TCGA') {
+				table_data[i][0] = '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="location.href=&apos;tcga&apos;;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
+			} else {
+				table_data[i][0] = '<button type="button" class="btn btn-outline-dark disabled btn-sm" onclick="change_path_val(&quot;'+table_data[i][0]+'&quot;)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>'; //return the contents of the cell;
+			}
+	
 		}
-		if (i == json_columns.length - 1){
-			var table = new Tabulator("#cohort-select-table", {
-				data:data_json,           //load row data from array
-				//layout:"fitDataFill",
-				layout:"fitColumns",      //fit columns to width of table
-				responsiveLayout:"hide",  //hide columns that dont fit on the table
-				tooltips:true,            //show tool tips on cells
-				addRowPos:"top",          //when adding a new row, add it to the top of the table
-				history:true,             //allow undo and redo actions on the table
-				pagination:"local",       //paginate the data
-				paginationSize:10,         //allow 7 rows per page of data
-				//movableColumns:true,      //allow column order to be changed
-				resizableRows:true,       //allow row order to be changed
-				initialSort:[             //set the initial sort order of the data
-					{column:"#Sample Count", dir:"desc"},
-				],
-				columns:columns_array,
-				persistence: {
-						filter: true, //persist filter sorting}
-						page: true,
-						sort: true, //persist column sorting
-				}
-			});
-		}
+	
+		$(document).ready(function() {
+			$('#cohort-select-table').DataTable( {
+				data: table_data,
+				columns: table_columns,
+				stateSave: true,
+				order: [[ Object.keys(data_json[0]).indexOf('Sample Count'), "desc" ]],
+				stateSaveCallback: function(settings,data) {
+					localStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+				  },
+				stateLoadCallback: function(settings) {
+				  return JSON.parse( localStorage.getItem( 'DataTables_' + settings.sInstance ) )
+				  }
+			} );
+		} );
+	
 	}
-});
-}
 
 function jsonToTable(data_json) {
 	columns_array = [

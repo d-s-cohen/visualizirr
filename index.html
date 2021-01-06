@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="lib/css/bootstrap.min.css">
   <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
   <link rel="stylesheet" href="lib/css/tabulator_bootstrap4.min.css">
+  <link rel="stylesheet" href="lib/css/jquery.dataTables.min.css">
   <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
   <script src="lib/js/bootstrap.min.js"></script>
   <script src="lib/js/jquery.min.js"></script>
@@ -16,6 +17,7 @@
   <script src="lib/js/markdown-it.min.js"></script>
   <script src="lib/js/tabulator.min.js"></script>
   <script src="lib/js/papaparse.min.js"></script>
+  <script src="lib/js/jquery.dataTables.min.js"></script>
 
   <link rel="stylesheet" href="css/table.css">
   <script src="js/load_sections.js"></script>
@@ -50,7 +52,7 @@
         </div>
         <div class="content_row" id="cohort_table" style="display:none;">
           <h2 class="h3">Cohort Selection Table</h2>
-                <div id="cohort-select-table"></div>
+          <table id="cohort-select-table" class="display"></table>
         </div>
         <div class="content_row static mb-3" id="cohort_select">
           <h2 class="h3">Cohort Path Selection</h2>
