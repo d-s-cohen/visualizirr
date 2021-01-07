@@ -17,8 +17,9 @@ Cohort analysis is available in which users can compare the distributions of imm
 This includes an intracohort anlaysis module which produces Wilcoxon rank-sum test p-values. 
 This also includes a paired sample cohort analysis which produces Wilcoxon signed-rank test p-values.
 There is also a table of the values and a scatterplot for comparing different measures.
+Cohort statistics data and available meta-information are available on the cohort analysis page in tables and are downloadable.
 
-The data for all figures is split into different available chains. All figures produced by VisualizIRR can be exported in raster or vector format.
+The data for all figures is split into different available chains. All figures produced by VisualizIRR can be exported in raster or vector format. 
 
 ---
 

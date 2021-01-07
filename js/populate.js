@@ -90,6 +90,13 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['info.html']) >= 0) {
 if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 0) {
 	$(document).ready(function () {
 
+		$.ajax({
+			url: "img/overview.png",
+			type:'HEAD',
+			success: function()
+			{ $('#cohortMetaTable').attr('style',''); }
+		});
+
 		if (sessionStorage.getItem('path_val') == null) {
 			jQuery.get("cohort_list.csv", function (data) {
 				var path_val = data.split("\n")[0].split(",")[0]
