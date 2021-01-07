@@ -94,7 +94,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 			url: "img/overview.png",
 			type:'HEAD',
 			success: function()
-			{ $('#cohortMetaTable').attr('style',''); }
+			{ $('#overview-figure').attr('style',''); }
 		});
 
 		if (sessionStorage.getItem('path_val') == null) {
