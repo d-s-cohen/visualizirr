@@ -297,8 +297,10 @@ $.ajax({
                     curr_chain = Object.keys(in_chain)[0];
                     if (cond_name[0] == 'VisGroup') {
                       curr_cond = cond_name[1];
+                      curr_group = cond_group[1];
                     } else {
                       curr_cond = cond_name[0];
+                      curr_group = cond_group[0];
                     }
                     curr_func_psca = func_name[0];
                     curr_chain_psca = Object.keys(in_chain)[0];
@@ -320,7 +322,7 @@ $.ajax({
                       return $(this).text() === curr_cond;
                     }).css("display", "none");
                     dataMorph();
-                    if (cond_name.includes('VisGroup')){
+                    if (cond_name.includes('VisGroup') && cond_name.includes('Timepoint')){
                       $('#content_PSCA').removeAttr('style');
                       $('#content_psca_nav').removeAttr('style');
                       pscaDraw();

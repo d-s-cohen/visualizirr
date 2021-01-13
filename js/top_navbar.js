@@ -81,7 +81,7 @@ $(function () {
 
 			// Show cohort name
 			$(document).ready(function () {
-				if (sessionStorage.getItem('path_val') != "data/") {
+				if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
 					$("#header_desc").text(sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2] + " Immune Repertoire");
 				}
 			});

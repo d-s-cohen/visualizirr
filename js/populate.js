@@ -152,9 +152,9 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 		}, dataType = 'text');
 	}
 
-	var i = setInterval(function () {
-		if (sessionStorage.length) {
-			clearInterval(i);
+	// var i = setInterval(function () {
+	// 	if (sessionStorage.length) {
+	// 		clearInterval(i);
 			parseData(data_path + "intracohort_data.csv", jsonToTable);
 			$("#statsCSV").attr('href', data_path + "intracohort_data.csv");
 			$.ajax({
@@ -167,7 +167,7 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 					$("#metaCSV").attr('href', data_path + "meta.csv");
 				}
 			});
-		}
-	}, 100);
+	// 	}
+	// }, 100);
 });
 }
