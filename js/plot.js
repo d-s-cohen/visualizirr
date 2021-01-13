@@ -295,7 +295,11 @@ $.ajax({
                   $(document).ready(function () {
                     curr_func = func_name[0];
                     curr_chain = Object.keys(in_chain)[0];
-                    curr_cond = cond_name[0];
+                    if (cond_name[0] != 'VisGroup') {
+                      curr_cond = cond_name[1];
+                    } else {
+                      curr_cond = cond_name[0];
+                    }
                     curr_func_psca = func_name[0];
                     curr_chain_psca = Object.keys(in_chain)[0];
                     curr_group = cond_group[0];
@@ -410,6 +414,8 @@ function dataMorph(cond, chain, func) {
   } else {
 
     $("#pval_table_space").html("");
+    $("#pval_table_space").removeClass("row");
+    $("#pval_table_space").css('column-gap','');
 
     var myTableDiv = document.getElementById("pval_table_space")
     var table = document.createElement('TABLE')
@@ -590,17 +596,23 @@ function condition_2nd(cond_2nd_idx) {
   Plotly.relayout('intracohortDiv', update)
 
   $("#pval_table_space").html("");
+  $("#pval_table_space").addClass("row");
+  $("#pval_table_space").css('column-gap','40px');
 
   for (let k = 0; k < Object.keys(curr_group_2nd).length; k++) {
   
       pval_populated = false;
   
       var myTableDiv = document.getElementById("pval_table_space")
+
+      var c = document.createElement("div");
+      c.classList.add('column');
+      myTableDiv.appendChild(c);
   
       var t = document.createElement("b");
       t.innerHTML = (curr_group_2nd[k].concat(":"));
       //t.style.fontWeight = 'bold';
-      myTableDiv.appendChild(t);
+      c.appendChild(t);
   
       var table = document.createElement('TABLE')
       var tableBody = document.createElement('TBODY')
@@ -671,17 +683,17 @@ function condition_2nd(cond_2nd_idx) {
       }
       if (pval_populated == false) {
         var br = document.createElement("br");
-        myTableDiv.appendChild(br);
+        c.appendChild(br);
         var tn = document.createTextNode('None');
-        myTableDiv.appendChild(tn);
+        c.appendChild(tn);
         var br = document.createElement("br");
-        myTableDiv.appendChild(br);
+        c.appendChild(br);
       } else {
-        myTableDiv.appendChild(table);
+        c.appendChild(table);
       }
       if (k != Object.keys(curr_group_2nd).length-1){
         var br = document.createElement("br");
-        myTableDiv.appendChild(br);
+        c.appendChild(br);
       }
   }
   
