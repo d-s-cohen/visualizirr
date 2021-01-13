@@ -295,7 +295,7 @@ $.ajax({
                   $(document).ready(function () {
                     curr_func = func_name[0];
                     curr_chain = Object.keys(in_chain)[0];
-                    if (cond_name[0] != 'VisGroup') {
+                    if (cond_name[0] == 'VisGroup') {
                       curr_cond = cond_name[1];
                     } else {
                       curr_cond = cond_name[0];
