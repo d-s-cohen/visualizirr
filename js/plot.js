@@ -880,7 +880,7 @@ function pscaDraw() {
           break
         }
 
-        if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null)) {
+        if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null) && !([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes("")) {
 
           var median_color = ''
 
