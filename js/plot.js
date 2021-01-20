@@ -958,7 +958,7 @@ function pscaDraw() {
 
               pval_anno.push({
                 showarrow: false,
-                text: p_prefix + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P']),
+                text: p_prefix + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number),zero_method='wilcox',correction=true)['P']),
                 x: m+.5,
                 xref: 'x',
                 y: 0,
@@ -986,7 +986,7 @@ function pscaDraw() {
       text: split_group[k],
       x: (k*timepoint_group.length)+((timepoint_group.length-1)*.5),
       xref: 'x',
-      y: 1,
+      y: 1.04,
       yref: 'paper',
       yanchor: 'top',
       font: {

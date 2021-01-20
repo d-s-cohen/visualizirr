@@ -171,3 +171,58 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 	// }, 100);
 });
 }
+
+
+if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html']) >= 0) {
+
+	$(document).on('click', '.btn-export', function () {
+
+		var xval_in = parseInt($(this).parent().find('.xval-in').val());
+		if (isNaN(xval_in)) {
+			xval_in = parseInt($(this).parent().find('.xval-in').prop("defaultValue"));
+		}
+		var yval_in = parseInt($(this).parent().find('.yval-in').val());
+		if (isNaN(yval_in)) {
+			yval_in = parseInt($(this).parent().find('.yval-in').prop("defaultValue"));
+		}
+		var plotlyDiv = $(this).parent().find('.js-plotly-plot').attr('id');
+		var exportName = plotlyDiv.replace("Div", "_plot");
+		if ($(this).hasClass('save-png')) {
+			var save_format = 'png';
+		} else if ($(this).hasClass('save-svg')) {
+			var save_format = 'svg';
+		}
+
+		save_img(plotlyDiv, save_format, exportName, xval_in, yval_in)
+
+		//console.log(plotlyDiv, save_format, exportName, xval_in, yval_in);
+
+	});
+
+} else {
+
+	$(document).on('click', '.btn-export', function () {
+
+		var xval_in = parseInt($(this).parent().parent().find('.xval-in').val());
+		if (isNaN(xval_in)) {
+			xval_in = parseInt($(this).parent().parent().find('.xval-in').prop("defaultValue"));
+		}
+		var yval_in = parseInt($(this).parent().parent().find('.yval-in').val());
+		if (isNaN(yval_in)) {
+			yval_in = parseInt($(this).parent().parent().find('.yval-in').prop("defaultValue"));
+		}
+		var plotlyDiv = $(this).parent().parent().find('.js-plotly-plot').attr('id');
+		var exportName = current_sample + '_' + plotlyDiv.replace(".csv", "").replace("/", "_").replace("Div", "");
+		if ($(this).hasClass('save-png')) {
+			var save_format = 'png';
+		} else if ($(this).hasClass('save-svg')) {
+			var save_format = 'svg';
+		}
+
+		save_img(plotlyDiv, save_format, exportName, xval_in, yval_in)
+
+		//console.log(plotlyDiv, save_format, exportName, xval_in, yval_in);
+
+	});
+
+}
