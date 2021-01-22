@@ -71,6 +71,14 @@
                   <a class="nav-link nav-pad" href="#" onclick="hide_others('#CS')">Cohort Scatterplot</a>
                 </li>
               </ul>
+
+              <a class="nav-link">
+                <div class="p-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="p-switch">
+                  <label class="custom-control-label" for="p-switch">P-value Style</label>
+                </div>
+              </a>
+
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
           </ul>
@@ -293,8 +301,8 @@
               </div>
               <div id="collapseCst" class="collapse" aria-labelledby="headingCst" data-parent="#accordionCst">
 
-                  <div id="data-table"></div>
-                  <a id="statsCSV" href="" download>Download CSV</a>
+                <div id="data-table"></div>
+                <a id="statsCSV" href="" download>Download CSV</a>
 
               </div>
             </div>
@@ -321,9 +329,9 @@
                 </div>
               </div>
             </div>
-        </div>
+          </div>
 
-        </div>        
+        </div>
 
         <div class="content_row cohort_overview" id="content_cs">
           <h2 class="h3">Cohort Scatterplot</h2>
@@ -367,7 +375,6 @@
               <button type="button" class="btn btn-success btn-export save-png">Save PNG</button>
               <button type="button" class="btn btn-success btn-export save-svg">Save SVG</button>
 
-
             </div>
           </div>
         </div>
@@ -375,7 +382,6 @@
       </main>
     </div>
   </div>
-
 
   </main>
   </div>

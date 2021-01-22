@@ -20,7 +20,6 @@ var pval_arrays = [];
 
 var pair_split = ""
 
-
 var timepoint_group = [];
 var pair_group = [];
 
@@ -35,6 +34,11 @@ var curr_chain_scatter = "";
 var sample_list = [];
 
 var ica_meta_ordered = [];
+
+var pToggle = false;
+$(document).ready(function () {
+  pToggle = $("#p-switch").is(':checked');
+});
 
 let checker = (arr, target) => target.every(v => arr.includes(v));
 
@@ -65,7 +69,6 @@ if (sessionStorage.getItem('path_val') != null) {
     location.reload();
   }, dataType = 'text');
 }
-
 
 $.ajax({
   url: data_path + "meta.csv",
@@ -547,12 +550,25 @@ function condition_2nd(cond_2nd_idx) {
         if (pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0 && pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).length !== 0) {
       
         x_text.push(curr_group_2nd[k]);
+
+        var p_val = toExp(mannwhitneyu.test(
+          pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
+          pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"])
+
+          var p_label = '';
+
+          if (pToggle){ 
+            p_label = "p: " + p_val
+          } else {
+            if (p_val < .05) {
+              p_label = '*'
+            }
+          }
+
         x_pvals.push( 
           {
           showarrow: false,
-          text: "p: " + toExp(mannwhitneyu.test(
-          pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
-          pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"]),
+          text: p_label,
           x: k,
           xref: 'x',
           y: 0,
@@ -763,12 +779,21 @@ function draw_traces() {
     if (k < curr_group.length - 1 && curr_group.length == 2) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var the_pval = "p: " + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+          var p_label = '';
+          var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+
+          if (pToggle){ 
+            p_label = "p: " + p_val
+          } else {
+            if (p_val < .05) {
+              p_label = '*'
+            }
+          }
         }
-      } else { var the_pval = ""; }
+      } else { var p_label = ""; }
       var anno = {
         showarrow: false,
-        text: the_pval,
+        text: p_label,
         x: k + .5,
         xref: 'x',
         y: 0,
@@ -812,11 +837,20 @@ function draw_traces() {
       for (let k = 0; k < pval_vis.length - 1; k++) {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-            var the_pval = "p:<br>" + toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
-          } else { var the_pval = ""; }
+            var p_label = '';
+            var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+  
+            if (pToggle){ 
+              p_label = "p: " + p_val
+            } else {
+              if (p_val < .05) {
+                p_label = '*'
+              }
+            }
+          } else { var p_label = ""; }
           var anno = {
             showarrow: false,
-            text: the_pval,
+            text: p_label,
             x: k + .5,
             xref: 'x',
             y: 0,
@@ -842,7 +876,7 @@ function hideOrShow(a, b) {
   Plotly.restyle(b, update);
 }
 
-
+// Draw paired sample cohort analysis plot
 
 function pscaDraw() {
 
@@ -956,9 +990,20 @@ function pscaDraw() {
 
               if (pval_paired_arrays[m][0].length>0){
 
+                var p_val = toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P'])
+                var p_label = '';
+
+                if (pToggle){ 
+                  p_label = p_prefix + p_val
+                } else {
+                  if (p_val < .05) {
+                    p_label = '*'
+                  }
+                }
+
               pval_anno.push({
                 showarrow: false,
-                text: p_prefix + toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number),zero_method='wilcox',correction=true)['P']),
+                text: p_label,
                 x: m+.5,
                 xref: 'x',
                 y: 0,
@@ -1020,6 +1065,8 @@ function pscaDraw() {
   Plotly.newPlot("pscaDiv", data, layout, {modeBarButtonsToRemove: ['toImage']});
 }
 
+// Paired sample cohort analysis data morph
+
 function dataMorphPSCA(chain, split, func) {
   // Chain change
   if (typeof chain != "undefined") {
@@ -1046,6 +1093,7 @@ function dataMorphPSCA(chain, split, func) {
 
 }
 
+// Draw plotly scatterplot
 
 function scatterDraw() {
 
@@ -1076,6 +1124,8 @@ function scatterDraw() {
 
 }
 
+// Scatterplot morphing
+
 function dataMorphScatter(chain,x,y) {
   // Chain change
   if (typeof chain != "undefined") {
@@ -1097,14 +1147,22 @@ function dataMorphScatter(chain,x,y) {
 
 }
 
+// Image display
 
 $(document).ready(function () {
-
-
   $('.imageEmbed').attr("src", function () { return data_path + $(this).attr("id") });
   $(".imageEmbed").on("load", function () {
     $('.static').removeAttr('style');
   });
 });
 
+// P-value display toggle
 
+$(document).on('change', '.p-control', function (e) {
+  pToggle = e.target.checked;
+  dataMorph();
+  if (cond_name.includes('VisGroup')){
+    pscaDraw();
+  }
+
+});
