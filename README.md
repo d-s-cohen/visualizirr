@@ -85,9 +85,12 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 ---
 
 **meta.csv** should be a csv with the first column including sample names and remaining columns for different conditions. 
-There are a few ways to enter your meta information, but the preferable way is to use a numeric range and denote 
+There are a few ways to enter your meta information, but in order to have ordered sample condition groups is to use a numeric range and denote 
 the categorical label of those groups in the header using '|' as the seperator (as demonstrated in condition 0 and 2). 
 You can also use the labels in the metasheet and not denote them in the header (as demonstrated in condition 1 and 3).
+Meta-data should be converted to categorical bins if it isn't categorical already.
+In order to set up paired samples analysis, a column must be named 'VisGroup' and contain patient ID. It coincides with the column 'Timepoint'. 
+Therefore, patient samples from different timepoints can be paired.
 
 meta.csv template:
 ```

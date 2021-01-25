@@ -555,7 +555,7 @@ function condition_2nd(cond_2nd_idx) {
           pval_arrays[0][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number), 
           pval_arrays[1][k].filter(function (el) {return ((el != null) && (el != ""))}).map(Number))["p"])
 
-          var p_label = '';
+          var p_label = 'n.s.';
 
           if (pToggle){ 
             p_label = "p: " + p_val
@@ -779,7 +779,7 @@ function draw_traces() {
     if (k < curr_group.length - 1 && curr_group.length == 2) {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-          var p_label = '';
+          var p_label = 'n.s.';
           var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
 
           if (pToggle){ 
@@ -837,7 +837,7 @@ function draw_traces() {
       for (let k = 0; k < pval_vis.length - 1; k++) {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
-            var p_label = '';
+            var p_label = 'n.s.';
             var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
   
             if (pToggle){ 
@@ -991,7 +991,7 @@ function pscaDraw() {
               if (pval_paired_arrays[m][0].length>0){
 
                 var p_val = toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P'])
-                var p_label = '';
+                var p_label = 'n.s.';
 
                 if (pToggle){ 
                   p_label = p_prefix + p_val
