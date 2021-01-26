@@ -990,7 +990,7 @@ function pscaDraw() {
 
               if (pval_paired_arrays[m][0].length>0){
 
-                var p_val = toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number))['P'])
+                var p_val = toExp(wilcoxon(pval_paired_arrays[m][0].map(Number),pval_paired_arrays[m][1].map(Number),zero_method='wilcox',correction=true)['P'])
                 var p_label = 'n.s.';
 
                 if (pToggle){ 
