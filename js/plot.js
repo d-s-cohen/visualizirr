@@ -272,10 +272,14 @@ $.ajax({
                     // Loop through functions and append values for sample/chain
                     for (let m = 0; m < func_name.length; m++) {
                       if (cond_name[k] == 'VisGroup'){
-                        if (Object.keys(ica_meta).includes("Timepoint")){
-                        pair_split = "Timepoint";
+                        if (Object.keys(ica_meta).includes("Timepoint")) {
+                          pair_split = "Timepoint";
                         } else {
-                          pair_split = Object.keys(ica_meta)[0]
+                          if (Object.keys(ica_meta)[0] == 'VisGroup') {
+                            pair_split = Object.keys(ica_meta)[1];
+                          } else {
+                            pair_split = Object.keys(ica_meta)[0];
+                          }
                         }
                         pair_groups = Object.keys(ica_meta[pair_split])
                         ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] = ica_data[cond_name[k]][cond_group[k][l]][data_rows[i][1]][func_name[m]] || Array.from(Array(pair_groups.length), () => null);;
@@ -307,7 +311,6 @@ $.ajax({
                     }
                     curr_func_psca = func_name[0];
                     curr_chain_psca = Object.keys(in_chain)[0];
-                    curr_group = cond_group[0];
                     curr_chain_scatter = Object.keys(in_chain)[0];
                     curr_x_scatter = func_name[0];
                     curr_y_scatter = func_name[0];
@@ -1031,7 +1034,7 @@ function pscaDraw() {
       text: split_group[k],
       x: (k*timepoint_group.length)+((timepoint_group.length-1)*.5),
       xref: 'x',
-      y: 1.04,
+      y: 1.06,
       yref: 'paper',
       yanchor: 'top',
       font: {
