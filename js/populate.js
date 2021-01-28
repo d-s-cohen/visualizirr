@@ -16,6 +16,7 @@ types['#PSCA'] = '#content_PSCA';
 types['#OL'] = '#content_ol';
 types['#CIT'] = '#content_cit';
 types['#CT'] = '#content_ct';
+types['#CS'] = '#content_cs';
 types[''] = 'blank';
 
 // Associate location hash with content IDs
