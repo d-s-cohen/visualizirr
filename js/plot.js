@@ -471,12 +471,12 @@ function dataMorph(cond, chain, func) {
                   )["p"]
                 )
               ));
-              if (toExp(
+              if (
                 mannwhitneyu.test(
                   ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number),
                   ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)
-                )["p"]
-              ) < .05) { td.style.fontWeight = 'bold'; }
+                  )["p"] <= .05
+                ) { td.style.fontWeight = 'bold'; }
               if (median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number)) > median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number))) {
                 td.style.backgroundColor = '#ffcccb';
               } else if (median(ica_data[curr_cond][curr_group[j]][curr_chain][curr_func].map(Number)) > median(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func].map(Number))) {
@@ -552,20 +552,20 @@ function condition_2nd(cond_2nd_idx) {
 
           x_text.push(curr_group_2nd[k]);
 
-          var p_val = toExp(mannwhitneyu.test(
+          var p_val = mannwhitneyu.test(
             pval_arrays[0][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number),
-            pval_arrays[1][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))["p"])
+            pval_arrays[1][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))["p"]
 
           var p_label = 'n.s.';
 
           if (pToggle) {
-            p_label = "p: " + p_val
+            p_label = "p: " + toExp(p_val)
           } else {
-            if (p_val < .05) {
+            if (p_val <= .05) {
               p_label = '*'
-              if (p_val < .005) {
+              if (p_val <= .005) {
                 p_label = '**'
-                if (p_val < .0005) {
+                if (p_val <= .0005) {
                   p_label = '***'
                 }
               }
@@ -687,12 +687,12 @@ function condition_2nd(cond_2nd_idx) {
                   )["p"]
                 )
               ));
-              if (toExp(
+              if (
                 mannwhitneyu.test(
                   pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number),
                   pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)
-                )["p"]
-              ) < .05) { td.style.fontWeight = 'bold'; }
+                  )["p"] <= .05
+                ) { td.style.fontWeight = 'bold'; }
               if (median(pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)) > median(pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))) {
                 td.style.backgroundColor = '#ffcccb';
               } else if (median(pval_arrays[j][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number)) > median(pval_arrays[i][k].filter(function (el) { return ((el != null) && (el != "")) }).map(Number))) {
@@ -788,16 +788,16 @@ function draw_traces() {
       if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain] !== 'undefined') {
         if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
           var p_label = 'n.s.';
-          var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+          var p_val = mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"];
 
           if (pToggle) {
-            p_label = "p: " + p_val
+            p_label = "p: " + toExp(p_val)
           } else {
-            if (p_val < .05) {
+            if (p_val <= .05) {
               p_label = '*'
-              if (p_val < .005) {
+              if (p_val <= .005) {
                 p_label = '**'
-                if (p_val < .0005) {
+                if (p_val <= .0005) {
                   p_label = '***'
                 }
               }
@@ -853,16 +853,16 @@ function draw_traces() {
         if (pval_vis[k] == true && pval_vis[k + 1] == true) {
           if (typeof ica_data[curr_cond][curr_group[k]][curr_chain][curr_func] !== 'undefined' && typeof ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func] !== 'undefined') {
             var p_label = 'n.s.';
-            var p_val = toExp(mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"]);
+            var p_val = mannwhitneyu.test(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].map(Number), ica_data[curr_cond][curr_group[k + 1]][curr_chain][curr_func].map(Number))["p"];
 
             if (pToggle) {
-              p_label = "p: " + p_val
+              p_label = "p: " + toExp(p_val)
             } else {
-              if (p_val < .05) {
+              if (p_val <= .05) {
                 p_label = '*'
-                if (p_val < .005) {
+                if (p_val <= .005) {
                   p_label = '**'
-                  if (p_val < .0005) {
+                  if (p_val <= .0005) {
                     p_label = '***'
                   }
                 }
@@ -1011,14 +1011,20 @@ function pscaDraw() {
 
         if (pval_paired_arrays[m][0].length > 0) {
 
-          var p_val = toExp(wilcoxon(pval_paired_arrays[m][0].map(Number), pval_paired_arrays[m][1].map(Number), zero_method = 'wilcox', correction = true)['P'])
+          var p_val = wilcoxon(pval_paired_arrays[m][0].map(Number), pval_paired_arrays[m][1].map(Number), zero_method = 'wilcox', correction = true)['P'];
           var p_label = 'n.s.';
 
           if (pToggle) {
-            p_label = p_prefix + p_val
+            p_label = p_prefix + toExp(p_val)
           } else {
-            if (p_val < .05) {
+            if (p_val <= .05) {
               p_label = '*'
+              if (p_val <= .005) {
+                p_label = '**'
+                if (p_val <= .0005) {
+                  p_label = '***'
+                }
+              }
             }
           }
 
