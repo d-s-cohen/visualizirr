@@ -821,10 +821,14 @@ function draw_traces() {
     }
   }
   // Plot layout
+  var cohort_name = 'Intracohort Analysis'
+  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
+    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+  }
   var layout = {
-    title: 'Intracohort Analysis',
+    title: cohort_name,
     yaxis: {
-      title: curr_func,
+      title: curr_chain + ' ' + curr_func,
       zeroline: false,
       showline: true
     },
@@ -1070,12 +1074,17 @@ function pscaDraw() {
 
   x_lab = [].concat(... new Array(split_group.length).fill(timepoint_group))
 
+  var cohort_name = 'Paired Sample Cohort Analysis'
+  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
+    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+  }
+
   // Plot layout
   var layout = {
-    title: 'Paired Sample Cohort Analysis',
+    title: cohort_name,
     font: { size: 14 },
     yaxis: {
-      title: curr_func_psca,
+      title: curr_chain_psca + ' ' + curr_func_psca,
       zeroline: false,
       showline: true
     },
@@ -1134,8 +1143,13 @@ function scatterDraw() {
 
   var data = [trace1];
 
+  var cohort_name = 'Cohort Scatterplot'
+  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
+    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+  }
+
   var layout = {
-    title: 'Cohort Scatterplot',
+    title: cohort_name,
     font: { size: 14 },
     xaxis: {
       automargin: true,
@@ -1144,7 +1158,7 @@ function scatterDraw() {
       showline: true
     },
     yaxis: {
-      title: curr_y_scatter,
+      title: curr_chain_scatter + ' ' + curr_y_scatter,
       zeroline: false,
       showline: true
     }
