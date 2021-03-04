@@ -166,6 +166,17 @@
                 </div>
               </div>
 
+              <div class="dropdown btn-group">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownPlotType" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  Box Plot
+                </button>
+                <div class="dropdown-menu" style="position: relative; z-index: 10000;" id="plot_type_selection">
+                  <a class="dropdown-item" onclick="plot_type_change('box')">Box Plot</a>
+                  <a class="dropdown-item" onclick="plot_type_change('violin')">Violin Plot</a>
+                </div>
+              </div>
+
               <div style="line-height:100%;"><br></div>
 
               x: <input type="text" class="xval-in" value="700" size="5">

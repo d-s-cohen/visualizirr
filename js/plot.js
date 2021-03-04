@@ -35,6 +35,8 @@ var sample_list = [];
 
 var ica_meta_ordered = [];
 
+var plot_type = 'box';
+
 var pToggle = false;
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
@@ -617,7 +619,8 @@ function condition_2nd(cond_2nd_idx) {
       showline: true
     },
     annotations: x_pvals,
-    boxmode: 'group'
+    boxmode: 'group',
+    violinmode: 'group'
   }
   Plotly.relayout('intracohortDiv', update)
 
@@ -773,8 +776,14 @@ function draw_traces() {
     // Populate trace data (Just primary condition data)
     if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined') {
       var trace = {
-        type: 'box',
+        type: plot_type,
         boxpoints: 'all',
+        box: {
+          visible: true
+        },
+        meanline: {
+          visible: true
+        },
         pointpos: 0,
         y: ica_data[curr_cond][curr_group[k]][curr_chain][curr_func],
         x: Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k),
@@ -1210,3 +1219,13 @@ $(document).on('change', '.p-control', function (e) {
   }
 
 });
+
+var plotTypes = {};
+plotTypes['violin'] = 'Violin Plot';
+plotTypes['box'] = 'Box Plot';
+
+function plot_type_change(plot_type_new){
+  plot_type = plot_type_new;
+  dataMorph();
+  $("#dropdownPlotType").text(plotTypes[plot_type_new]);
+}
