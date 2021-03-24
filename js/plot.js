@@ -38,6 +38,10 @@ var ica_meta_ordered = [];
 var plot_type = 'box';
 
 var pToggle = false;
+
+var z_vals =[];
+var z_vals_cond = [];
+
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
 });
@@ -58,6 +62,13 @@ const median = arr => {
     nums = [...arr].sort((a, b) => a - b);
   return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
 };
+
+function normalize(min, max) {
+  var delta = max - min;
+  return function (val) {
+      return (val - min) / delta;
+  };
+}
 
 var data_path = 'data/'
 if (sessionStorage.getItem('path_val') != null) {
@@ -416,6 +427,9 @@ function dataMorph(cond, chain, func) {
   }
 
   draw_traces();
+
+  draw_heatmap();
+
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
     condition_2nd();
@@ -900,6 +914,50 @@ function draw_traces() {
       var update = { annotations: pvals };
       Plotly.relayout('intracohortDiv', update);
     }
+  })
+}
+
+function draw_heatmap() {
+
+  z_vals = Array.from(Array(func_name.length), () => []);
+  z_vals_cond = []
+  x_vals_name = []
+  for (let k = 0; k < curr_group.length; k++) {
+    // Populate trace data (Just primary condition data)
+    for (let l = 0; l < func_name.length; l++) {
+      z_vals[l]=[].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
+
+      if (k == curr_group.length-1){
+        //z_vals[l] = z_vals[l].map(v => v / Math.max(...z_vals[l]))
+        z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+      }
+    }
+    z_vals_cond=[].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
+    x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
+  }
+
+
+  Plotly.newPlot('heatmapDiv', [{
+    type: 'heatmap',
+    z: [z_vals_cond],
+    y: [curr_cond],
+    showscale: false,
+    colorscale: 'Viridis',
+    xaxis: 'x',
+    yaxis: 'y'
+  }, {
+    type: 'heatmap',
+    z: z_vals,
+    x: x_vals_name,
+    y: func_name,
+    showscale: false,
+    yaxis: 'y2',
+    xaxis: 'x2'
+  }], {
+    yaxis: {domain: [0.9, 1],automargin: true},
+    yaxis2: {domain: [0, 0.85],automargin: true},
+    xaxis: {visible: false},
+    xaxis2: {showticklabels: true,anchor:'y2'}
   })
 }
 // Make plot visible or invisible
