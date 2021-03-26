@@ -17,6 +17,8 @@ var curr_group_2nd = [];
 var activated_cond_2nd = false;
 var curr_y = [];
 var pval_arrays = [];
+var curr_sample = [];
+var curr_sample_sub = [];
 
 var pair_split = ""
 
@@ -41,6 +43,9 @@ var pToggle = false;
 
 var z_vals =[];
 var z_vals_cond = [];
+var z_vals_2nd = [];
+var primary_cond_heatmap = [];
+var secondary_cond_heatmap = [];
 
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
@@ -522,8 +527,13 @@ function condition_2nd(cond_2nd_idx) {
   activated_cond_2nd = true;
 
   condition_2nd_x = [];
-  var curr_sample = [];
+  curr_sample = [];
   curr_y = [];
+
+  z_vals_2nd = Array.from(Array(func_name.length), () => Array.from(Array(curr_group_2nd.length), () => Array.from(Array(curr_group.length), () => [])));
+  primary_cond_heatmap = Array.from(Array(curr_group_2nd.length), () => Array.from(Array(curr_group.length), () => []));
+  curr_sample_sub = Array.from(Array(curr_group_2nd.length), () => Array.from(Array(curr_group.length), () => []));
+  secondary_cond_heatmap = Array.from(Array(curr_group_2nd.length), () => []);
 
   // if (curr_group.length == 2) {
   //   pval_arrays = [[], []];
@@ -536,6 +546,7 @@ function condition_2nd(cond_2nd_idx) {
     curr_sample.push(ica_meta_ordered[curr_cond][curr_group[i]][curr_chain]);
     curr_y.push([]);
     condition_2nd_x.push([]);
+    //curr_sample_sub.push([]);
   }
 
   for (let i = 0; i < curr_sample.length; i++) {
@@ -548,6 +559,13 @@ function condition_2nd(cond_2nd_idx) {
           // Push corresponding x (secondary condition grouping) and y (primary condition value)
           condition_2nd_x[i].push(k);
           curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
+          // Prepare heatmap
+          for (let l = 0; l < func_name.length; l++) {
+            z_vals_2nd[l][k][i].push(ica_data[curr_cond][curr_group[i]][curr_chain][func_name[l]][j]);
+          }
+          primary_cond_heatmap[k][i].push(i);
+          curr_sample_sub[k][i].push(sample);
+          secondary_cond_heatmap[k].push(k);
           //if (curr_group.length == 2) {
           pval_arrays[i][k] = pval_arrays[i][k] || [];
           pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
@@ -756,6 +774,8 @@ function condition_2nd(cond_2nd_idx) {
     $("#button2nd_condition").prepend('<button id="swap_2nd" type="button" onclick="swap_conds()" class="btn btn-warning">&UpArrowDownArrow;</button>');
   }
 
+  draw_heatmap_2nd();
+
 }
 
 function clear_2nd() {
@@ -941,6 +961,7 @@ function draw_heatmap() {
     type: 'heatmap',
     z: [z_vals_cond],
     y: [curr_cond],
+    x: x_vals_name,
     showscale: false,
     colorscale: 'Viridis',
     xaxis: 'x',
@@ -950,14 +971,82 @@ function draw_heatmap() {
     z: z_vals,
     x: x_vals_name,
     y: func_name,
-    showscale: false,
+    //showscale: false,
     yaxis: 'y2',
     xaxis: 'x2'
   }], {
     yaxis: {domain: [0.9, 1],automargin: true},
     yaxis2: {domain: [0, 0.85],automargin: true},
     xaxis: {visible: false},
-    xaxis2: {showticklabels: true,anchor:'y2'}
+    xaxis2: {anchor:'y2',matches: 'x'}
+  })
+}
+
+function draw_heatmap_2nd() {
+
+  console.log('x')
+
+  // z_vals = Array.from(Array(func_name.length), () => []);
+  // z_vals_cond = primary_cond_heatmap.flat(Infinity)
+  // z_vals_cond_2nd = secondary_cond_heatmap.flat(Infinity)
+  // x_vals_name = []
+  // for (let k = 0; k < curr_group.length; k++) {
+  //   // Populate trace data (Just primary condition data)
+  //   for (let l = 0; l < func_name.length; l++) {
+  //     z_vals[l]=[].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
+
+  //     if (k == curr_group.length-1){
+  //       //z_vals[l] = z_vals[l].map(v => v / Math.max(...z_vals[l]))
+  //       z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+  //     }
+  //   }
+  //   z_vals_cond=[].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
+  //   x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
+  // }
+
+  for (let l = 0; l < func_name.length; l++) {
+    z_vals_2nd[l] = z_vals_2nd[l].flat(Infinity)
+    z_vals_2nd[l] = z_vals_2nd[l].map(normalize(Math.min(...z_vals_2nd[l]), Math.max(...z_vals_2nd[l])))
+  }
+
+  primary_cond_heatmap = primary_cond_heatmap.flat(Infinity)
+  secondary_cond_heatmap = secondary_cond_heatmap.flat(Infinity)
+  curr_sample_sub = curr_sample_sub.flat(Infinity)
+
+
+  Plotly.newPlot('heatmapDiv', [{
+    type: 'heatmap',
+    z: [secondary_cond_heatmap],
+    y: [curr_cond_2nd],
+    x: curr_sample_sub,
+    showscale: false,
+    colorscale: 'Viridis',
+    xaxis: 'x',
+    yaxis: 'y'
+  },{
+    type: 'heatmap',
+    z: [primary_cond_heatmap],
+    y: [curr_cond],
+    x: curr_sample_sub,
+    showscale: false,
+    //colorscale: 'Viridis',
+    xaxis: 'x3',
+    yaxis: 'y3'
+  }, {
+    type: 'heatmap',
+    z: z_vals_2nd,
+    x: curr_sample_sub,
+    y: func_name,
+    //showscale: false,
+    yaxis: 'y2',
+    xaxis: 'x2'
+  }], {
+    yaxis: {domain: [0.95, 1],automargin: true},
+    yaxis3: {domain: [0.9, .95],automargin: true},
+    yaxis2: {domain: [0, 0.85],automargin: true},
+    xaxis: {visible: false},
+    xaxis3: {visible: false,matches: 'x'},
+    xaxis2: {anchor:'y2',matches: 'x'}
   })
 }
 // Make plot visible or invisible
