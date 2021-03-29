@@ -47,6 +47,20 @@ var z_vals_2nd = [];
 var primary_cond_heatmap = [];
 var secondary_cond_heatmap = [];
 
+var color_codes = [
+  '#1f77b4',  // muted blue
+  '#ff7f0e',  // safety orange
+  '#2ca02c',  // cooked asparagus green
+  '#d62728',  // brick red
+  '#9467bd',  // muted purple
+  '#8c564b',  // chestnut brown
+  '#e377c2',  // raspberry yogurt pink
+  '#7f7f7f',  // middle gray
+  '#bcbd22',  // curry yellow-green
+  '#17becf'   // blue-teal
+];
+var curr_color_codes = [];
+
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
 });
@@ -939,6 +953,12 @@ function draw_traces() {
 
 function draw_heatmap() {
 
+  curr_color_codes = Array.from(Array(curr_group.length), () => []);
+
+  for (let k = 0; k < curr_group.length; k++) {
+     curr_color_codes[k] = [k/(curr_group.length-1),color_codes[k % 10]]
+  }
+
   z_vals = Array.from(Array(func_name.length), () => []);
   z_vals_cond = []
   x_vals_name = []
@@ -963,7 +983,7 @@ function draw_heatmap() {
     y: [curr_cond],
     x: x_vals_name,
     showscale: false,
-    colorscale: 'Viridis',
+    colorscale: curr_color_codes,
     xaxis: 'x',
     yaxis: 'y'
   }, {
@@ -984,25 +1004,11 @@ function draw_heatmap() {
 
 function draw_heatmap_2nd() {
 
-  console.log('x')
+  curr_color_codes = Array.from(Array(curr_group.length), () => []);
 
-  // z_vals = Array.from(Array(func_name.length), () => []);
-  // z_vals_cond = primary_cond_heatmap.flat(Infinity)
-  // z_vals_cond_2nd = secondary_cond_heatmap.flat(Infinity)
-  // x_vals_name = []
-  // for (let k = 0; k < curr_group.length; k++) {
-  //   // Populate trace data (Just primary condition data)
-  //   for (let l = 0; l < func_name.length; l++) {
-  //     z_vals[l]=[].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
-
-  //     if (k == curr_group.length-1){
-  //       //z_vals[l] = z_vals[l].map(v => v / Math.max(...z_vals[l]))
-  //       z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
-  //     }
-  //   }
-  //   z_vals_cond=[].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
-  //   x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
-  // }
+  for (let k = 0; k < curr_group.length; k++) {
+     curr_color_codes[k] = [k/(curr_group.length-1),color_codes[k % 10]]
+  }
 
   for (let l = 0; l < func_name.length; l++) {
     z_vals_2nd[l] = z_vals_2nd[l].flat(Infinity)
@@ -1029,7 +1035,9 @@ function draw_heatmap_2nd() {
     y: [curr_cond],
     x: curr_sample_sub,
     showscale: false,
-    //colorscale: 'Viridis',
+    colorscale: curr_color_codes,
+    zmin: 0,
+    zmax: curr_color_codes.length-1,
     xaxis: 'x3',
     yaxis: 'y3'
   }, {
