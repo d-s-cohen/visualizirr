@@ -61,6 +61,21 @@ var color_codes = [
 ];
 var curr_color_codes = [];
 
+var color_codes_2nd = [
+  "#8dd3c7",
+  "#ffffb3",
+  "#bebada",
+  "#fb8072",
+  "#80b1d3",
+  "#fdb462",
+  "#b3de69",
+  "#fccde5",
+  "#d9d9d9",
+  "#bc80bd"
+];
+var curr_color_codes_2nd = [];
+
+
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
 });
@@ -549,10 +564,6 @@ function condition_2nd(cond_2nd_idx) {
   curr_sample_sub = Array.from(Array(curr_group_2nd.length), () => Array.from(Array(curr_group.length), () => []));
   secondary_cond_heatmap = Array.from(Array(curr_group_2nd.length), () => []);
 
-  // if (curr_group.length == 2) {
-  //   pval_arrays = [[], []];
-  // }
-
   pval_arrays = Array.from(Array(curr_group.length), () => []);
 
   // Loop through groups in current condition and push data for them
@@ -953,48 +964,68 @@ function draw_traces() {
 
 function draw_heatmap() {
 
-  curr_color_codes = Array.from(Array(curr_group.length), () => []);
-
+  curr_color_codes = [];
+  tick_pos = [];
+  // Define color codes based off of plotly.js defaults and group length
   for (let k = 0; k < curr_group.length; k++) {
-     curr_color_codes[k] = [k/(curr_group.length-1),color_codes[k % 10]]
+     curr_color_codes.push([k/(curr_group.length),color_codes[k % 10]]);
+     curr_color_codes.push([(k+1)/(curr_group.length),color_codes[(k) % 10]]);
+      // tick position
+     tick_pos.push((curr_group.length-1)*(((k/(curr_group.length))+((k+1)/(curr_group.length)))/2))
   }
 
   z_vals = Array.from(Array(func_name.length), () => []);
   z_vals_cond = []
   x_vals_name = []
-  for (let k = 0; k < curr_group.length; k++) {
-    // Populate trace data (Just primary condition data)
-    for (let l = 0; l < func_name.length; l++) {
-      z_vals[l]=[].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
 
+  for (let k = 0; k < curr_group.length; k++) {
+    // Populate trace data (Just primary condition data
+    for (let l = 0; l < func_name.length; l++) {
+      z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
+      // Peform min-max normalization
       if (k == curr_group.length-1){
-        //z_vals[l] = z_vals[l].map(v => v / Math.max(...z_vals[l]))
         z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
       }
     }
-    z_vals_cond=[].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
+    // populate condition and name arrays
+    z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
     x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
+  }
+  // clean colorbar text
+  curr_group_mod = Array.from(Array(curr_group.length), () => []);;
+  for(var i=0; i<curr_group.length; ++i){
+    curr_group_mod[i] = curr_group[i].split(' ').join('<br>').split('/').join('/<br>');
   }
 
 
   Plotly.newPlot('heatmapDiv', [{
+    // color coding
     type: 'heatmap',
     z: [z_vals_cond],
     y: [curr_cond],
     x: x_vals_name,
-    showscale: false,
+    // "colorbar" legend
+    colorbar:{
+      autotick: false,
+      tickmode: 'array',
+      tickvals: [0].concat(tick_pos,[curr_group.length-1]),
+      ticktext: [''].concat(curr_group_mod,['']),
+      x: 1.25, y: .75, len: 0.5, thickness: 15,
+      title:{text:curr_cond.split(' ').join('<br>')}
+    },
     colorscale: curr_color_codes,
     xaxis: 'x',
     yaxis: 'y'
   }, {
+    // main heatmap
     type: 'heatmap',
     z: z_vals,
     x: x_vals_name,
     y: func_name,
-    //showscale: false,
     yaxis: 'y2',
     xaxis: 'x2'
   }], {
+    // alignment of subplots
     yaxis: {domain: [0.9, 1],automargin: true},
     yaxis2: {domain: [0, 0.85],automargin: true},
     xaxis: {visible: false},
