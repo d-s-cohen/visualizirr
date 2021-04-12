@@ -910,8 +910,8 @@ function draw_traces() {
       showline: true
     },
     annotations: pvals,
-    showlegend: true
-
+    showlegend: true,
+    legend: {traceorder: 'reversed'}
   };
   // Render plot
   Plotly.newPlot("intracohortDiv", data, layout, { modeBarButtonsToRemove: ['toImage'] });
@@ -1023,7 +1023,8 @@ function draw_heatmap() {
     x: x_vals_name,
     y: func_name,
     yaxis: 'y2',
-    xaxis: 'x2'
+    xaxis: 'x2',
+    colorbar:{title: 'z-norm'}
   }], {
     // alignment of subplots
     yaxis: {domain: [0.9, 1],automargin: true},
