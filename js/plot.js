@@ -462,8 +462,9 @@ function dataMorph(cond, chain, func) {
 
   draw_traces();
 
-  draw_heatmap();
-
+  if (Object.keys(ica_meta)[0] != 'no_cond_cond'){
+    draw_heatmap();
+  }
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
     condition_2nd();
