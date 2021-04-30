@@ -1124,7 +1124,8 @@ function draw_heatmap_2nd() {
     x: curr_sample_sub,
     y: func_name,
     yaxis: 'y2',
-    xaxis: 'x2'
+    xaxis: 'x2',
+    colorbar:{title: 'z-norm'}
   }], {
     yaxis: {domain: [0.95, 1],automargin: true},
     yaxis3: {domain: [0.9, .95],automargin: true},
