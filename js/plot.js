@@ -47,6 +47,8 @@ var z_vals_2nd = [];
 var primary_cond_heatmap = [];
 var secondary_cond_heatmap = [];
 
+var z_vals_pair=[[]];
+
 var color_codes = [
   '#1f77b4',  // muted blue
   '#ff7f0e',  // safety orange
@@ -89,6 +91,10 @@ function toExp(x) {
   //  x = x.toFixed(3)
   //}
   return x;
+}
+
+function foldChange (x,y) {
+  return y/x-1;
 }
 
 const median = arr => {
@@ -151,7 +157,7 @@ $.ajax({
             }
           }
           // On last data table row draw plot
-          if (i == (data_rows.length - 1)) {
+          if ((i == (data_rows.length - 1)) && k == (cond_name.length - 1)) {
 
             $(document).ready(function () {
               curr_func = func_name[0];
@@ -343,7 +349,8 @@ $.ajax({
                   }
                 }
                 // On last data table row draw plot
-                if (i == (data_rows.length - 1)) {
+                if ((i == (data_rows.length - 1)) && k == (cond_name.length - 1)) {
+
                   $(document).ready(function () {
                     curr_func = func_name[0];
                     curr_chain = Object.keys(in_chain)[0];
@@ -1147,6 +1154,8 @@ function hideOrShow(a, b) {
 
 function pscaDraw() {
 
+  z_vals_pair = [[]];
+
   var data = [];
 
   timepoint_group = cond_group[cond_name.indexOf(pair_split)]
@@ -1192,6 +1201,8 @@ function pscaDraw() {
           } else {
             median_color = 'grey'
           }
+
+          //z_vals_pair[0].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]))
 
           var trace = {
             mode: 'lines+markers',
