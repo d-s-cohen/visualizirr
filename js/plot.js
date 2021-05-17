@@ -48,6 +48,8 @@ var primary_cond_heatmap = [];
 var secondary_cond_heatmap = [];
 
 var z_vals_pair=[[]];
+var xlab_pair=[];
+var timepoint_colorbar=[];
 
 var color_codes = [
   '#1f77b4',  // muted blue
@@ -62,6 +64,8 @@ var color_codes = [
   '#17becf'   // blue-teal
 ];
 var curr_color_codes = [];
+var curr_color_codes_paired = [];
+
 
 var color_codes_2nd = [
   "#8dd3c7",
@@ -76,7 +80,7 @@ var color_codes_2nd = [
   "#bc80bd"
 ];
 var curr_color_codes_2nd = [];
-
+var curr_color_codes_2nd_paired = [];
 
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
@@ -384,6 +388,7 @@ $.ajax({
                       $('#content_PSCA').removeAttr('style');
                       $('#content_psca_nav').removeAttr('style');
                       pscaDraw();
+                      draw_paired_heatmap();
                     }
                     scatterDraw();
                   });
@@ -1154,12 +1159,15 @@ function hideOrShow(a, b) {
 
 function pscaDraw() {
 
-  z_vals_pair = [[]];
-
   var data = [];
 
   timepoint_group = cond_group[cond_name.indexOf(pair_split)]
   pair_group = cond_group[cond_name.indexOf("VisGroup")]
+
+  z_vals_pair = Array.from(Array(func_name.length), () => Array.from(Array(timepoint_group.length-1), () => []))
+  xlab_pair=Array.from(Array(timepoint_group.length-1), () => []);
+  timepoint_colorbar=Array.from(Array(timepoint_group.length-1), () => []);
+
   if (curr_split_psca == "psca_allsamples") {
     split_group = [" "]
   } else {
@@ -1202,7 +1210,12 @@ function pscaDraw() {
             median_color = 'grey'
           }
 
-          //z_vals_pair[0].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]))
+          for (let p = 0; p < func_name.length; p++) {
+          z_vals_pair[p][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
+          }
+          xlab_pair[l].push(pair_group[k]+'_'+l+'/'+(l+1));
+          timepoint_colorbar[l].push(l);
+
 
           var trace = {
             mode: 'lines+markers',
@@ -1355,6 +1368,89 @@ function pscaDraw() {
   Plotly.newPlot("pscaDiv", data, layout, { modeBarButtonsToRemove: ['toImage'] });
 }
 
+
+function draw_paired_heatmap() {
+
+  curr_color_codes_paired = [];
+  tick_pos = [];
+  timepoint_paired_group = [];
+  for (let k = 0; k < timepoint_group.length-1; k++) {
+    timepoint_paired_group.push(timepoint_group[k]+'/'+timepoint_group[k+1])
+  }
+  // Define color codes based off of plotly.js defaults and group length
+  for (let k = 0; k < timepoint_paired_group.length; k++) {
+     curr_color_codes_paired.push([k/(timepoint_paired_group.length),color_codes[k % 10]]);
+     curr_color_codes_paired.push([(k+1)/(timepoint_paired_group.length),color_codes[(k) % 10]]);
+      // tick position
+     tick_pos.push((timepoint_paired_group.length-1)*(((k/(timepoint_paired_group.length))+((k+1)/(timepoint_paired_group.length)))/2))
+  }
+
+  // z_vals = Array.from(Array(func_name.length), () => []);
+  // z_vals_cond = []
+  // x_vals_name = []
+
+  // for (let k = 0; k < timepoint_paired_group.length; k++) {
+  //   // Populate trace data (Just primary condition data
+  //   for (let l = 0; l < func_name.length; l++) {
+  //     z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][timepoint_paired_group[k]][curr_chain][func_name[l]])
+  //     // Peform min-max normalization
+  //     if (k == timepoint_paired_group.length-1){
+  //       z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+  //     }
+  //   }
+  //   // populate condition and name arrays
+  //   z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][timepoint_paired_group[k]][curr_chain][curr_func].length).fill(k))
+  //   x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][timepoint_paired_group[k]][curr_chain])
+  // }
+  // clean colorbar text
+  timepoint_paired_group_mod = Array.from(Array(timepoint_paired_group.length), () => []);;
+  for(var i=0; i<timepoint_paired_group.length; ++i){
+    timepoint_paired_group_mod[i] = timepoint_paired_group[i].split(' ').join('<br>').split('/').join('/<br>');
+  }
+  
+// paired sample heatmap
+
+  Plotly.newPlot('heatmapPairedDiv', [{
+    // color coding
+    type: 'heatmap',
+    z: [timepoint_colorbar.flat(Infinity)],
+    y: [pair_split],
+    x: xlab_pair.flat(Infinity),
+    // "colorbar" legend
+    colorbar:{
+      autotick: false,
+      tickmode: 'array',
+      tickvals: [0].concat(tick_pos,[timepoint_paired_group.length-1]),
+      ticktext: [''].concat(timepoint_paired_group_mod,['']),
+      x: 1.25, y: .75, len: 0.5, thickness: 15,
+      title:{text:'Timepoint'}
+    },
+    colorscale: curr_color_codes_paired,
+    xaxis: 'x',
+    yaxis: 'y'
+  }, {
+    // main heatmap
+    type: 'heatmap',
+    z: z_vals_pair.map(function(e) { 
+      return e.flat(Infinity);
+    }),
+    x: xlab_pair.flat(Infinity),
+    y: func_name,
+    yaxis: 'y2',
+    xaxis: 'x2',
+    colorbar:{title: 'fc'},
+    zmin: -2, 
+    zmax: 2
+  }], {
+    // alignment of subplots
+    yaxis: {domain: [0.9, 1],automargin: true},
+    yaxis2: {domain: [0, 0.85],automargin: true},
+    xaxis: {visible: false},
+    xaxis2: {anchor:'y2',matches: 'x'}
+  })
+}
+
+
 // Paired sample cohort analysis data morph
 
 function dataMorphPSCA(chain, split, func) {
@@ -1380,6 +1476,7 @@ function dataMorphPSCA(chain, split, func) {
   }
 
   pscaDraw();
+  draw_paired_heatmap();
 
 }
 
