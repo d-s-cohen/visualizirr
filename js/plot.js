@@ -51,6 +51,8 @@ var z_vals_pair=[[]];
 var xlab_pair=[];
 var timepoint_colorbar=[];
 
+var paired_sample_split = false
+
 var color_codes = [
   '#1f77b4',  // muted blue
   '#ff7f0e',  // safety orange
@@ -1037,7 +1039,7 @@ function draw_heatmap() {
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'z-norm'}
+    colorbar:{title: 'z',thickness: 15}
   }], {
     // alignment of subplots
     yaxis: {domain: [0.9, 1],automargin: true},
@@ -1137,7 +1139,7 @@ function draw_heatmap_2nd() {
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'z-norm'}
+    colorbar:{title: 'z',thickness: 15}
   }], {
     yaxis: {domain: [0.95, 1],automargin: true},
     yaxis3: {domain: [0.9, .95],automargin: true},
@@ -1164,15 +1166,18 @@ function pscaDraw() {
   timepoint_group = cond_group[cond_name.indexOf(pair_split)]
   pair_group = cond_group[cond_name.indexOf("VisGroup")]
 
-  z_vals_pair = Array.from(Array(func_name.length), () => Array.from(Array(timepoint_group.length-1), () => []))
-  xlab_pair=Array.from(Array(timepoint_group.length-1), () => []);
-  timepoint_colorbar=Array.from(Array(timepoint_group.length-1), () => []);
-
   if (curr_split_psca == "psca_allsamples") {
     split_group = [" "]
+    paired_sample_split = false
   } else {
     split_group = cond_group[cond_name.indexOf(curr_split_psca)]
+    paired_sample_split = true
   }
+
+  z_vals_pair = Array.from(Array(func_name.length), () => Array.from(Array(timepoint_group.length-1), () => Array.from(Array(split_group.length), () => [])))
+  xlab_pair=Array.from(Array(timepoint_group.length-1), () => Array.from(Array(split_group.length), () => []));
+  timepoint_colorbar=Array.from(Array(split_group.length), () => Array.from(Array(timepoint_group.length-1), () => []));
+  split_colorbar=Array.from(Array(split_group.length), () => []);
 
   median_arrays = Array.from(Array((timepoint_group.length + 10) * (split_group.length + 1)), () => []);
   pval_paired_arrays = Array.from(Array((timepoint_group.length + 10) * (split_group.length + 1)), () => [[], []]);
@@ -1210,11 +1215,19 @@ function pscaDraw() {
             median_color = 'grey'
           }
 
+          for (let z = 0; z < split_group.length; z++) {
+
+            if (checker(ica_meta[curr_split_psca][split_group[z]], ica_meta['VisGroup'][pair_group[k]])) {
+
           for (let p = 0; p < func_name.length; p++) {
-          z_vals_pair[p][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
+          z_vals_pair[p][l][z].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
           }
-          xlab_pair[l].push(pair_group[k]+'_'+l+'/'+(l+1));
-          timepoint_colorbar[l].push(l);
+          xlab_pair[l][z].push(pair_group[k]+'_'+l+'/'+(l+1));
+          timepoint_colorbar[z][l].push(l);
+          split_colorbar[z].push(z);
+          break
+        }
+      }
 
 
           var trace = {
@@ -1385,32 +1398,52 @@ function draw_paired_heatmap() {
      tick_pos.push((timepoint_paired_group.length-1)*(((k/(timepoint_paired_group.length))+((k+1)/(timepoint_paired_group.length)))/2))
   }
 
-  // z_vals = Array.from(Array(func_name.length), () => []);
-  // z_vals_cond = []
-  // x_vals_name = []
+  if (paired_sample_split == true){
 
-  // for (let k = 0; k < timepoint_paired_group.length; k++) {
-  //   // Populate trace data (Just primary condition data
-  //   for (let l = 0; l < func_name.length; l++) {
-  //     z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][timepoint_paired_group[k]][curr_chain][func_name[l]])
-  //     // Peform min-max normalization
-  //     if (k == timepoint_paired_group.length-1){
-  //       z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
-  //     }
-  //   }
-  //   // populate condition and name arrays
-  //   z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][timepoint_paired_group[k]][curr_chain][curr_func].length).fill(k))
-  //   x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][timepoint_paired_group[k]][curr_chain])
-  // }
-  // clean colorbar text
-  timepoint_paired_group_mod = Array.from(Array(timepoint_paired_group.length), () => []);;
-  for(var i=0; i<timepoint_paired_group.length; ++i){
-    timepoint_paired_group_mod[i] = timepoint_paired_group[i].split(' ').join('<br>').split('/').join('/<br>');
+    curr_split_color = [];
+    tick_pos_split = [];
+
+    for (let k = 0; k < split_group.length; k++) {
+      curr_split_color.push([k/(split_group.length),color_codes_2nd[k % 10]]);
+      curr_split_color.push([(k+1)/(split_group.length),color_codes_2nd[(k) % 10]]);
+       // tick position
+       tick_pos_split.push((split_group.length-1)*(((k/(split_group.length))+((k+1)/(split_group.length)))/2)) 
+    }
+
+    curr_split_color_mod = Array.from(Array(split_group.length), () => []);;
+    for(var i=0; i<split_group.length; ++i){
+      curr_split_color_mod[i] = split_group[i].split(' ').join('<br>').split('/').join('/<br>');
+    }
+      
   }
   
 // paired sample heatmap
 
+if (paired_sample_split == true){
+
   Plotly.newPlot('heatmapPairedDiv', [{
+    
+    // color coding
+    type: 'heatmap',
+    z: [split_colorbar.flat(Infinity)],
+    y: [curr_split_psca],
+    x: xlab_pair.flat(Infinity),
+    // "colorbar" legend
+    colorbar:{
+      autotick: false,
+      tickmode: 'array',
+      tickvals: [0].concat(tick_pos_split,[split_group.length-1]),
+      ticktext: [''].concat(curr_split_color_mod,['']),
+      x: 1.25, y: .25, len: 0.5, thickness: 15,
+      title:{text:curr_split_psca.split(' ').join('<br>')}
+    },
+    colorscale: curr_split_color,
+    zmin: 0,
+    zmax: split_group.length-1,
+    xaxis: 'x',
+    yaxis: 'y'
+  },{
+    
     // color coding
     type: 'heatmap',
     z: [timepoint_colorbar.flat(Infinity)],
@@ -1421,13 +1454,13 @@ function draw_paired_heatmap() {
       autotick: false,
       tickmode: 'array',
       tickvals: [0].concat(tick_pos,[timepoint_paired_group.length-1]),
-      ticktext: [''].concat(timepoint_paired_group_mod,['']),
+      ticktext: [''].concat(timepoint_paired_group,['']),
       x: 1.25, y: .75, len: 0.5, thickness: 15,
       title:{text:'Timepoint'}
     },
     colorscale: curr_color_codes_paired,
-    xaxis: 'x',
-    yaxis: 'y'
+    xaxis: 'x3',
+    yaxis: 'y3'
   }, {
     // main heatmap
     type: 'heatmap',
@@ -1438,16 +1471,60 @@ function draw_paired_heatmap() {
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'fc'},
+    colorbar:{title: 'z',thickness: 15},
     zmin: -2, 
     zmax: 2
   }], {
     // alignment of subplots
-    yaxis: {domain: [0.9, 1],automargin: true},
+    yaxis: {domain: [0.95, 1],automargin: true},
+    yaxis3: {domain: [0.9, .95],automargin: true},
     yaxis2: {domain: [0, 0.85],automargin: true},
     xaxis: {visible: false},
+    xaxis3: {visible: false,matches: 'x'},
     xaxis2: {anchor:'y2',matches: 'x'}
   })
+  } else {
+    Plotly.newPlot('heatmapPairedDiv', [{
+      // color coding
+      type: 'heatmap',
+      z: [timepoint_colorbar.flat(Infinity)],
+      y: [pair_split],
+      x: xlab_pair.flat(Infinity),
+      // "colorbar" legend
+      colorbar:{
+        autotick: false,
+        tickmode: 'array',
+        tickvals: [0].concat(tick_pos,[timepoint_paired_group.length-1]),
+        ticktext: [''].concat(timepoint_paired_group,['']),
+        x: 1.25, y: .75, len: 0.5, thickness: 15,
+        title:{text:'Timepoint'}
+      },
+      colorscale: curr_color_codes_paired,
+      xaxis: 'x',
+      yaxis: 'y'
+    }, {
+      // main heatmap
+      type: 'heatmap',
+      z: z_vals_pair.map(function(e) { 
+        return e.flat(Infinity);
+      }),
+      x: xlab_pair.flat(Infinity),
+      y: func_name,
+      yaxis: 'y2',
+      xaxis: 'x2',
+      colorbar:{title: 'z',thickness: 15},
+      zmin: -2, 
+      zmax: 2
+    }], {
+      // alignment of subplots
+      yaxis: {domain: [0.9, 1],automargin: true},
+      yaxis2: {domain: [0, 0.85],automargin: true},
+      xaxis: {visible: false},
+      xaxis2: {anchor:'y2',matches: 'x'}
+    })
+
+  }
+
 }
 
 
