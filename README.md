@@ -1,4 +1,6 @@
-#### **V**isualiz**IRR** (**V**isualized **I**mmune **R**epertoire **R**eport)
+## **V**isualiz**IRR** (**V**isualized **I**mmune **R**epertoire **R**eport)
+
+### v0.2.0
 
 An in-browser immune repertoire report, incorporating popular web development libraries, including jQuery, Bootstrap, and plotly.js, in order to make immune repertoire analysis results simple to navigate and understand for the end user on their local machine or on a server.
 These reports are structured to dynamically display the results of whatever cohort you run TCR/BCR analysis on.

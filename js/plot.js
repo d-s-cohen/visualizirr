@@ -84,6 +84,16 @@ var color_codes_2nd = [
 var curr_color_codes_2nd = [];
 var curr_color_codes_2nd_paired = [];
 
+var cohort_name_intra = 'Intracohort Analysis'
+var cohort_name_pair = 'Paired Sample Cohort Analysis'
+var cohort_name_scatter = 'Intracohort Scatterplot'
+
+if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
+  cohort_name_intra = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+  cohort_name_pair = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+  cohort_name_scatter = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
+}
+
 $(document).ready(function () {
   pToggle = $("#p-switch").is(':checked');
 });
@@ -904,12 +914,8 @@ function draw_traces() {
     }
   }
   // Plot layout
-  var cohort_name = 'Intracohort Analysis'
-  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
-    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
-  }
   var layout = {
-    title: cohort_name,
+    title: cohort_name_intra,
     yaxis: {
       title: curr_chain + ' ' + curr_func,
       zeroline: false,
@@ -1041,6 +1047,7 @@ function draw_heatmap() {
     xaxis: 'x2',
     colorbar:{title: 'z',thickness: 15}
   }], {
+    title: cohort_name_intra,
     // alignment of subplots
     yaxis: {domain: [0.9, 1],automargin: true},
     yaxis2: {domain: [0, 0.85],automargin: true},
@@ -1141,6 +1148,7 @@ function draw_heatmap_2nd() {
     xaxis: 'x2',
     colorbar:{title: 'z',thickness: 15}
   }], {
+    title: cohort_name_intra,
     yaxis: {domain: [0.95, 1],automargin: true},
     yaxis3: {domain: [0.9, .95],automargin: true},
     yaxis2: {domain: [0, 0.85],automargin: true},
@@ -1174,8 +1182,8 @@ function pscaDraw() {
     paired_sample_split = true
   }
 
-  z_vals_pair = Array.from(Array(func_name.length), () => Array.from(Array(timepoint_group.length-1), () => Array.from(Array(split_group.length), () => [])))
-  xlab_pair=Array.from(Array(timepoint_group.length-1), () => Array.from(Array(split_group.length), () => []));
+  z_vals_pair = Array.from(Array(func_name.length), () => Array.from(Array(split_group.length), () => Array.from(Array(timepoint_group.length-1), () => [])))
+  xlab_pair=Array.from(Array(split_group.length), () => Array.from(Array(timepoint_group.length-1), () => []));
   timepoint_colorbar=Array.from(Array(split_group.length), () => Array.from(Array(timepoint_group.length-1), () => []));
   split_colorbar=Array.from(Array(split_group.length), () => []);
 
@@ -1220,9 +1228,9 @@ function pscaDraw() {
             if (checker(ica_meta[curr_split_psca][split_group[z]], ica_meta['VisGroup'][pair_group[k]])) {
 
           for (let p = 0; p < func_name.length; p++) {
-          z_vals_pair[p][l][z].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
+          z_vals_pair[p][z][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
           }
-          xlab_pair[l][z].push(pair_group[k]+'_'+l+'/'+(l+1));
+          xlab_pair[z][l].push(pair_group[k]+'_'+l+'/'+(l+1));
           timepoint_colorbar[z][l].push(l);
           split_colorbar[z].push(z);
           break
@@ -1242,13 +1250,12 @@ function pscaDraw() {
             visible: true,
             marker: {
               color: 'grey',
-              size: 7
+              size: 4
             },
             line: {
               color: median_color,
               width: 1
-            },
-            hoverinfo: 'none'
+            }
           };
 
           data.push(trace);
@@ -1353,14 +1360,9 @@ function pscaDraw() {
 
   x_lab = [].concat(... new Array(split_group.length).fill(timepoint_group))
 
-  var cohort_name = 'Paired Sample Cohort Analysis'
-  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
-    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
-  }
-
   // Plot layout
   var layout = {
-    title: cohort_name,
+    title: cohort_name_pair,
     font: { size: 14 },
     yaxis: {
       title: curr_chain_psca + ' ' + curr_func_psca,
@@ -1475,6 +1477,7 @@ if (paired_sample_split == true){
     zmin: -2, 
     zmax: 2
   }], {
+    title: cohort_name_pair,
     // alignment of subplots
     yaxis: {domain: [0.95, 1],automargin: true},
     yaxis3: {domain: [0.9, .95],automargin: true},
@@ -1516,6 +1519,7 @@ if (paired_sample_split == true){
       zmin: -2, 
       zmax: 2
     }], {
+      title: cohort_name_pair,
       // alignment of subplots
       yaxis: {domain: [0.9, 1],automargin: true},
       yaxis2: {domain: [0, 0.85],automargin: true},
@@ -1570,13 +1574,8 @@ function scatterDraw() {
 
   var data = [trace1];
 
-  var cohort_name = 'Cohort Scatterplot'
-  if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
-    cohort_name = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
-  }
-
   var layout = {
-    title: cohort_name,
+    title: cohort_name_scatter,
     font: { size: 14 },
     xaxis: {
       automargin: true,
