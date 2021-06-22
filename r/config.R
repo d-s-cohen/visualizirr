@@ -48,6 +48,7 @@ clonotypeMax = 8
 sample_level_run = TRUE
 cohort_level_run = TRUE
 intracohort_run = TRUE
+db_run = TRUE
 
 #####################
 # CUSTOM INPUT FORMAT

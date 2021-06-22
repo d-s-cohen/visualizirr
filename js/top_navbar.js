@@ -55,15 +55,23 @@ $(function () {
 				if (current_sample == "All") {
 					$("#cohort_analysis").attr("class", "nav-link nav-a");
 					$("#cohort_analysis_status").attr("class", "nav-item active");
+					$('#cohort_analysis_expanded_button').prop('disabled', false);
 				}
+				// db data availability
+				$.ajax({
+					url: path_val + "db_data.csv",
+					type: 'HEAD',
+					error: function () {
+						$('#cohort_analysis').show();
+					},
+					success: function () {
+						$('#cohort_analysis_expanded').show();
+					}
+				});
+				
 			});
 			// Current sample display on dropdown
-			if (current_sample == '') {
-				$('#chosen_sample').text('All');
-			}
-			else {
-				$('#chosen_sample').text(current_sample);
-			}
+			$('#chosen_sample').text(current_sample);
 			// Search dropdown samples
 			$(document).ready(function () {
 				$("#searchSamples").on("keyup", function () {

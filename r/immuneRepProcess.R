@@ -5,6 +5,7 @@ args = commandArgs(trailingOnly=TRUE)
 sample_level_run = TRUE
 cohort_level_run = TRUE
 intracohort_run = TRUE
+db_run = TRUE
 chains_search = c("TRB", "TRA", "TRG", "TRD", "IGH", "IGL", "IGK")
 input_prefix = ""
 input_suffix = ""
@@ -89,6 +90,15 @@ if (length(clonotypeAbundance)>0) {
 
 isotype_list <- c('IGHA1', 'IGHA2', 'IGHD', 'IGHE', 'IGHG1', 'IGHG2', 'IGHG3', 'IGHG4', 'IGHM')
 
+if (db_run == TRUE){
+  db_table <- read.csv("db_table.csv", stringsAsFactors=FALSE)
+  cancer_list <- read.csv("db_table_cancer_list.csv", sep="", stringsAsFactors=FALSE)[,1]
+
+  db_result <- data.frame(matrix(ncol = length(unique(db_table$species_pathology)), nrow = 0),stringsAsFactors = FALSE)
+  colnames(db_result) <- unique(db_table$species_pathology)
+  sample_list_db <- vector()
+}
+
 # File list
 
 input_dir = sub("/$","",input_dir)
@@ -109,7 +119,7 @@ files <- gsub(paste("(",input_prefix,"|",input_suffix,"$)",sep=""),"", files)
 
 dir.create(output_dir, showWarnings = FALSE)
 
-if (sample_level_run == TRUE || intracohort_run == TRUE) {
+if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
   
   if (sample_level_run == TRUE) {
     sample_list <- vector()
@@ -126,6 +136,12 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
     if (intracohort_run == TRUE) {
       if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating intracohort analysis table"))}
     }  
+    if ((sample_level_run == TRUE || intracohort_run == TRUE) && (db_run == TRUE)) {
+      if (match(current_sample,files) == 1) {print("&")}
+    }  
+    if (db_run == TRUE) {
+      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating DB analysis table"))}
+    }      
     
     print(paste(Sys.time(),"Sample",match(current_sample,files),"/",length(files),"-",current_sample))
     
@@ -867,13 +883,36 @@ if (sample_level_run == TRUE || intracohort_run == TRUE) {
                 }
               }
               
+            }
+          }
+            # annotation
+            if (current_chain == 'TRB' && db_run == TRUE){
+              #common <- inner_join(db_table[c('CDR3_AA','V_gene','J_gene')],chain_table_unprocessed[c('CDR3_AA','V_gene','J_gene')])
+              # v and j gene version
+              #common <- merge(db_table, chain_table_unprocessed[c('CDR3_AA','V_gene','J_gene','read_fragment_freq')], by=c('CDR3_AA','V_gene','J_gene')) 
+              # cdr3 AA only version
+              common <- merge(db_table, chain_table_unprocessed[c('CDR3_AA','read_fragment_freq')], by=c('CDR3_AA')) 
+              db_result[nrow(db_result)+1,] <- vector(mode="numeric",length=length(ncol(db_result)))
+              if (nrow(common)>0){
+                #antigen_table <- table(common$species_pathology)
+                weighted_table <- as.data.frame(count(x = common, species_pathology, wt = read_fragment_freq),stringsAsFactors = FALSE)
+                #db_result[nrow(db_result)+1,] <- vector(mode="character",length=length(ncol(db_result)))
+                for (i in c(1:ncol(db_result))){
+                  col_name <- colnames(db_result)[i]
+                  if (col_name %in% weighted_table$species_pathology){
+                    db_result[nrow(db_result),i] <- weighted_table[which(weighted_table$species_pathology == col_name),2]
+                  } else {
+                    db_result[nrow(db_result),i] <- 0
+                  }
+                }
               }
+              sample_list_db <- c(sample_list_db,current_sample)
+            }
           }
         }
       }
     }
   }
-}
 
 # Write intracohort_data.csv
 
@@ -887,6 +926,42 @@ if (intracohort_run == TRUE) {
     na = ""
   )
 }
+
+# Write db_data.csv
+  
+if (db_run == TRUE && nrow(db_result) > 0) {
+
+  db_result <- db_result[,names(sort(colSums(db_result), decreasing = TRUE))]
+  
+  noncancer_results <- db_result[ , !names(db_result) %in% cancer_list ]
+  
+  cancer_results <- db_result[,cancer_list]
+  
+  cancer_sum <- rowSums(db_result[,cancer_list])
+  
+  misc_sum <- rowSums(cbind
+                      (noncancer_results[c(9:ncol(noncancer_results))],
+                      cancer_results[c(4:ncol(cancer_results))]))
+  
+  db_result_cleaned <- cbind(noncancer_results[c(1:8)],cancer_results[c(1:3)],cancer_sum,misc_sum)
+  db_result_cleaned[] <- lapply(db_result_cleaned, formatC)
+  db_result_cleaned <- cbind(sample_list_db,'TRB',db_result_cleaned)
+  db_result_cleaned <- db_result_cleaned[, colSums(db_result_cleaned != 0) > 0]
+  
+  colnames(db_result_cleaned) <- gsub("\\.", "", colnames(db_result_cleaned))
+  
+  colnames(db_result_cleaned)[c(1,2)] <- c("sample","chain")
+  
+  write.table(
+    db_result_cleaned,
+    file = paste(output_dir,'/db_data.csv',sep=""),
+    quote = F,
+    sep = ",",
+    row.names = F,
+    na = ""
+  )
+}
+
 
 # Write sample_list.csv
 

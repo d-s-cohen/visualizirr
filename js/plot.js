@@ -88,6 +88,11 @@ var cohort_name_intra = 'Intracohort Analysis'
 var cohort_name_pair = 'Paired Sample Cohort Analysis'
 var cohort_name_scatter = 'Intracohort Scatterplot'
 
+var data_sheet = {};
+data_sheet[null] = 'intracohort_data.csv';
+data_sheet['db'] = 'db_data.csv';
+var data_sheet_url = data_sheet[new URL(location.href).searchParams.get('data')];
+
 if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
   cohort_name_intra = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
   cohort_name_pair = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
@@ -143,7 +148,7 @@ $.ajax({
   url: data_path + "meta.csv",
   type: 'HEAD',
   error: function () {
-    d3.text(data_path + "intracohort_data.csv").then(function (data) {
+    d3.text(data_path + data_sheet_url).then(function (data) {
 
       cond_name[0] = "no_cond_cond";
       cond_group[0] = [];
@@ -303,7 +308,7 @@ $.ajax({
         // On last meta table row...
         if (j == (meta_rows.length - 1)) {
 
-          d3.text(data_path + "intracohort_data.csv").then(function (data) {
+          d3.text(data_path + data_sheet_url).then(function (data) {
 
             var data_rows = d3.csvParseRows(data);
             func_name = data_rows[0].slice(2);
@@ -1345,7 +1350,7 @@ function pscaDraw() {
 
     pval_anno.push({
       showarrow: false,
-      text: split_group[k],
+      text: split_group[k].split(' ').join('<br>').split('/').join('/<br>'),
       x: (k * timepoint_group.length) + ((timepoint_group.length - 1) * .5),
       xref: 'x',
       y: 1.06,

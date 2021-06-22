@@ -30,8 +30,8 @@ plot_labels['csumBarplot'] = ['C Gene Usage', 'C Gene', 'Frequency'];
 plot_labels['vjStackBar'] = ['V-J Gene Usage', 'V Gene', 'Frequency', 'J Gene'];
 
 // Get current sample value from URL
-var current_sample = $(location).attr('search').split('=').pop();
-if (current_sample == "") {
+var current_sample = new URL(location.href).searchParams.get('sample');
+if (current_sample == null) {
 	current_sample = "All";
 }
 // Populate figures based off of sample ID
@@ -140,37 +140,35 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['index.html', '']) >= 
 // Populate information table from info.csv
 if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html']) >= 0) {
 	$(document).ready(function () {
-	var data_path = 'data/'
-	if (sessionStorage.getItem('path_val') != null) {
-		data_path = sessionStorage.getItem('path_val')
-	} else {
-		jQuery.get("cohort_list.csv", function (data) {
-			var path_val = data.split("\n")[0].split(",")[0]
-			path_val = path_val.replace(/\/?$/, '/');
-			sessionStorage.setItem('path_val', path_val);
-			data_path = sessionStorage.getItem('path_val');
-			location.reload();
-		}, dataType = 'text');
-	}
+		var data_path = 'data/'
+		if (sessionStorage.getItem('path_val') != null) {
+			data_path = sessionStorage.getItem('path_val')
+		} else {
+			jQuery.get("cohort_list.csv", function (data) {
+				var path_val = data.split("\n")[0].split(",")[0]
+				path_val = path_val.replace(/\/?$/, '/');
+				sessionStorage.setItem('path_val', path_val);
+				data_path = sessionStorage.getItem('path_val');
+				location.reload();
+			}, dataType = 'text');
+		}
 
-	// var i = setInterval(function () {
-	// 	if (sessionStorage.length) {
-	// 		clearInterval(i);
-			parseData(data_path + "intracohort_data.csv", jsonToTable);
-			$("#statsCSV").attr('href', data_path + "intracohort_data.csv");
-			$.ajax({
-				url: data_path + "meta.csv",
-				type:'HEAD',
-				success: function()
-				{
-					$('#cohortMetaTable').attr('style','');
-					parseData(data_path + "meta.csv", jsonToMetaTable);
-					$("#metaCSV").attr('href', data_path + "meta.csv");
-				}
-			});
-	// 	}
-	// }, 100);
-});
+		let data_sheet = {};
+		data_sheet[null] = 'intracohort_data.csv';
+		data_sheet['db'] = 'db_data.csv';
+		let data_sheet_url = data_sheet[new URL(location.href).searchParams.get('data')];
+		parseData(data_path + data_sheet_url, jsonToTable);
+		$("#statsCSV").attr('href', data_path + data_sheet_url);
+		$.ajax({
+			url: data_path + "meta.csv",
+			type: 'HEAD',
+			success: function () {
+				$('#cohortMetaTable').attr('style', '');
+				parseData(data_path + "meta.csv", jsonToMetaTable);
+				$("#metaCSV").attr('href', data_path + "meta.csv");
+			}
+		});
+	});
 }
 
 
