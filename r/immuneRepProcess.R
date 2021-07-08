@@ -69,12 +69,12 @@ suppressMessages(library(Biostrings))
 
 # Intracohort analysis functions setup
 
-intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy", "1/Entropy", "Normalized Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index",
+intracohortColNames = c("sample", "chain", "Raw Diversity", "Entropy", "1/Entropy", "Normalized Entropy", "Gini Coefficient","Gini-Simpson Index","Inverse Simpson Index","Chao1 Index", "CPK",
                         "Clonal Proportion (Top 10)", "Clonal Proportion (Top 100)", "Clonal Proportion (Top 1000)", "Cumulative Proportion Clonotypes (Top 10%)", "Cumulative Proportion Clonotypes (Top 50%)", "Clonality",
                         "Average CDR3 Length (Nt)", "Unique CDR3 Count (Nt)", "Unique CDR3 Count (AA)")
 
 if (input_format == "RHTCRSEQ" || cdr3nt_skip == TRUE) {
-  intracohortColNames = intracohortColNames[-18]
+  intracohortColNames = intracohortColNames[-19]
 }
 
 functionNum = length(intracohortColNames)
@@ -134,13 +134,13 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
       if (match(current_sample,files) == 1) {print("&")}
     }  
     if (intracohort_run == TRUE) {
-      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating intracohort analysis table"))}
+      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating diversity intracohort analysis table"))}
     }  
     if ((sample_level_run == TRUE || intracohort_run == TRUE) && (db_run == TRUE)) {
       if (match(current_sample,files) == 1) {print("&")}
     }  
     if (db_run == TRUE) {
-      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating DB analysis table"))}
+      if (match(current_sample,files) == 1) {print(paste(Sys.time(),"Generating DB intracohort analysis table"))}
     }      
     
     print(paste(Sys.time(),"Sample",match(current_sample,files),"/",length(files),"-",current_sample))
@@ -765,6 +765,13 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
                 chain_table_div <- IGKL_table
               }
               
+              chain_table_div <- dplyr::filter(chain_table_div, !grepl("\\_",CDR3_AA))
+              
+              intracohort_values[1, 1] <- current_sample
+              intracohort_values[1, 2] <- chain_iso
+              
+              if (nrow(chain_table_div) > 0){
+              
               if (input_format == "RHTCRSEQ" || cdr3nt_skip == TRUE){
                 chain_table_cdr3 <- chain_table_div[c("read_fragment_count", "CDR3_AA")]
                 names(chain_table_cdr3)[names(chain_table_cdr3) == 'CDR3_AA'] <- 'CDR3'
@@ -811,9 +818,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
                 }
               } 
               
-              intracohort_values[1, 1] <- current_sample
-              intracohort_values[1, 2] <- chain_iso
-              
               suppressMessages(intracohort_values[1, 3] <- round(repDiversity(chain_table_div, "div", process_col),4))
               if (nrow(chain_table_cdr3) != 1){
                 
@@ -826,34 +830,35 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
                 suppressMessages(intracohort_values[1, 8] <- round(repDiversity(chain_table_div, "gini.simp", process_col),4))
                 suppressMessages(intracohort_values[1, 9] <- round(repDiversity(chain_table_div, "inv.simp", process_col),4))
                 suppressMessages(intracohort_values[1, 10] <- round(repDiversity(chain_table_div, "chao1", process_col)[1],4))
+                intracohort_values[1, 11] <- round((length(unique(chain_table_div$CDR3.aa))/sum(chain_table_div$Clones))*1000,4)
               } 
               
               clonality_top <- repClonality(chain_table_div, "top")
-              suppressMessages(intracohort_values[1, 11] <- round(clonality_top[1],4))
-              suppressMessages(intracohort_values[1, 12] <- round(clonality_top[2],4))
-              suppressMessages(intracohort_values[1, 13] <- round(clonality_top[3],4))
-              suppressMessages(intracohort_values[1, 14] <- round(repClonality(chain_table_div, "clonal.prop",.perc=10)[1],4))
-              suppressMessages(intracohort_values[1, 15] <- round(repClonality(chain_table_div, "clonal.prop",.perc=50)[1],4))
+              suppressMessages(intracohort_values[1, 12] <- round(clonality_top[1],4))
+              suppressMessages(intracohort_values[1, 13] <- round(clonality_top[2],4))
+              suppressMessages(intracohort_values[1, 14] <- round(clonality_top[3],4))
+              suppressMessages(intracohort_values[1, 15] <- round(repClonality(chain_table_div, "clonal.prop",.perc=10)[1],4))
+              suppressMessages(intracohort_values[1, 16] <- round(repClonality(chain_table_div, "clonal.prop",.perc=50)[1],4))
               
               if (nrow(chain_table_cdr3) != 1){
-                suppressMessages(intracohort_values[1, 16] <- round(1-(entropy(ent_range)/log2(length(ent_range))),4))
+                suppressMessages(intracohort_values[1, 17] <- round(1-(entropy(ent_range)/log2(length(ent_range))),4))
               }
               
               if ((nrow(chain_table_cdr3) != 1) && (length(unique(chain_table_cdr3$CDR3)) != 1)){
-                intracohort_values[1, 17] <- round(cdr3_aggregate/total_count,4)
+                intracohort_values[1, 18] <- round(cdr3_aggregate/total_count,4)
               } else {
-                intracohort_values[1, 17] <- chain_table_cdr3[1, 2]
+                intracohort_values[1, 18] <- chain_table_cdr3[1, 2]
               }
               
               if (input_format == "RHTCRSEQ" || cdr3nt_skip == TRUE){
-                intracohort_values[1, 17] <- intracohort_values[1, 16]*3
+                intracohort_values[1, 18] <- intracohort_values[1, 19]*3
               }
               
               if (input_format == "RHTCRSEQ" || cdr3nt_skip == TRUE){
-                intracohort_values[1, 18] <- length(unique(chain_table_div$CDR3.aa))
-              } else {
-                intracohort_values[1, 18] <- length(unique(chain_table_div$CDR3.nt))
                 intracohort_values[1, 19] <- length(unique(chain_table_div$CDR3.aa))
+              } else {
+                intracohort_values[1, 19] <- length(unique(chain_table_div$CDR3.nt))
+                intracohort_values[1, 20] <- length(unique(chain_table_div$CDR3.aa))
               }
               
               if (length(clonotypeAbundance)>0){
@@ -866,6 +871,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
                   intracohort_values[1, functionNum+i] <- foundClonotype
                   #}
                 }
+              }
               }
               
               if (exists("intracohort_table")) {
@@ -934,8 +940,10 @@ if (db_run == TRUE && nrow(db_result) > 0) {
   db_result <- db_result[,names(sort(colSums(db_result), decreasing = TRUE))]
   
   noncancer_results <- db_result[ , !names(db_result) %in% cancer_list ]
+  noncancer_results <- noncancer_results[,names(sort(colSums(noncancer_results), decreasing = TRUE))]
   
   cancer_results <- db_result[,cancer_list]
+  cancer_results <- cancer_results[,names(sort(colSums(cancer_results), decreasing = TRUE))]
   
   cancer_sum <- rowSums(db_result[,cancer_list])
   
