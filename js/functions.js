@@ -33,6 +33,12 @@ function change_path_val(path_val){
 	sessionStorage.setItem('path_val', path_val);
 	location.reload(); 
 }
+// check if elemennt exists in array
+function checkAvailability(arr, val) {
+    return arr.some(function (arrVal) {
+        return val === arrVal;
+    });
+}
 //Load plotly figures
 function load_plotly_bar(data_path,this_id){
 
@@ -326,3 +332,105 @@ function jsonToMetaTable(data_json) {
 		}
 	}
 }
+
+
+function jsonToSampleSelectTable(data_json) {
+
+	var dset = data_json;	
+	var table_columns = [];
+	Object.keys(data_json[0]).forEach((key, i) => table_columns[i] = key);
+
+    var table = $('#filterTable');
+
+    //BUILD the table up
+    table.empty();
+    content = "<thead><tr><th></th>"
+    $.each(table_columns, function(i, col) { content += "<th>"+col+"</th>";});
+    content += "</tr></thead>"
+    $.each(dset, function(i, row) {
+        content += "<tr><td></td>"
+	//Add id
+        //content += "<td>"+row['sample']+"</td>";
+        for (v of Object.values(row)) {
+            content +="<td>"+v+"</td>";
+         }
+         content += "</tr>";
+    });
+    table.append(content);
+    //Figure out number of searchPanes columns to use
+    filter_num = $('#filterTable')[0].rows[0].cells.length-3
+    if (filter_num < 6){searchpanes_col = 'columns-'+String(filter_num)} else {searchpanes_col = 'columns-6'}
+
+    let tbl = table.DataTable({
+        initComplete: function() {
+            this.api().rows().select();
+            $("th.select-checkbox").addClass("selected");
+          },
+          language: {
+            select: {
+                rows: ""
+            }
+        },
+        dom: 'PSflBrtip',
+        searchPanes: {
+            dtOpts: {
+                select: {
+                    style: 'multi'
+                }
+            },
+            layout: searchpanes_col,
+            controls: false
+        },
+        columnDefs: [{
+            orderable: false,
+            className: 'select-checkbox',
+            targets: 0
+        }],
+        select: {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
+        order: [
+            //[1, 'asc'] //This breaks datatables
+        ],
+        buttons: [
+            {
+                text: 'Update Sample Selection',
+                action: function () {
+                    current_samples = tbl.rows({ search:'applied', selected: true }).data()
+                        .map(function (x) {
+                            return x[1];
+                        }).toArray();
+
+                        populate_page();
+
+                }
+            }
+        ]
+    });
+    tbl.on("click", "th.select-checkbox", function() {
+    if ($("th.select-checkbox").hasClass("selected")) {
+        tbl.rows().deselect();
+        $("th.select-checkbox").removeClass("selected");
+    } else {
+        tbl.rows({search:'applied'}).select();
+        $("th.select-checkbox").addClass("selected");
+    }
+}).on("select deselect", function() {
+    ("Some selection or deselection going on")
+    if (tbl.rows({
+            selected: true
+        }).count() !== tbl.rows().count()) {
+        $("th.select-checkbox").removeClass("selected");
+    } else {
+        $("th.select-checkbox").addClass("selected");
+    }
+});
+current_samples = tbl.rows({ search:'applied', selected: true }).data()
+.map(function (x) {
+	return x[1];
+}).toArray();
+
+populate_page();
+	
+	}

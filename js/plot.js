@@ -25,6 +25,8 @@ var pair_split = ""
 var timepoint_group = [];
 var pair_group = [];
 
+var timepoint_group_original = [];
+
 var curr_chain_psca = "";
 var curr_func_psca = "";
 var curr_split_psca = "psca_allsamples";
@@ -124,12 +126,40 @@ const median = arr => {
   return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
 };
 
-function normalize(min, max) {
-  var delta = max - min;
+// function normalize(min, max) {
+//   var delta = max - min;
+//   return function (val) {
+//       return (val - min) / delta;
+//   };
+// }
+
+const quantile = (arr, q) => {
+  const sorted = arr.sort((a, b) => a - b);
+  const pos = (sorted.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+  } else {
+      return sorted[base];
+  }
+};
+
+const q25 = arr => quantile(arr, .25);
+const q50 = arr => quantile(arr, .50);
+const q75 = arr => quantile(arr, .75);
+
+function normalize(med,iqr) {
   return function (val) {
-      return (val - min) / delta;
+    norm_val = ((val - med) / iqr)
+    if ((![NaN,-Infinity,Infinity].includes(norm_val))){
+      return ((val - med) / iqr);
+    } else {
+      return 0;
+    }
   };
 }
+
 
 var data_path = 'data/'
 if (sessionStorage.getItem('path_val') != null) {
@@ -144,6 +174,22 @@ if (sessionStorage.getItem('path_val') != null) {
   }, dataType = 'text');
 }
 
+var current_samples = [];
+// $.ajax({
+//   url: data_path + "meta.csv",
+//   type: 'HEAD',
+//   success: function () {
+//     d3.text(data_path + "meta.csv").then(function (data) {
+
+//       var meta_rows = d3.csvParseRows(data);
+//       for (let j = 1; j < meta_rows.length; j++) {
+//         current_samples.push(meta_rows[j][0]);
+//       }
+//     })
+//   }
+// });
+
+function populate_page() {
 $.ajax({
   url: data_path + "meta.csv",
   type: 'HEAD',
@@ -222,7 +268,6 @@ $.ajax({
               $("#x_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined," + n + ",undefined)'>" + func_name[n] + "</a>");
               $("#y_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
             }
-            $("#dropdownFondition").text(func_name[curr_func]);
             // Populate chain options in html
             var available_chains = Object.keys(in_chain).sort();
             for (let n = 0; n < available_chains.length; n++) {
@@ -236,6 +281,11 @@ $.ajax({
     })
   },
   success: function () {
+
+    ica_data = [];
+    ica_meta = [];
+    ica_meta_ordered = [];
+
     d3.text(data_path + "meta.csv").then(function (data) {
 
       var meta_rows = d3.csvParseRows(data);
@@ -269,6 +319,10 @@ $.ajax({
 
             if (j == (meta_header.length - 1)) {
               $(document).ready(function () {
+                $("#condition_selection").empty();
+                $("#condition2nd_selection").empty();
+                $("#split_selection_psca").empty();
+                $("#split_selection_psca").append("<a class='dropdown-item' onclick=dataMorphPSCA(undefined,'none',undefined)>No Split</a>");
                 for (let k = 0; k < cond_name.length; k++) {
                   if (cond_name[k] != 'VisGroup') {
                     // Populate condition options in html
@@ -298,11 +352,13 @@ $.ajax({
         for (let i = 0; i < meta_header.length; i++) {
           var grouping = meta_rows[j][i + 1];
           if (typeof grouping !== 'undefined' && grouping !== "NA" && grouping !== "-" && grouping !== "") {
-            if (meta_header[i].split("|").slice(1).length == 0) {
-              ica_meta[cond_name[i]][grouping].push(meta_rows[j][0]);
-            } else {
-              ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
-            }
+            if (checkAvailability(current_samples, meta_rows[j][0])) {
+              if (meta_header[i].split("|").slice(1).length == 0) {
+                ica_meta[cond_name[i]][grouping].push(meta_rows[j][0]);
+              } else {
+                ica_meta[cond_name[i]][cond_group[i][grouping]].push(meta_rows[j][0]);
+              }
+          }
           }
         }
         // On last meta table row...
@@ -315,6 +371,7 @@ $.ajax({
             all_data = [];
 
             for (let i = 1; i < data_rows.length; i++) {
+             if (checkAvailability(current_samples, data_rows[i][0])) {
               // Collect information on which chains are included for cond_group
               in_chain[data_rows[i][1]] = in_chain[data_rows[i][1]] || [];
               in_chain[data_rows[i][1]].push(data_rows[i][0]);
@@ -324,11 +381,13 @@ $.ajax({
                 all_data[data_rows[i][1]][func_name[m]] = all_data[data_rows[i][1]][func_name[m]] || [];
                 all_data[data_rows[i][1]][func_name[m]].push(data_rows[i][m + 2])
               }
+            }
 
 
               // Loop through available conditions
               for (let k = 0; k < cond_name.length; k++) {
                 // Loop through condition groups
+                if (checkAvailability(current_samples, data_rows[i][0])) {
                 for (let l = 0; l < cond_group[k].length; l++) {
                   // if sample is in condition group...
                   if (ica_meta[cond_name[k]][cond_group[k][l]].includes(data_rows[i][0])) {
@@ -369,24 +428,50 @@ $.ajax({
                     }
                   }
                 }
+              }
                 // On last data table row draw plot
                 if ((i == (data_rows.length - 1)) && k == (cond_name.length - 1)) {
 
-                  $(document).ready(function () {
-                    curr_func = func_name[0];
-                    curr_chain = Object.keys(in_chain)[0];
-                    if (cond_name[0] == 'VisGroup') {
-                      curr_cond = cond_name[1];
-                      curr_group = cond_group[1];
-                    } else {
-                      curr_cond = cond_name[0];
-                      curr_group = cond_group[0];
+                  for (let l = 0; l < cond_name.length; l++) {
+                    if (typeof ica_meta_ordered[cond_name[l]] != "undefined") {
+                      if (cond_name[l] == 'Timepoint') {timepoint_group_original = cond_group[l];}
+                      cond_group[l] = Object.keys(ica_meta_ordered[cond_name[l]]).sort(function(a, b){  
+                        return cond_group[l].indexOf(a) - cond_group[l].indexOf(b);
+                      }); 
                     }
-                    curr_func_psca = func_name[0];
-                    curr_chain_psca = Object.keys(in_chain)[0];
-                    curr_chain_scatter = Object.keys(in_chain)[0];
-                    curr_x_scatter = func_name[0];
-                    curr_y_scatter = func_name[0];
+                  }
+
+                  $(document).ready(function () {
+                    if (curr_func == "") {
+                      curr_func = func_name[0];
+                    }
+                    if (curr_chain == "") {
+                      curr_chain = Object.keys(in_chain)[0];
+                    }
+                    if (curr_cond == "") {
+                      if (cond_name[0] == 'VisGroup') {
+                        curr_cond = cond_name[1];
+                      } else {
+                        curr_cond = cond_name[0];
+                      }
+                    }       
+                    curr_group = cond_group[cond_name.indexOf(curr_cond)]
+
+                    if (curr_func_psca == "") {
+                      curr_func_psca = func_name[0];
+                    }
+                    if (curr_chain_psca == "") {
+                      curr_chain_psca = Object.keys(in_chain)[0];
+                    }
+                    if (curr_chain_scatter == "") {
+                      curr_chain_scatter = Object.keys(in_chain)[0];
+                    }
+                    if (curr_x_scatter == "") {
+                      curr_x_scatter = func_name[0];
+                    }
+                    if (curr_y_scatter == "") {
+                      curr_y_scatter = func_name[0];
+                    }
                     $("#dropdownChain").text(curr_chain);
                     $("#dropdownFunction").text(curr_func);
                     $("#dropdownCondition").text(curr_cond);
@@ -413,6 +498,13 @@ $.ajax({
               }
               if (i == (data_rows.length - 1)) {
                 $(document).ready(function () {
+                  $("#function_selection").empty();
+                  $("#function_selection_psca").empty();
+                  $("#x_selection_scatter").empty();
+                  $("#y_selection_scatter").empty();
+                  $("#chain_selection").empty();
+                  $("#chain_selection_psca").empty();
+                  $("#chain_selection_scatter").empty();
                   // Populate function options in html
                   for (let n = 0; n < func_name.length; n++) {
                     $("#function_selection").append("<a class='dropdown-item' onclick='dataMorph(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
@@ -420,7 +512,6 @@ $.ajax({
                     $("#x_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined," + n + ",undefined)'>" + func_name[n] + "</a>");
                     $("#y_selection_scatter").append("<a class='dropdown-item' onclick='dataMorphScatter(undefined,undefined," + n + ")'>" + func_name[n] + "</a>");
                   }
-                  $("#dropdownFondition").text(func_name[curr_func]);
                   // Populate chain options in html
                   var available_chains = Object.keys(in_chain).sort();
                   var reference_chain_array = ['IGH', 'IGHA1', 'IGHA2', 'IGHD', 'IGHE', 'IGHG1', 'IGHG2', 'IGHG3', 'IGHG4', 'IGHM', 'IGK+IGL', 'IGK', 'IGL', 'TRA', 'TRB', 'TRD', 'TRG'];
@@ -438,6 +529,7 @@ $.ajax({
                   }
                 });
               }
+
             }
           })
         }
@@ -446,6 +538,9 @@ $.ajax({
 
   }
 });
+}
+
+//populate_page();
 
 $(document).ready(function () {
   // URL location hash show/hide support
@@ -496,7 +591,12 @@ function dataMorph(cond, chain, func) {
   }
   // If secondary condition was already activated, rerun that function to account for change in primary condition
   if (activated_cond_2nd == true) {
-    condition_2nd();
+    if (curr_cond_2nd == ''){
+      cond_2nd_idx = undefined
+    } else {
+      cond_2nd_idx = cond_name.indexOf(curr_cond_2nd)
+    }
+    condition_2nd(cond_2nd_idx);
   } else {
 
     $("#pval_table_space").html("");
@@ -526,16 +626,16 @@ function dataMorph(cond, chain, func) {
     }
 
     //TABLE ROWS
-    for (i = 0; i < Object.keys(ica_data[curr_cond]).length; i++) {
+    for (i = 0; i < curr_group.length; i++) {
 
       var tr = document.createElement('TR');
       var td = document.createElement('TD');
       td.style.fontWeight = 'bold';
 
-      td.appendChild(document.createTextNode(Object.keys(ica_data[curr_cond])[i]));
+      td.appendChild(document.createTextNode(curr_group[i]));
       tr.appendChild(td)
 
-      for (j = 0; j < Object.keys(ica_data[curr_cond]).length; j++) {
+      for (j = 0; j < curr_group.length; j++) {
         var td = document.createElement('TD')
         if (curr_group[i] == curr_group[j]) {
           td.appendChild(document.createTextNode(""));
@@ -598,10 +698,12 @@ function condition_2nd(cond_2nd_idx) {
 
   // Loop through groups in current condition and push data for them
   for (let i = 0; i < curr_group.length; i++) {
-    curr_sample.push(ica_meta_ordered[curr_cond][curr_group[i]][curr_chain]);
-    curr_y.push([]);
-    condition_2nd_x.push([]);
-    //curr_sample_sub.push([]);
+    if (typeof ica_meta_ordered[curr_cond][curr_group[i]] !== 'undefined'){
+      curr_sample.push(ica_meta_ordered[curr_cond][curr_group[i]][curr_chain]);
+      curr_y.push([]);
+      condition_2nd_x.push([]);
+      //curr_sample_sub.push([]);
+    }
   }
 
   for (let i = 0; i < curr_sample.length; i++) {
@@ -609,9 +711,11 @@ function condition_2nd(cond_2nd_idx) {
       var sample = curr_sample[i][j];
       // Loop through secondary condition groups
       for (let k = 0; k < curr_group_2nd.length; k++) {
+        if (typeof ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]] !== 'undefined'){
         // If primary condition group includes sample...
         if (ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]][curr_chain].includes(sample)) {
           // Push corresponding x (secondary condition grouping) and y (primary condition value)
+         // if (typeof ica_data[curr_cond][curr_group[i]][curr_chain] !== 'undefined'){
           condition_2nd_x[i].push(k);
           curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
           // Prepare heatmap
@@ -626,6 +730,8 @@ function condition_2nd(cond_2nd_idx) {
           pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
           //}
         }
+       // }
+      }
       }
     }
   }
@@ -751,16 +857,16 @@ function condition_2nd(cond_2nd_idx) {
     }
 
     //TABLE ROWS
-    for (i = 0; i < Object.keys(ica_data[curr_cond]).length; i++) {
+    for (i = 0; i < curr_group.length; i++) {
 
       var tr = document.createElement('TR');
       var td = document.createElement('TD');
       td.style.fontWeight = 'bold';
 
-      td.appendChild(document.createTextNode(Object.keys(ica_data[curr_cond])[i]));
+      td.appendChild(document.createTextNode(curr_group[i]));
       tr.appendChild(td)
 
-      for (j = 0; j < Object.keys(ica_data[curr_cond]).length; j++) {
+      for (j = 0; j < curr_group.length; j++) {
         var td = document.createElement('TD')
         if (curr_group[i] == curr_group[j]) {
           td.appendChild(document.createTextNode(""));
@@ -992,6 +1098,7 @@ function draw_heatmap() {
 
   curr_color_codes = [];
   tick_pos = [];
+
   // Define color codes based off of plotly.js defaults and group length
   for (let k = 0; k < curr_group.length; k++) {
      curr_color_codes.push([k/(curr_group.length),color_codes[k % 10]]);
@@ -1007,15 +1114,25 @@ function draw_heatmap() {
   for (let k = 0; k < curr_group.length; k++) {
     // Populate trace data (Just primary condition data
     for (let l = 0; l < func_name.length; l++) {
-      z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
-      // Peform min-max normalization
+
+      if (window.ica_data[curr_cond][curr_group[k]][curr_chain]!==undefined){
+        z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
+      }
+      // Peform normalization
       if (k == curr_group.length-1){
-        z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+        zval_clone = [...z_vals[l]].map(parseFloat);
+        zval_med = q50(zval_clone)
+        zval_iqr = q75(zval_clone)-q25(zval_clone)
+        z_vals[l] = z_vals[l].map(normalize(zval_med,zval_iqr))
+        z_vals[l] = z_vals[l].map(value => isNaN(value) ? 0 : value);
+       // z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
       }
     }
     // populate condition and name arrays
-    z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
-    x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
+    if (window.ica_data[curr_cond][curr_group[k]][curr_chain]!==undefined){
+      z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
+      x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
+    }
   }
   // clean colorbar text
   curr_group_mod = Array.from(Array(curr_group.length), () => []);;
@@ -1050,7 +1167,9 @@ function draw_heatmap() {
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'z',thickness: 15}
+    colorbar:{thickness: 15},
+    zmin: -2,
+    zmax: 2
   }], {
     title: cohort_name_intra,
     // alignment of subplots
@@ -1065,6 +1184,7 @@ function draw_heatmap_2nd() {
 
   curr_color_codes = [];
   tick_pos = [];
+  
   // Define color codes based off of plotly.js defaults and group length
   for (let k = 0; k < curr_group.length; k++) {
     curr_color_codes.push([k/(curr_group.length),color_codes[k % 10]]);
@@ -1086,7 +1206,11 @@ function draw_heatmap_2nd() {
 // Populate trace data (secondary condition data)
   for (let l = 0; l < func_name.length; l++) {
     z_vals_2nd[l] = z_vals_2nd[l].flat(Infinity)
-    z_vals_2nd[l] = z_vals_2nd[l].map(normalize(Math.min(...z_vals_2nd[l]), Math.max(...z_vals_2nd[l])))
+    zval_clone = [...z_vals_2nd[l]].map(parseFloat);
+    zval_med = q50(zval_clone)
+    zval_iqr = q75(zval_clone)-q25(zval_clone)
+    z_vals_2nd[l] = z_vals_2nd[l].map(normalize(zval_med,zval_iqr))
+    //z_vals_2nd[l] = z_vals_2nd[l].map(normalize(Math.min(...z_vals_2nd[l]), Math.max(...z_vals_2nd[l])))
   }
   // flatten pre-populated condition and name nested arrays
   primary_cond_heatmap = primary_cond_heatmap.flat(Infinity)
@@ -1151,7 +1275,9 @@ function draw_heatmap_2nd() {
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'z',thickness: 15}
+    colorbar:{thickness: 15},
+    zmin: -2,
+    zmax: 2
   }], {
     title: cohort_name_intra,
     yaxis: {domain: [0.95, 1],automargin: true},
@@ -1201,6 +1327,9 @@ function pscaDraw() {
 
       for (let l = 0; l < (timepoint_group.length - 1); l++) {
 
+        tp_1 = timepoint_group_original.indexOf(timepoint_group[l])
+        tp_2 = timepoint_group_original.indexOf(timepoint_group[l+1])
+
         found_it = false
 
         for (let z = 0; z < split_group.length; z++) {
@@ -1216,13 +1345,13 @@ function pscaDraw() {
           break
         }
 
-        if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes(null) && !([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]]).includes("")) {
+        if (!([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2]]).includes(null) && !([ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2]]).includes("")) {
 
           var median_color = ''
 
-          if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) > Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+          if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1]) > Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2])) {
             median_color = 'royalblue'
-          } else if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]) < Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1])) {
+          } else if (Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1]) < Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2])) {
             median_color = 'crimson'
           } else {
             median_color = 'grey'
@@ -1232,15 +1361,15 @@ function pscaDraw() {
 
             if (checker(ica_meta[curr_split_psca][split_group[z]], ica_meta['VisGroup'][pair_group[k]])) {
 
-          for (let p = 0; p < func_name.length; p++) {
-          z_vals_pair[p][z][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][l + 1]))
+              for (let p = 0; p < func_name.length; p++) {
+                z_vals_pair[p][z][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_2]))
+              }
+              xlab_pair[z][l].push(pair_group[k] + '_' + l + '/' + (l + 1));
+              timepoint_colorbar[z][l].push(l);
+              split_colorbar[z].push(z);
+              break
+            }
           }
-          xlab_pair[z][l].push(pair_group[k]+'_'+l+'/'+(l+1));
-          timepoint_colorbar[z][l].push(l);
-          split_colorbar[z].push(z);
-          break
-        }
-      }
 
 
           var trace = {
@@ -1250,7 +1379,7 @@ function pscaDraw() {
               (subplot_num + l + k / 2000 - pair_group.length / 4000),
               ((subplot_num + l + 1) + k / 2000 - pair_group.length / 4000)
             ],
-            y: [ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]],
+            y: [ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2]],
             name: pair_group[k],
             visible: true,
             marker: {
@@ -1265,11 +1394,11 @@ function pscaDraw() {
 
           data.push(trace);
 
-          median_arrays[subplot_num + l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]);
-          median_arrays[subplot_num + l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]);
+          median_arrays[subplot_num + l][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1]);
+          median_arrays[subplot_num + l + 1][pair_group[k]] = Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2]);
 
-          pval_paired_arrays[subplot_num + l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l]));
-          pval_paired_arrays[subplot_num + l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][l + 1]));
+          pval_paired_arrays[subplot_num + l][0].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_1]));
+          pval_paired_arrays[subplot_num + l][1].push(Number(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][curr_func_psca][tp_2]));
 
         }
 
@@ -1478,7 +1607,7 @@ if (paired_sample_split == true){
     y: func_name,
     yaxis: 'y2',
     xaxis: 'x2',
-    colorbar:{title: 'z',thickness: 15},
+    colorbar:{thickness: 15},
     zmin: -2, 
     zmax: 2
   }], {
@@ -1520,7 +1649,7 @@ if (paired_sample_split == true){
       y: func_name,
       yaxis: 'y2',
       xaxis: 'x2',
-      colorbar:{title: 'z',thickness: 15},
+      colorbar:{thickness: 15},
       zmin: -2, 
       zmax: 2
     }], {

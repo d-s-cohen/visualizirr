@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="lib/css/bootstrap.min.css">
   <link rel="stylesheet" href="lib/css/bootstrap-table.min.css">
   <link rel="stylesheet" href="lib/css/tabulator.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/select.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="lib/css/searchPanes.dataTables.min.css">
   <script src="lib/js/popper.min.js"></script>
   <script src="lib/js/jquery-3.3.1.slim.min.js"></script>
   <script src="lib/js/bootstrap.min.js"></script>
@@ -19,8 +22,14 @@
   <script src="lib/js/wilcoxon_signed_rank_test.js"></script>
   <script src="lib/js/tabulator.min.js"></script>
   <script src="lib/js/papaparse.min.js"></script>
+  <script src="lib/js/jquery.dataTables.min.js"></script>
+  <script src="lib/js/dataTables.select.min.js"></script>
+  <script src="lib/js/dataTables.buttons.min.js"></script>
+  <script src="lib/js/buttons.html5.min.js"></script>
+  <script src="lib/js/dataTables.searchPanes.min.js"></script>
   <!-- CSS and JS specifically for HTML report -->
   <link rel="stylesheet" href="css/styling.css">
+  <link rel="stylesheet" href="css/sample_select.css">
   <script src="js/load_sections.js"></script>
   <script src="js/functions.js"></script>
   <script src="js/populate.js"></script>
@@ -86,6 +95,11 @@
               ***: p &#8804; .0005
             </a>
 
+            <a class="nav-link" id='sample-selection-button'>
+              <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#filterTableContainer" aria-expanded="false" aria-controls="filterTableContainer">
+                Show&nbsp;Sample&nbsp;Selection&nbsp;Table</button>
+            </a>
+
             </li>
             <div id="compressed-view-fix" style="height: 80px;">&nbsp;</div>
           </ul>
@@ -93,10 +107,19 @@
       </nav>
 
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4" style="margin-bottom: 6rem;margin-top: 1rem;">
-
+        
         <div
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Cohort Analysis</h1>
+        </div>
+
+        <div class="collapse" id="filterTableContainer">
+          <div class="card card-body">
+            <table id="filterTable" class="display" cellspacing="0" width="100%">
+              <thead>
+              </thead>
+            </table>
+          </div>
         </div>
 
         <div class="content_row dynamic" id="content_ICA">

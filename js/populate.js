@@ -166,6 +166,14 @@ if ($.inArray(window.location.pathname.split('/').pop(), ['cohort_analysis.html'
 				$('#cohortMetaTable').attr('style', '');
 				parseData(data_path + "meta.csv", jsonToMetaTable);
 				$("#metaCSV").attr('href', data_path + "meta.csv");
+
+				parseData(data_path + "meta.csv", jsonToSampleSelectTable);
+
+			},
+			error: function () {
+				populate_page();
+				$('#heatmapDiv').parent().hide();
+				$('#sample-selection-button').hide();
 			}
 		});
 	});

@@ -22,6 +22,7 @@ json_out = FALSE
 process_col = "aa"
 null_values = c('*','','.','unresolved')
 cdr3nt_skip = FALSE
+db_data_dir = ''
 
 # Command line arguments
 
@@ -91,8 +92,8 @@ if (length(clonotypeAbundance)>0) {
 isotype_list <- c('IGHA1', 'IGHA2', 'IGHD', 'IGHE', 'IGHG1', 'IGHG2', 'IGHG3', 'IGHG4', 'IGHM')
 
 if (db_run == TRUE){
-  db_table <- read.csv("db_table.csv", stringsAsFactors=FALSE)
-  cancer_list <- read.csv("db_table_cancer_list.csv", sep="", stringsAsFactors=FALSE)[,1]
+  db_table <- read.csv(paste(db_data_dir,"db_table.csv",sep=""), stringsAsFactors=FALSE)
+  cancer_list <- read.csv(paste(db_data_dir,"db_table_cancer_list.csv",sep=""), sep="", stringsAsFactors=FALSE)[,1]
 
   db_result <- data.frame(matrix(ncol = length(unique(db_table$species_pathology)), nrow = 0),stringsAsFactors = FALSE)
   colnames(db_result) <- unique(db_table$species_pathology)

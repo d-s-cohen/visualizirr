@@ -44,6 +44,10 @@ clonotypeMax = 8
 # Produce corresponding JSON files of report information for samples
 #json_out = FALSE
 
+# Directory containing db data (db_table.csv, db_table_cancer_list.csv)
+# End in /, Leave blank if files are in current directory
+# db_data_dir = ''
+
 # Components to run (DEFAULT: TRUE)
 sample_level_run = TRUE
 cohort_level_run = TRUE
