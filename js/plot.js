@@ -95,6 +95,11 @@ data_sheet[null] = 'intracohort_data.csv';
 data_sheet['db'] = 'db_data.csv';
 var data_sheet_url = data_sheet[new URL(location.href).searchParams.get('data')];
 
+var heat_vals = {};
+heat_vals[NaN] = 0;
+heat_vals[-Infinity] = -2;
+heat_vals[Infinity] = 2;
+
 if (sessionStorage.getItem('path_val') != "data/" && sessionStorage.getItem('path_val') != null) {
   cohort_name_intra = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
   cohort_name_pair = sessionStorage.getItem('path_val').split("/")[sessionStorage.getItem('path_val').split("/").length - 2];
@@ -116,8 +121,13 @@ function toExp(x) {
   return x;
 }
 
-function foldChange (x,y) {
-  return y/x-1;
+function log2fc (x,y) {
+  log2fc_val = Math.log2(y/x);
+  if ((![NaN,-Infinity,Infinity].includes(log2fc_val))){
+    return log2fc_val;
+  } else {
+    return heat_vals[log2fc_val];
+  }
 }
 
 const median = arr => {
@@ -125,13 +135,6 @@ const median = arr => {
     nums = [...arr].sort((a, b) => a - b);
   return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
 };
-
-// function normalize(min, max) {
-//   var delta = max - min;
-//   return function (val) {
-//       return (val - min) / delta;
-//   };
-// }
 
 const quantile = (arr, q) => {
   const sorted = arr.sort((a, b) => a - b);
@@ -153,9 +156,9 @@ function normalize(med,iqr) {
   return function (val) {
     norm_val = ((val - med) / iqr)
     if ((![NaN,-Infinity,Infinity].includes(norm_val))){
-      return ((val - med) / iqr);
+      return norm_val;
     } else {
-      return 0;
+      return heat_vals[norm_val];
     }
   };
 }
@@ -1362,7 +1365,7 @@ function pscaDraw() {
             if (checker(ica_meta[curr_split_psca][split_group[z]], ica_meta['VisGroup'][pair_group[k]])) {
 
               for (let p = 0; p < func_name.length; p++) {
-                z_vals_pair[p][z][l].push(foldChange(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_2]))
+                z_vals_pair[p][z][l].push(log2fc(ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_1], ica_data['VisGroup'][pair_group[k]][curr_chain_psca][func_name[p]][tp_2]))
               }
               xlab_pair[z][l].push(pair_group[k] + '_' + l + '/' + (l + 1));
               timepoint_colorbar[z][l].push(l);
@@ -1434,8 +1437,13 @@ function pscaDraw() {
       for (let m = 0; m < (pval_paired_arrays.length); m++) {
 
         if (pval_paired_arrays[m][0].length > 0) {
-
-          var p_val = wilcoxon(pval_paired_arrays[m][0].map(Number), pval_paired_arrays[m][1].map(Number), zero_method = 'wilcox', correction = true)['P'];
+          // check if all x-y values equal 0
+          all_0_check = pval_paired_arrays[m][0].map(Number).map(function(v,i) { return (v - pval_paired_arrays[m][1].map(Number)[i]); }); 
+          if (all_0_check.some(item => item !== 0)){
+            var p_val = wilcoxon(pval_paired_arrays[m][0].map(Number), pval_paired_arrays[m][1].map(Number), zero_method = 'wilcox', correction = true)['P'];
+          } else {
+            var p_val = 1;
+          }
           var p_label = 'n.s.';
 
           if (pToggle) {

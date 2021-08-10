@@ -1,6 +1,6 @@
 ## **V**isualiz**IRR** (**V**isualized **I**mmune **R**epertoire **R**eport)
 
-### v0.3.2
+### v0.4.0
 
 An in-browser immune repertoire report, incorporating popular web development libraries, including jQuery, Bootstrap, and plotly.js, in order to make immune repertoire analysis results simple to navigate and understand for the end user on their local machine or on a server.
 These reports are structured to dynamically display the results of whatever cohort you run TCR/BCR analysis on.
@@ -20,14 +20,14 @@ Support is included for TRUST4, MiXCR, VDJtools, Adaptive, and custom clonesets.
     * CDR3 Info
         * Amino acid length distribution
         * Nucleotide length distribution
-        * Top clonotypes
-    * User customized meta information 
+        * Top clonotypes 
 * Cohort Analysis
-    * Intracohort Analysis, Sample Cohort Analysis, Cohort Information Table, Cohort Scatterplot
-    * Raw Diversity, Entropy, 1/Entropy, Normalized Entropy, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, Clonal Proportion, Cumulative Proportion Clonotypes, Clonality, Average CDR3 Length (Nt), Unique CDR3 Count (Nt), Unique CDR3 Count (AA)
-    * Comparison between sub-cohort groups of these measures
+    * Intracohort Analysis, Paired Sample Cohort Analysis, Cohort Information Table, Cohort Scatterplot
+        * Raw Diversity, Entropy, 1/Entropy, Normalized Entropy, Gini Coefficient, Gini-Simpson Index, Inverse Simpson Index, Chao1 Index, CPK, Clonal Proportion, Cumulative Proportion Clonotypes, Clonality, Average CDR3 Length (Nt), Unique CDR3 Count (Nt), Unique CDR3 Count (AA)
+        * Annotation database overlap analysis
+    * Comparison between sub-cohort groups
 * Everything is split between different available chains 
-    * TRB, TRA, TRG, TRD, IGH, IGL, IGK
+    * TRB, TRA, TRG, TRD, IGH (+ Isotypes), IGL, IGK
 
 ---
 
@@ -119,6 +119,11 @@ cohort_list.csv template:
 path/to/cohort1,Cohort 1
 path/to/cohort2,Cohort 2
 ```
+
+---
+
+**db_table.csv** is a table containing TCR sequences associated with a target antigen or related to a specific pathology. They are sourced from VDJdb and McPAS-TCR which contains sequences curated from existing literature. 
+**db_table_cancer_list.csv** contains a list of cancer associated annotations.
 
 ---
 
