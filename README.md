@@ -173,6 +173,8 @@ SampleName2,IGK,32.707,3.3842,4.2796,0.2337,0.866,0.8199,5.5511,394.038,279
 Due to the nature of this format, you may append any column you like as an additional function for comparison in the analysis. 
 It will be processed the same as the others in the report.
 
+**db_data.csv** is formatted the same way as intracohort_data.csv and is integrated into the report, when available, alongside intracohort_data.csv. It contains sample repertoire CDR3 overlaps with db_table.csv, weighted by the frequency of the CDR3s in the repertoire of the samples. CDR3 overlaps are grouped into top cancer/non-cancer annotation categories, a cancer sum category, and a misc sum category.
+
 ---
 
 **sample_list.csv** needs to contain a newline seperated list of sample directory names.
