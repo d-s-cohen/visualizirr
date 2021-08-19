@@ -1,6 +1,6 @@
 ## **V**isualiz**IRR** (**V**isualized **I**mmune **R**epertoire **R**eport)
 
-### v0.4.0
+### v0.4.1
 
 An in-browser immune repertoire report, incorporating popular web development libraries, including jQuery, Bootstrap, and plotly.js, in order to make immune repertoire analysis results simple to navigate and understand for the end user on their local machine or on a server.
 These reports are structured to dynamically display the results of whatever cohort you run TCR/BCR analysis on.
@@ -28,6 +28,8 @@ Support is included for TRUST4, MiXCR, VDJtools, Adaptive, and custom clonesets.
     * Comparison between sub-cohort groups
 * Everything is split between different available chains 
     * TRB, TRA, TRG, TRD, IGH (+ Isotypes), IGL, IGK
+
+For more details on the contents of the generated report, check the **home&#46;md** file which is displayed on the report homepage and contains more in-depth information on different sections.
 
 ---
 
@@ -86,20 +88,38 @@ Support is included for TRUST4, MiXCR, Adaptive, and custom clonesets.
 
 ---
 
-**meta.csv** should be a csv with the first column including sample names and remaining columns for different conditions. 
-There are a few ways to enter your meta information, but in order to have ordered sample condition groups is to use a numeric range and denote 
+**meta.csv** should be a csv with the first column including sample names (named "sample") and remaining columns for different conditions. 
+Sample names must correspond to the names of the input repertoire files with prefix and/or suffix stripped according to the input_prefix and input_suffix values defined in config.R. 
+This can be further checked by comparing these to the sample names in the intracohort_data.csv file generated for the report.
+There are a few ways to enter your meta information, but in order to have ordered sample condition groups one can use a numeric range and denote 
 the categorical label of those groups in the header using '|' as the seperator (as demonstrated in condition 0 and 2). 
+In Condition 0, Group 0 = 0 and Group 1 = 1.
 You can also use the labels in the metasheet and not denote them in the header (as demonstrated in condition 1 and 3).
 Meta-data should be converted to categorical bins if it isn't categorical already.
-In order to set up paired samples analysis, a column must be named 'VisGroup' and contain patient ID. It coincides with the column 'Timepoint'. 
-Therefore, patient samples from different timepoints can be paired.
 
-meta.csv template:
+meta.csv template 1:
 ```
 sample,Condition 0|Group 0|Group 1,Condition 1,Condition 2|Group 0|Group 1|Group 2,Condition 3
 SampleName0,1,A,0,Aa
 SampleName1,0,A,2,Bb
 SampleName2,1,B,1,Cc
+```
+
+In order to set up paired samples analysis, a column must be named 'VisGroup' and contain patient ID. 
+It coincides with the column 'Timepoint'. 
+Therefore, patient samples from different timepoints can be paired.
+The VisGroup column contains patient IDs and the Timepoint column contains different timepoints. 
+These can be utilized together to conduct paired sample analysis. 
+Below we see two samples with the VisGroup value Patient1. 
+They have two different timepoints (0 and 1) and therefore will be paired accordingly.
+
+meta.csv template 2:
+```
+sample,Condition 0|Group 0|Group 1,Timepoint|Pre|Post,VisGroup
+SampleName0,0,0,Patient1
+SampleName1,0,1,Patient1
+SampleName2,1,0,Patient2
+SampleName3,1,1,Patient2
 ```
 
 ---

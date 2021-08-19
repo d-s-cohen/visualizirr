@@ -13,9 +13,10 @@ VisualizIRR collects immune repertoire data from immunotherapy cohorts of differ
 Cohort Selection is available on the home page. 
 From there, the user can use the top navigation bar to view segment usage and CDR3 distribution information on either the cohort level or the individual sample level, depending on what they select from the drop-down menu. 
 
-Cohort analysis is available in which users can compare the distributions of immune repertoire features of samples among differing groups within the cohort. 
+Cohort analysis is available in which users can compare the distributions of immune repertoire features of samples among differing groups and subgroups within the cohort. 
 This includes an intracohort anlaysis module which produces Wilcoxon rank-sum test p-values. An associated heatmap is available with all measures and utilizes IQR based normalization.
 This also includes a paired sample cohort analysis which produces Wilcoxon signed-rank test p-values. An associated heatmap is available with all measures and utilizes log2 fold change between timepoints.
+Heatmap samples are organized based on user-selected groupings and subgroupings. Samples are further sorted by the values of the metric selected.
 There is also a table of the values and a scatterplot for comparing different measures.
 Cohort statistics data and available meta-information are available on the cohort analysis page in tables and are downloadable.
 The cohort can be subsetted by the user based on metadata and/or individual sample seleciton.
@@ -75,9 +76,9 @@ The data for all figures is split into different available chains. All figures p
 * Unique CDR3 Count (Nt)
 * Unique CDR3 Count (AA)
 
-**Cohort Analysis - Database**
+**Cohort Analysis - Annotation**
 
-Database analysis utilizes TCR sequences associated with a target antigen or related to a specific pathology. 
+Annotation analysis utilizes TCR sequences associated with a target antigen or related to a specific pathology. 
 They are sourced from VDJdb and McPAS-TCR which contain sequences curated from existing literature. 
 Overlapping hits are weighted by the frequency of abundance of these CDR3s in the immune repertoire of the samples.
 Top antigen/pathology-specific overlaps are reported. 

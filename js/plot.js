@@ -710,31 +710,35 @@ function condition_2nd(cond_2nd_idx) {
   }
 
   for (let i = 0; i < curr_sample.length; i++) {
-    for (let j = 0; j < curr_sample[i].length; j++) {
-      var sample = curr_sample[i][j];
-      // Loop through secondary condition groups
-      for (let k = 0; k < curr_group_2nd.length; k++) {
-        if (typeof ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]] !== 'undefined'){
-        // If primary condition group includes sample...
-        if (ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]][curr_chain].includes(sample)) {
-          // Push corresponding x (secondary condition grouping) and y (primary condition value)
-         // if (typeof ica_data[curr_cond][curr_group[i]][curr_chain] !== 'undefined'){
-          condition_2nd_x[i].push(k);
-          curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
-          // Prepare heatmap
-          for (let l = 0; l < func_name.length; l++) {
-            z_vals_2nd[l][k][i].push(ica_data[curr_cond][curr_group[i]][curr_chain][func_name[l]][j]);
+    if (typeof curr_sample[i] !== 'undefined') {
+      for (let j = 0; j < curr_sample[i].length; j++) {
+        var sample = curr_sample[i][j];
+        // Loop through secondary condition groups
+        for (let k = 0; k < curr_group_2nd.length; k++) {
+          if (typeof ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]] !== 'undefined') {
+            if (typeof ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]][curr_chain] !== 'undefined') {
+              // If primary condition group includes sample...
+              if (ica_meta_ordered[curr_cond_2nd][curr_group_2nd[k]][curr_chain].includes(sample)) {
+                // Push corresponding x (secondary condition grouping) and y (primary condition value)
+                // if (typeof ica_data[curr_cond][curr_group[i]][curr_chain] !== 'undefined'){
+                condition_2nd_x[i].push(k);
+                curr_y[i].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
+                // Prepare heatmap
+                for (let l = 0; l < func_name.length; l++) {
+                  z_vals_2nd[l][k][i].push(ica_data[curr_cond][curr_group[i]][curr_chain][func_name[l]][j]);
+                }
+                primary_cond_heatmap[k][i].push(i);
+                curr_sample_sub[k][i].push(sample);
+                secondary_cond_heatmap[k].push(k);
+                //if (curr_group.length == 2) {
+                pval_arrays[i][k] = pval_arrays[i][k] || [];
+                pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
+                //}
+              }
+              // }
+            }
           }
-          primary_cond_heatmap[k][i].push(i);
-          curr_sample_sub[k][i].push(sample);
-          secondary_cond_heatmap[k].push(k);
-          //if (curr_group.length == 2) {
-          pval_arrays[i][k] = pval_arrays[i][k] || [];
-          pval_arrays[i][k].push(ica_data[curr_cond][curr_group[i]][curr_chain][curr_func][j]);
-          //}
         }
-       // }
-      }
       }
     }
   }
@@ -792,14 +796,16 @@ function condition_2nd(cond_2nd_idx) {
   k_count = 0;
   // Populate available traces
   for (let k = 0; k < condition_2nd_x.length; k++) {
-    //if (condition_2nd_x[k].length > 0) {
-    var update = {
-      x: [condition_2nd_x[k]],
-      y: [curr_y[k]]
+    if (condition_2nd_x[k].length > 0) {
+      //if (condition_2nd_x[k].length > 0) {
+      var update = {
+        x: [condition_2nd_x[k]],
+        y: [curr_y[k]]
+      }
+      Plotly.restyle('intracohortDiv', update, k_count);
+      k_count = k_count + 1;
+      //}
     }
-    Plotly.restyle('intracohortDiv', update, k_count);
-    k_count = k_count + 1;
-    //}
   }
   // Delete extra remaining traces
   for (let k = k_count; k < intracohortDiv.data.length; k++) {
@@ -1116,27 +1122,34 @@ function draw_heatmap() {
 
   for (let k = 0; k < curr_group.length; k++) {
     // Populate trace data (Just primary condition data
-    for (let l = 0; l < func_name.length; l++) {
 
-      if (window.ica_data[curr_cond][curr_group[k]][curr_chain]!==undefined){
-        z_vals[l] = [].concat(z_vals[l],ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]])
+    if (typeof ica_data[curr_cond][curr_group[k]][curr_chain] !== 'undefined') {
+
+      let indices = [...ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].keys()].sort((a, b) => ica_data[curr_cond][curr_group[k]][curr_chain][curr_func][b] - ica_data[curr_cond][curr_group[k]][curr_chain][curr_func][a]);
+
+      for (let l = 0; l < func_name.length; l++) {
+
+        if (window.ica_data[curr_cond][curr_group[k]][curr_chain] !== undefined) {
+
+          z_vals[l] = [].concat(z_vals[l], [ica_data[curr_cond][curr_group[k]][curr_chain][func_name[l]]].map(a => indices.map(i => a[i]))[0])
+        }
+        // Peform normalization
+        if (k == curr_group.length - 1) {
+          zval_clone = [...z_vals[l]].map(parseFloat);
+          zval_med = q50(zval_clone)
+          zval_iqr = q75(zval_clone) - q25(zval_clone)
+          z_vals[l] = z_vals[l].map(normalize(zval_med, zval_iqr))
+          z_vals[l] = z_vals[l].map(value => isNaN(value) ? 0 : value);
+          // z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+        }
       }
-      // Peform normalization
-      if (k == curr_group.length-1){
-        zval_clone = [...z_vals[l]].map(parseFloat);
-        zval_med = q50(zval_clone)
-        zval_iqr = q75(zval_clone)-q25(zval_clone)
-        z_vals[l] = z_vals[l].map(normalize(zval_med,zval_iqr))
-        z_vals[l] = z_vals[l].map(value => isNaN(value) ? 0 : value);
-       // z_vals[l] = z_vals[l].map(normalize(Math.min(...z_vals[l]), Math.max(...z_vals[l])))
+      // populate condition and name arrays
+      if (window.ica_data[curr_cond][curr_group[k]][curr_chain] !== undefined) {
+        z_vals_cond = [].concat(z_vals_cond, Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
+        x_vals_name = [].concat(x_vals_name, [ica_meta_ordered[curr_cond][curr_group[k]][curr_chain]].map(a => indices.map(i => a[i]))[0])
       }
     }
-    // populate condition and name arrays
-    if (window.ica_data[curr_cond][curr_group[k]][curr_chain]!==undefined){
-      z_vals_cond = [].concat(z_vals_cond,Array(ica_data[curr_cond][curr_group[k]][curr_chain][curr_func].length).fill(k))
-      x_vals_name = [].concat(x_vals_name,ica_meta_ordered[curr_cond][curr_group[k]][curr_chain])
-    }
-  }
+}
   // clean colorbar text
   curr_group_mod = Array.from(Array(curr_group.length), () => []);;
   for(var i=0; i<curr_group.length; ++i){
@@ -1205,6 +1218,21 @@ function draw_heatmap_2nd() {
     // tick position
    tick_pos_2nd.push((curr_group_2nd.length-1)*(((k/(curr_group_2nd.length))+((k+1)/(curr_group_2nd.length)))/2))
 }
+
+
+for (let i = 0; i < z_vals_2nd[func_name.indexOf(curr_func)].length; i++) {
+  for (let j = 0; j < z_vals_2nd[func_name.indexOf(curr_func)][i].length; j++) {
+    let indices = [...z_vals_2nd[func_name.indexOf(curr_func)][i][j].keys()].sort((a, b) => 
+    z_vals_2nd[func_name.indexOf(curr_func)][i][j][b] - 
+    z_vals_2nd[func_name.indexOf(curr_func)][i][j][a]);
+
+    for (let k = 0; k < func_name.length; k++) {
+      z_vals_2nd[k][i][j] = [z_vals_2nd[k][i][j]].map(a => indices.map(i => a[i]))[0];
+    }
+    curr_sample_sub[i][j] = [curr_sample_sub[i][j]].map(a => indices.map(i => a[i]))[0];
+  }
+}
+
 
 // Populate trace data (secondary condition data)
   for (let l = 0; l < func_name.length; l++) {
@@ -1560,6 +1588,21 @@ function draw_paired_heatmap() {
     }
       
   }
+
+  for (let i = 0; i < z_vals_pair[func_name.indexOf(curr_func_psca)].length; i++) {
+    for (let j = 0; j < z_vals_pair[func_name.indexOf(curr_func_psca)][i].length; j++) {
+      let indices = [...z_vals_pair[func_name.indexOf(curr_func_psca)][i][j].keys()].sort((a, b) => 
+      z_vals_pair[func_name.indexOf(curr_func_psca)][i][j][b] - 
+      z_vals_pair[func_name.indexOf(curr_func_psca)][i][j][a]);
+  
+      for (let k = 0; k < func_name.length; k++) {
+        z_vals_pair[k][i][j] = [z_vals_pair[k][i][j]].map(a => indices.map(i => a[i]))[0];
+      }
+      xlab_pair[i][j] = [xlab_pair[i][j]].map(a => indices.map(i => a[i]))[0];
+    }
+  }
+  
+
   
 // paired sample heatmap
 
