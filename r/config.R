@@ -49,9 +49,13 @@ clonotypeMax = 8
 # db_data_dir = ''
 
 # Components to run (DEFAULT: TRUE)
+# Sample level CDR3 distribution + gene usage plots
 sample_level_run = TRUE
+# Cohort level CDR3 distribution + gene usage plots
 cohort_level_run = TRUE
+# Cohort diversity analysis
 intracohort_run = TRUE
+# Cohort annotation database analysis
 db_run = TRUE
 
 #####################
