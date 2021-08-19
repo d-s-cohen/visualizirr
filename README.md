@@ -105,9 +105,7 @@ SampleName1,0,A,2,Bb
 SampleName2,1,B,1,Cc
 ```
 
-In order to set up paired samples analysis, a column must be named 'VisGroup' and contain patient ID. 
-It coincides with the column 'Timepoint'. 
-Therefore, patient samples from different timepoints can be paired.
+In order to set up paired sample analysis, a column must be named 'VisGroup' and another named 'Timepoint'.
 The VisGroup column contains patient IDs and the Timepoint column contains different timepoints. 
 These can be utilized together to conduct paired sample analysis. 
 Below we see two samples with the VisGroup value Patient1. 
