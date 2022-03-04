@@ -13,9 +13,17 @@ VisualizIRR collects immune repertoire data from immunotherapy cohorts of differ
 Cohort Selection is available on the home page. 
 From there, the user can use the top navigation bar to view segment usage and CDR3 distribution information on either the cohort level or the individual sample level, depending on what they select from the drop-down menu. 
 
+![Sample-level information](img/doc/sample-level.png "Sample-level information")
+
 Cohort analysis is available in which users can compare the distributions of immune repertoire features of samples among differing groups and subgroups within the cohort. 
 This includes an intracohort anlaysis module which produces Wilcoxon rank-sum test p-values. An associated heatmap is available with all measures and utilizes IQR based normalization.
+
+![Intracohort analysis](img/doc/intracohort.png "Intracohort analysis")
+
 This also includes a paired sample cohort analysis which produces Wilcoxon signed-rank test p-values. An associated heatmap is available with all measures and utilizes log2 fold change between timepoints.
+
+![Paired sample analysis](img/doc/paired.png "Paired sample analysis")
+
 Heatmap samples are organized based on user-selected groupings and subgroupings. Samples are further sorted by the values of the metric selected.
 There is also a table of the values and a scatterplot for comparing different measures.
 Cohort statistics data and available meta-information are available on the cohort analysis page in tables and are downloadable.
@@ -84,3 +92,7 @@ Overlapping hits are weighted by the frequency of abundance of these CDR3s in th
 Top antigen/pathology-specific overlaps are reported. 
 The cancer_sum overlap contains the sum of all cancer associated overlaps. 
 The misc_sum overlap contains the sum of all associated sequence overlaps which are not individually contained in the report.
+
+**Data Availability**
+
+immunoSEQ TCR-seq and BCR-seq data is available [here](https://clients.adaptivebiotech.com/immuneaccess).

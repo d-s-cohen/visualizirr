@@ -39,7 +39,13 @@
         <div class="sidebar-sticky sticky-top" style="padding-top: 1rem">
           <ul class="nav flex-column">
             <li class="nav-item" style='padding-top: 40px;'>
-              <a class="nav-link" href="#info" style="font-size: 1rem">Home</a>
+              <a class="nav-link" href="#cohort-select" style="font-size: 1rem">Cohort Selection</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#overview-figure" style="font-size: 1rem">VisualizIRR Overview Figure</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#documentation" style="font-size: 1rem">VisualizIRR Documentation</a>
             </li>
           </ul>
         </div>
@@ -50,8 +56,10 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
           <h1 class="h2">Home</h1>
         </div>
+        <div name='cohort-select' id='cohort-select'></div>
         <div class="content_row" id="cohort_table" style="display:none;">
           <h2 class="h3">Cohort Selection Table</h2>
+          <h6 class="current-cohort-indicator" style="font-weight: bold;"></h6>
           <table id="cohort-select-table" class="display"></table>
         </div>
         <div class="content_row static mb-3" id="cohort_select">
@@ -64,10 +72,11 @@
             </div>
           </div>
         </div>
-        <div id="overview-figure" style="display:none;">
+        <div name='overview-figure' id="overview-figure" style="display:none;">
+          <h2 class="h3">Overview Figure</h2>
           <img class="rounded mx-auto d-block" src="img/overview.png">
         </div>
-        <div class="content_row static" id="documentation">
+        <div name='documentation' class="content_row static" id="documentation">
           <h2 class="h3">Documentation</h2>
           <div id="markdown"></div>
         </div>
