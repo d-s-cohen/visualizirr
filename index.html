@@ -84,6 +84,18 @@
     </div>
   </div>
 
+  <script type="text/javascript">
+    $(window).on("load", function () {
+      if (location.hash == '#documentation') {
+        setTimeout(function () {
+          document.getElementById('documentation').scrollIntoView({
+            behavior: 'auto'
+          });
+        }, 250);
+      }
+    });
+  </script>
+
 </body>
 
 </html>
