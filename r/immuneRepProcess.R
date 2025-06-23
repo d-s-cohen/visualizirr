@@ -118,7 +118,7 @@ files <-
 
 files <- gsub(paste("(",input_prefix,"|",input_suffix,"$)",sep=""),"", files)
 
-dir.create(output_dir, showWarnings = FALSE)
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
   
@@ -147,7 +147,6 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
     print(paste(Sys.time(),"Sample",match(current_sample,files),"/",length(files),"-",current_sample))
     
     # TRUST4 file format
-    
     if (input_format == "TRUST4") {
       
       sample_table <-
@@ -198,6 +197,23 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
             "read_fragment_count",
             "CDR3_germline_similarity"
           )
+      } else if (ncol(sample_table) == 13) {
+        colnames(sample_table) <-
+          c(
+            "consensus_id",
+            "index_within_consensus",
+            "V_gene",
+            "D_gene",
+            "J_gene",
+            "C_gene",
+            "CDR1",
+            "CDR2",
+            "CDR3",
+            "CDR3_score",
+            "read_fragment_count",
+            "CDR3_germline_similarity",
+            "complete_vdj"
+          )
       }
       
       # remove partials
@@ -206,7 +222,7 @@ if (sample_level_run == TRUE || intracohort_run == TRUE || db_run == TRUE) {
       sample_table$CDR3_AA <- as.character(translate(DNAStringSet(sample_table$CDR3),if.fuzzy.codon="X"))
       
       sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), ",") , "[", 1)
-      
+
     }       
     
     # TRUST4_SIMPLE file format
@@ -956,7 +972,7 @@ if (db_run == TRUE && nrow(db_result) > 0) {
   db_result_cleaned[] <- lapply(db_result_cleaned, formatC)
   db_result_cleaned <- cbind(sample_list_db,'TRB',db_result_cleaned)
   db_result_cleaned <- db_result_cleaned[, colSums(db_result_cleaned != 0) > 0]
-  
+
   colnames(db_result_cleaned) <- gsub("\\.", "", colnames(db_result_cleaned))
   
   colnames(db_result_cleaned)[c(1,2)] <- c("sample","chain")
@@ -1048,6 +1064,23 @@ if (cohort_level_run == TRUE) {
           "CDR3_score",
           "read_fragment_count",
           "CDR3_germline_similarity"
+        )
+    } else if (ncol(sample_table) == 13) {
+      colnames(sample_table) <-
+        c(
+          "consensus_id",
+          "index_within_consensus",
+          "V_gene",
+          "D_gene",
+          "J_gene",
+          "C_gene",
+          "CDR1",
+          "CDR2",
+          "CDR3",
+          "CDR3_score",
+          "read_fragment_count",
+          "CDR3_germline_similarity",
+          "complete_vdj"
         )
     }
     
@@ -1295,8 +1328,9 @@ if (cohort_level_run == TRUE) {
       sample_table$C_gene <- sapply(strsplit(as.character(sample_table$C_gene), "[*]") , "[", 1)
     }
   }
-  
+
   sample_table <- sample_table[order(-sample_table$read_fragment_count),] 
+
   
   # Current chain
   
@@ -1563,6 +1597,9 @@ if (cohort_level_run == TRUE) {
 # Write cohort_list.csv
 
 if (!is.null(report_dir)) {
+  if (!dir.exists(report_dir)) {
+    dir.create(report_dir, recursive = TRUE, showWarnings = FALSE)
+  }
   
   if (file.exists(paste(report_dir,"/cohort_list.csv",sep=""))) {
     cohort_list <- read.table(paste(report_dir,"/cohort_list.csv",sep=""),stringsAsFactors=FALSE, header=FALSE,sep=",")
